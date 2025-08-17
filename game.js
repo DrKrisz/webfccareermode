@@ -231,13 +231,18 @@ function renderCalendar(){
     }
     item.innerHTML=`<div class="muted">${dateStr}</div><div class="dot"></div>${label}${extra||''}`;
 
-    if(entry&&entry.isMatch){
-      if(sameDay(entry.date, st.currentDate)){
-        item.style.cursor='pointer'; item.title=entry.played?'View match summary':'Play match';
-        item.onclick=()=> entry.played?viewMatchSummary(entry):openMatch(entry);
+    if(entry && entry.isMatch){
+    if(sameDay(entry.date, st.currentDate)){
+      item.style.cursor='pointer';
+      item.title = entry.played ? 'View match summary' : 'Play match';
+      item.onclick = ()=> entry.played ? viewMatchSummary(entry) : openMatch(entry);
+    }
+    // add this else-if:
+    else if(entry.played){
+      item.style.cursor='pointer';
+      item.title='View match summary';
+      item.onclick=()=> viewMatchSummary(entry);
       }
-      // If you want to allow past played summaries, uncomment below:
-      // else if(entry.played){ item.style.cursor='pointer'; item.title='View match summary'; item.onclick=()=>viewMatchSummary(entry); }
     }
     grid.append(item);
   }
@@ -462,7 +467,7 @@ function updateAutoBtn(){ const b=q('#btn-auto'); if(!b) return; b.textContent =
 function toggleAuto(){ Game.state.auto=!Game.state.auto; Game.save(); updateAutoBtn(); if(Game.state.auto) autoTick(); }
 function autoTick(){
   if(!Game.state.auto) return;
-  const entry=Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate));
+  const entry = Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate));
   if(entry && entry.isMatch && !entry.played){ // pause at matches
     setTimeout(()=>{ Game.state.auto=false; updateAutoBtn(); }, 1200);
     return;

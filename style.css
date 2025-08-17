@@ -78,6 +78,15 @@ body{
 .pills .pill{margin-right:6px}
 .hint{font-size:12px}
 
+.badge {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  background: #101821;
+}
+
+
 /* Panels */
 .left{display:grid;gap:16px}
 .kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center}
