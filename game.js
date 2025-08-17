@@ -1,4 +1,4 @@
-/* WebCareerGame • Pre‑Alpha v0.0.6
+/* WebCareerGame • Pre-Alpha v0.0.6
    External JS (state, sim, UI). Mobile + desktop safe.
    Keep gameplay deterministic enough for testing but fun.
 */
@@ -31,7 +31,17 @@ const Game = {
   },
   money(n){ try { return '£' + Math.round(n).toLocaleString('en-GB'); } catch { return '£' + Math.round(n); } },
   save(){ localStorage.setItem(LS_KEY, JSON.stringify(this.state)); },
-  load(){ const raw = localStorage.getItem(LS_KEY); if(!raw) return false; try{ this.state = JSON.parse(raw); return true; }catch{ return false; } },
+  load(){
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    try{
+      this.state = JSON.parse(raw);
+      migrateState(this.state);
+      return true;
+    }catch{
+      return false;
+    }
+  },
   reset(){ localStorage.removeItem(LS_KEY); location.reload(); },
   log(msg){ const stamp = new Date(this.state.currentDate || Date.now()).toDateString(); this.state.eventLog.push(`[${stamp}] ${msg}`); },
   newGame(setup){
@@ -45,8 +55,8 @@ const Game = {
       overall,
       club: 'Free Agent',
       league: '',
-      status: '—',
-      timeBand: '—',
+      status: '-',
+      timeBand: '-',
       salary: 0,
       salaryMultiplier: 1,
       passiveIncome: 0,
@@ -74,6 +84,26 @@ const Game = {
   }
 };
 
+// ensure missing fields exist for older saves
+function migrateState(st){
+  st.eventLog = st.eventLog || [];
+  st.playedMatchDates = st.playedMatchDates || [];
+  st.shopPurchases = st.shopPurchases || {};
+  st.auto = !!st.auto;
+  if(st.player){
+    st.player.salaryMultiplier = st.player.salaryMultiplier || 1;
+    st.player.passiveIncome = st.player.passiveIncome || 0;
+    st.player.houses = st.player.houses || 0;
+    st.player.status = st.player.status || '-';
+    st.player.timeBand = st.player.timeBand || '-';
+  }
+  if(typeof st.currentDate !== 'number'){
+    const firstSched = Array.isArray(st.schedule) && st.schedule.length ? st.schedule[0] : null;
+    if(firstSched && typeof firstSched.date === 'number') st.currentDate = firstSched.date;
+    else st.currentDate = Date.now();
+  }
+}
+
 // ===== Date / Schedule helpers =====
 function lastSaturdayOfAugust(year){ const d = new Date(year,7,31); while(d.getDay()!==6) d.setDate(d.getDate()-1); return d; }
 function randomWedToSatOfWeek(anchor){ // returns a date between Wed..Sat of the week of anchor
@@ -88,7 +118,7 @@ function weekAfter(d){ const n=new Date(d.getTime()); n.setDate(n.getDate()+7); 
 function buildSchedule(firstMatchDate, weeks, excludeClub){
   const opponents = makeOpponents().filter(t=>t!==excludeClub);
   const out = [];
-  // Season start marker (non-match) – 1 day before first kickoff OR same day? We keep marker the day before kickoff-ish.
+  // season start marker one day before first kickoff
   const seasonStart = new Date(firstMatchDate.getTime()); seasonStart.setDate(seasonStart.getDate()-1);
   out.push({date:seasonStart.getTime(), type:'seasonStart', isMatch:false, played:true});
   let last = new Date(firstMatchDate.getTime());
@@ -100,7 +130,7 @@ function buildSchedule(firstMatchDate, weeks, excludeClub){
     out.push({date:d.getTime(), opponent:opponents[i%opponents.length], isMatch:true, played:false, result:null, scoreline:null, type:'match', competition:'League'});
     current = weekAfter(current);
   }
-  // Season end marker two days after final match
+  // season end marker two days after final match
   const end=new Date(last.getTime()); end.setDate(end.getDate()+2);
   out.push({date:end.getTime(), type:'seasonEnd', isMatch:false, played:true});
   return out;
@@ -207,9 +237,9 @@ function renderAll(){
   q('#v-pos').textContent = st.player.pos;
   if(st.player.goldenClub){ q('#v-club').innerHTML = `<span class="gold">★ ${st.player.club}</span>`; }
   else { q('#v-club').textContent = st.player.club; }
-  q('#v-league').textContent = st.player.league || '—';
+  q('#v-league').textContent = st.player.league || '-';
   q('#v-status').textContent = st.player.status;
-  q('#v-years').textContent = st.player.yearsLeft ? `${st.player.yearsLeft} season${st.player.yearsLeft>1?'s':''}` : '—';
+  q('#v-years').textContent = st.player.yearsLeft ? `${st.player.yearsLeft} season${st.player.yearsLeft>1?'s':''}` : '-';
 
   q('#v-season').textContent = st.season;
   q('#v-week').textContent = `${Math.min(st.week,38)} / 38`;
@@ -436,7 +466,8 @@ function openShop(){
   const box=document.createElement('div'); box.className='glass';
   box.innerHTML='<div class="h">Club shop</div>';
   SHOP_ITEMS.forEach(item=>{
-    const count=st.shopPurchases[item.id]||0;
+    const purchases = st.shopPurchases || (st.shopPurchases = {});
+    const count=purchases[item.id]||0;
     const left=item.limit-count;
     const row=document.createElement('div'); row.className='row spread center-v';
     const disabled=left<=0;
@@ -450,13 +481,15 @@ function openShop(){
 
 function buyItem(item){
   const st=Game.state;
-  const count=st.shopPurchases[item.id]||0;
+  const purchases = st.shopPurchases || (st.shopPurchases = {});
+  const count=purchases[item.id]||0;
   if(count>=item.limit){ alert('Item limit reached.'); return; }
   if((st.player.balance||0)<item.cost){ alert('Not enough funds.'); return; }
   st.player.balance-=item.cost;
-  st.shopPurchases[item.id]=count+1;
+  purchases[item.id]=count+1;
   item.apply(st);
   Game.log(`Bought ${item.name} for ${Game.money(item.cost)}`);
+  showMessage(`Bought ${item.name}!`);
   Game.save(); renderAll(); openShop();
 }
 
@@ -582,10 +615,10 @@ function simulateMatch(entry){
   const oppGoals=oppBase;
   const result=teamGoals>oppGoals?'W': teamGoals<oppGoals?'L':'D';
   const scoreline=`${teamGoals}-${oppGoals}`;
-    entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
-    st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists;
-    st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists;
-    applyPostMatchGrowth(st, minutes, rating, goals, assists);
+  entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
+  st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists;
+  st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists;
+  applyPostMatchGrowth(st, minutes, rating, goals, assists);
   st.player.value=Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   payWeekly(st);
   st.week=Math.min(38, st.week+1);
@@ -645,7 +678,7 @@ function openSeasonEnd(){
   if(st.player.yearsLeft>0){
     st.player.yearsLeft -= 1;
     if(st.player.yearsLeft<=0){
-      st.player.yearsLeft=0; st.player.club='Free Agent'; st.player.league=''; st.player.status='—'; st.player.timeBand='—'; st.player.salary=0;
+      st.player.yearsLeft=0; st.player.club='Free Agent'; st.player.league=''; st.player.status='-'; st.player.timeBand='-'; st.player.salary=0;
       Game.log('Contract ended. You are a Free Agent.');
     }
   }
@@ -656,7 +689,7 @@ function openSeasonEnd(){
   const c=q('#match-content'); c.innerHTML='';
   const box=document.createElement('div'); box.className='glass';
   box.innerHTML = `<div class="h">Season ${st.season} summary</div>
-    <div>League position: ${pos}/20 ${won?' – <span class="badge">CHAMPIONS</span>':''}</div>
+    <div>League position: ${pos}/20 ${won?' - <span class="badge">CHAMPIONS</span>':''}</div>
     <div class="muted" style="margin-top:8px">Season: ${st.seasonMinutes} min, G ${st.seasonGoals}, A ${st.seasonAssists}</div>
     <div class="muted" style="margin-top:4px">Career: ${st.minutesPlayed} min, G ${st.goals}, A ${st.assists}</div>
     ${tableHtml}
