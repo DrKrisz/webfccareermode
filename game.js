@@ -190,6 +190,18 @@ function renderAll(){
   q('#v-value').textContent = fmtValue(st.player.value);
   q('#v-balance').textContent = Game.money(st.player.balance||0);
 
+  const landing = q('#landing');
+  const manager = q('#manager');
+  if (onLanding) {
+    landing.classList.remove('hidden');
+    manager.classList.add('hidden');
+    manager.style.display = '';
+  } else {
+    landing.classList.add('hidden');
+    manager.classList.remove('hidden');
+    manager.style.display = '';
+  }
+
   // This week panel
   const today = new Date(st.currentDate);
   const todayEntry = st.schedule.find(d=>sameDay(d.date, st.currentDate));
@@ -260,10 +272,10 @@ function renderCalendar(){
 function renderLiveLog(){ const el=q('#live-log'); if(!el) return; const st=Game.state; const last=st.eventLog.slice(-30); el.textContent=last.join('\n'); }
 
 function injectVersion(){
-  document.title = document.title.replace(/v[\d.]+/, APP_VERSION);
-  document.querySelectorAll('.app-version').forEach(el => {
-    el.textContent = APP_VERSION;
-  });
+  const before = document.title;
+  const next = before.replace(/v[\d.]+/, APP_VERSION);
+  document.title = (before === next) ? `${before} ${APP_VERSION}` : next;
+  document.querySelectorAll('.app-version').forEach(el => el.textContent = APP_VERSION);
 }
 
 // ===== Market UI =====
