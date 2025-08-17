@@ -210,6 +210,13 @@ function renderAll(){
     q('#week-summary').textContent = 'Training and recovery. Prepare for the next game.';
   }
 
+  const trainBtn=q('#btn-train');
+  if(trainBtn){
+    const hasMatch=todayEntry && todayEntry.isMatch;
+    const injured=st.player.status && st.player.status.toLowerCase().includes('injur');
+    trainBtn.disabled = hasMatch || injured;
+  }
+
   q('#date-label').textContent = today.toDateString();
   renderCalendar();
   renderLiveLog();
@@ -356,6 +363,32 @@ function openMatch(entry){
     setTimeout(()=>finishMatch(entry, 0, {clicks:0,success:false,score:0}), 500);
   }
   q('#match-modal').setAttribute('open','');
+}
+
+function openTraining(){
+  const st=Game.state;
+  const todayEntry = st.schedule.find(d=>sameDay(d.date, st.currentDate));
+  const injured = st.player.status && st.player.status.toLowerCase().includes('injur');
+  if(todayEntry && todayEntry.isMatch){ alert('Match scheduled today. Focus on the game.'); return; }
+  if(injured){ alert('You are injured and cannot train.'); return; }
+  const c=q('#training-content'); if(c) c.innerHTML='';
+  const box=document.createElement('div');
+  box.innerHTML='<div class="title">Training session</div>';
+  const mini=minigameView('Finish the drill to improve!', res=>finishTraining(res));
+  box.append(mini);
+  c.append(box);
+  q('#training-modal').setAttribute('open','');
+}
+
+function finishTraining(mini){
+  const st=Game.state;
+  const gain=+(mini.score*0.5).toFixed(2);
+  st.player.overall=Math.min(100, +(st.player.overall+gain).toFixed(2));
+  Game.log(`Training session: overall +${gain.toFixed(2)}`);
+  const notes=q('#notes'); if(notes) notes.textContent=`Trained today. Overall +${gain.toFixed(2)}.`;
+  Game.save();
+  renderAll();
+  setTimeout(()=>{ q('#training-modal').removeAttribute('open'); }, 600);
 }
 
 function minigameView(title, onDone){
@@ -522,6 +555,8 @@ function wireEvents(){
   click('#close-market', ()=>q('#market-modal').removeAttribute('open'));
   click('#btn-next', ()=>nextDay());
   click('#btn-auto', ()=>toggleAuto());
+  click('#btn-train', ()=>openTraining());
+  click('#close-training', ()=>q('#training-modal').removeAttribute('open'));
   click('#btn-save', ()=>{ Game.save(); alert('Saved'); });
   click('#btn-reset', ()=>{ if(confirm('Delete your local save and restart')) Game.reset(); });
   click('#btn-retire', ()=>retirePrompt());
