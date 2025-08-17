@@ -183,6 +183,12 @@ function q(sel){ return document.querySelector(sel); }
 function btn(label, onClick, cls='btn primary'){ const b=document.createElement('button'); b.className=cls; b.textContent=label; b.onclick=onClick; return b; }
 function fmtValue(v){ if(v>=1_000_000) return '£'+(v/1_000_000).toFixed(1)+'m'; if(v>=1_000) return '£'+Math.round(v/100)/10+'k'; return Game.money(v); }
 
+function showMessage(msg){
+  const modal=q('#message-modal');
+  const content=q('#message-content');
+  if(modal && content){ content.textContent=msg; modal.setAttribute('open',''); }
+}
+
 // ===== Rendering =====
 function renderAll(){
   const st = Game.state; const onLanding = !st.player;
@@ -552,10 +558,37 @@ function viewMatchSummary(entry){
 // ===== Season end summary & rollover =====
 function openSeasonEnd(){
   const st=Game.state;
-  // crude league position with bias: higher overall -> better finish
-  const bias = Math.max(0, 100 - st.player.overall);
-  const pos = Math.max(1, Math.min(20, Math.round(randNorm(10 + bias*0.05, 4))));
-  const won = pos===1;
+
+  // compute player's team stats from season
+  const stats={w:0,d:0,l:0,gf:0,ga:0};
+  st.schedule.filter(e=>e.isMatch).forEach(e=>{
+    if(e.played){
+      if(e.result==='W') stats.w++;
+      else if(e.result==='D') stats.d++;
+      else stats.l++;
+      if(e.scoreline){ const [gf,ga]=e.scoreline.split('-').map(Number); stats.gf+=gf; stats.ga+=ga; }
+    } else {
+      stats.l++; // unplayed matches count as losses
+    }
+  });
+  stats.pts=stats.w*3+stats.d;
+
+  const club=st.player.club;
+  const teams=makeOpponents().map(t=>({team:t}));
+  if(!teams.find(t=>t.team===club)){ teams.pop(); teams.push({team:club}); }
+  teams.forEach(t=>{
+    if(t.team===club){ Object.assign(t,stats); }
+    else {
+      const w=randInt(5,25); const d=randInt(0,38-w); const l=38-w-d;
+      const gf=w*randInt(1,3)+d*randInt(0,2)+randInt(0,10);
+      const ga=l*randInt(1,3)+d*randInt(0,2)+randInt(0,10);
+      const pts=w*3+d;
+      Object.assign(t,{w,d,l,gf,ga,pts});
+    }
+  });
+  teams.sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga));
+  const pos=teams.findIndex(t=>t.team===club)+1;
+  const won=pos===1;
   if(won){ st.player.goldenClub=true; Game.log('🏆 League won! Club marked gold.'); }
   else { st.player.goldenClub=false; }
 
@@ -568,12 +601,16 @@ function openSeasonEnd(){
     }
   }
 
+  const rows=teams.map((t,i)=>`<tr${t.team===club?' class="highlight"':''}><td>${i+1}</td><td>${t.team}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gf}</td><td>${t.ga}</td><td>${t.pts}</td></tr>`).join('');
+  const tableHtml=`<table class="league-table"><thead><tr><th>Pos</th><th>Team</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table>`;
+
   const c=q('#match-content'); c.innerHTML='';
   const box=document.createElement('div'); box.className='glass';
   box.innerHTML = `<div class="h">Season ${st.season} summary</div>
     <div>League position: ${pos}/20 ${won?' – <span class="badge">CHAMPIONS</span>':''}</div>
     <div class="muted" style="margin-top:8px">Season: ${st.seasonMinutes} min, G ${st.seasonGoals}, A ${st.seasonAssists}</div>
     <div class="muted" style="margin-top:4px">Career: ${st.minutesPlayed} min, G ${st.goals}, A ${st.assists}</div>
+    ${tableHtml}
     <div style="margin-top:10px"><button class="btn primary" id="btn-next-season">Start next season</button></div>`;
   c.append(box); q('#match-modal').setAttribute('open','');
 
@@ -588,7 +625,7 @@ function openSeasonEnd(){
     } else if(lastSeason.min<600){
       msg='Tough season. Salary stays the same.';
     }
-    alert(msg);
+    showMessage(msg);
     Game.log(`Manager: ${msg}`);
     st.season += 1; st.week = 1;
     st.player.age += 1;
@@ -666,6 +703,7 @@ function wireEvents(){
   click('#retire-confirm', ()=>{ q('#retire-modal').removeAttribute('open'); Game.reset(); });
   click('#btn-log', ()=>downloadLog());
   click('#close-match', ()=>q('#match-modal').removeAttribute('open'));
+  click('#close-message', ()=>q('#message-modal').removeAttribute('open'));
 }
 
 (function boot(){

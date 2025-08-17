@@ -1,4 +1,4 @@
-/* WebCareerGame • Pre-Alpha v0.0.4
+/* WebCareerGame • Pre-Alpha v0.0.5
    External stylesheet (dark, minimalist, iOS‑ish)
    Mobile-first, responsive up to desktop
 */
@@ -220,6 +220,15 @@ a{ color:var(--primary) }
 /* Utilities */
 .hidden{display:none}
 .gold{color:var(--warning);font-weight:800}
+
+/* League table */
+.league-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
+.league-table th,.league-table td{padding:4px 8px;text-align:center}
+.league-table thead{color:var(--text-dim)}
+.league-table tr:nth-child(even){background:var(--surface-2)}
+.league-table tr.highlight{background:rgba(78,156,255,.15)}
+.league-table td:first-child{text-align:right;width:32px}
+.league-table td:nth-child(2){text-align:left}
 
 /* Landing layout */
 .landing{display:grid;gap:16px}
