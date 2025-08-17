@@ -1,13 +1,13 @@
-/* WebCareerGame • Pre‑Alpha v0.0.4
+/* WebCareerGame • Pre‑Alpha v0.0.5
    External JS (state, sim, UI). Mobile + desktop safe.
    Keep gameplay deterministic enough for testing but fun.
 */
 
 // Version string injected into the UI and document title.
-const APP_VERSION = 'v0.0.4';
+const APP_VERSION = 'v0.0.5';
 
 // ===== Storage / Globals =====
-const LS_KEY = 'webcareergame.save.v004';
+const LS_KEY = 'webcareergame.save.v005';
 
 const Game = {
   state: {
@@ -20,6 +20,9 @@ const Game = {
     minutesPlayed: 0,
     goals: 0,
     assists: 0,
+    seasonMinutes: 0,
+    seasonGoals: 0,
+    seasonAssists: 0,
     lastOffers: [],
     playedMatchDates: [],
     eventLog: [],
@@ -53,6 +56,7 @@ const Game = {
     };
     this.state.season = 1; this.state.week = 1;
     this.state.minutesPlayed = 0; this.state.goals = 0; this.state.assists = 0;
+    this.state.seasonMinutes = 0; this.state.seasonGoals = 0; this.state.seasonAssists = 0;
     this.state.lastOffers = []; this.state.playedMatchDates = []; this.state.eventLog = [];
     this.state.auto = false;
     const year = new Date().getFullYear();
@@ -76,8 +80,8 @@ function randomWedToSatOfWeek(anchor){ // returns a date between Wed..Sat of the
 }
 function weekAfter(d){ const n=new Date(d.getTime()); n.setDate(n.getDate()+7); return n; }
 
-function buildSchedule(firstMatchDate, weeks){
-  const opponents = makeOpponents();
+function buildSchedule(firstMatchDate, weeks, excludeClub){
+  const opponents = makeOpponents().filter(t=>t!==excludeClub);
   const out = [];
   // Season start marker (non-match) – 1 day before first kickoff OR same day? We keep marker the day before kickoff-ish.
   const seasonStart = new Date(firstMatchDate.getTime()); seasonStart.setDate(seasonStart.getDate()-1);
@@ -88,13 +92,21 @@ function buildSchedule(firstMatchDate, weeks){
     const d = randomWedToSatOfWeek(current);
     if(d.getTime() <= last.getTime()) d.setDate(last.getDate()+2); // ensure increasing
     last = d;
-    out.push({date:d.getTime(), opponent:opponents[i%opponents.length], isMatch:true, played:false, result:null, scoreline:null, type:'match'});
+    out.push({date:d.getTime(), opponent:opponents[i%opponents.length], isMatch:true, played:false, result:null, scoreline:null, type:'match', competition:'League'});
     current = weekAfter(current);
   }
   // Season end marker two days after final match
   const end=new Date(last.getTime()); end.setDate(end.getDate()+2);
   out.push({date:end.getTime(), type:'seasonEnd', isMatch:false, played:true});
   return out;
+}
+
+function ensureNoSelfMatches(club){
+  if(!club) return;
+  const others = makeOpponents().filter(t=>t!==club);
+  Game.state.schedule.forEach(e=>{
+    if(e.isMatch && e.opponent===club){ e.opponent = pick(others); }
+  });
 }
 
 // ===== Data / RNG helpers =====
@@ -217,7 +229,7 @@ function renderAll(){
     if(cta) cta.append(btn('Open market', ()=>openMarket()));
   }
   else if(todayEntry && todayEntry.isMatch){
-    q('#week-summary').textContent = `Match day: ${st.player.club} vs ${todayEntry.opponent}`;
+    q('#week-summary').innerHTML = `Match day: ${st.player.club} vs ${todayEntry.opponent}<div class="muted" style="font-size:11px">${todayEntry.competition||'League'} game</div>`;
     if(!todayEntry.played && cta) cta.append(btn('Play match', ()=>openMatch(todayEntry)));
   }
   else if(todayEntry && todayEntry.type==='seasonEnd'){
@@ -262,7 +274,7 @@ function renderCalendar(){
     if(entry){
       if(entry.type==='seasonStart') label='<div style="font-size:11px">Season start</div>';
       else if(entry.type==='seasonEnd') label='<div style="font-size:11px">Season end</div>';
-      else if(entry.isMatch) label=`<div style="font-size:11px;">vs ${entry.opponent}</div>`;
+      else if(entry.isMatch) label=`<div style="font-size:11px;">vs ${entry.opponent}</div><div style="font-size:10px">${entry.competition||'League'} game</div>`;
     }
     item.innerHTML=`<div class="muted">${dateStr}</div><div class="dot"></div>${label}${extra||''}`;
 
@@ -286,7 +298,7 @@ function renderLiveLog(){
   const el=q('#live-log');
   if(!el) return;
   const st=Game.state;
-  const last=st.eventLog.slice(-30).reverse();
+  const last=st.eventLog.slice().reverse();
   el.textContent = last.join('\n');
   el.scrollTop = 0;
 }
@@ -346,6 +358,7 @@ function acceptOffer(i){
   st.player.club=o.club; st.player.league=o.league; st.player.status=o.status; st.player.timeBand=o.timeBand;
   st.player.salary=Math.round(o.salary); st.player.value=Math.round(o.value);
   st.player.yearsLeft=o.years; st.player.transferListed=false; st.lastOffers=[];
+  ensureNoSelfMatches(o.club);
   Game.log(`Signed for ${o.club}, ${o.years}y, ${o.status}, ${o.timeBand}, ${Game.money(o.salary)}/w`);
   Game.save(); renderAll(); q('#market-modal').removeAttribute('open');
 }
@@ -467,6 +480,7 @@ function finishMatch(entry, minutes, mini){
   // Commit outcome
   entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
   st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists;
+  st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists;
   applyPostMatchGrowth(st, minutes, rating, goals, assists);
   st.player.value = Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   if(st.player.salary>0) st.player.balance = Math.round((st.player.balance||0)+st.player.salary);
@@ -513,9 +527,10 @@ function simulateMatch(entry){
   const oppGoals=oppBase;
   const result=teamGoals>oppGoals?'W': teamGoals<oppGoals?'L':'D';
   const scoreline=`${teamGoals}-${oppGoals}`;
-  entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
-  st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists;
-  applyPostMatchGrowth(st, minutes, rating, goals, assists);
+    entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
+    st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists;
+    st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists;
+    applyPostMatchGrowth(st, minutes, rating, goals, assists);
   st.player.value=Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   if(st.player.salary>0) st.player.balance=Math.round((st.player.balance||0)+st.player.salary);
   st.week=Math.min(38, st.week+1);
@@ -557,17 +572,33 @@ function openSeasonEnd(){
   const box=document.createElement('div'); box.className='glass';
   box.innerHTML = `<div class="h">Season ${st.season} summary</div>
     <div>League position: ${pos}/20 ${won?' – <span class="badge">CHAMPIONS</span>':''}</div>
-    <div class="muted" style="margin-top:8px">Minutes ${st.minutesPlayed}, Goals ${st.goals}, Assists ${st.assists}, Overall ${st.player.overall}</div>
+    <div class="muted" style="margin-top:8px">Season: ${st.seasonMinutes} min, G ${st.seasonGoals}, A ${st.seasonAssists}</div>
+    <div class="muted" style="margin-top:4px">Career: ${st.minutesPlayed} min, G ${st.goals}, A ${st.assists}</div>
     <div style="margin-top:10px"><button class="btn primary" id="btn-next-season">Start next season</button></div>`;
   c.append(box); q('#match-modal').setAttribute('open','');
 
   q('#btn-next-season').onclick=()=>{
     q('#match-modal').removeAttribute('open');
+    const lastSeason = {min:st.seasonMinutes, goals:st.seasonGoals, assists:st.seasonAssists};
+    // manager feedback
+    let msg='Well kid decent season, please work more.';
+    if(lastSeason.goals>=10 || lastSeason.min>=1800){
+      msg='Great season! Your salary increased.';
+      st.player.salary=Math.round(st.player.salary*1.1);
+    } else if(lastSeason.min<600){
+      msg='Tough season. Salary stays the same.';
+    }
+    alert(msg);
+    Game.log(`Manager: ${msg}`);
     st.season += 1; st.week = 1;
+    st.player.age += 1;
     const baseYear = new Date(new Date(st.schedule[0].date).getFullYear()+1,7,31).getFullYear();
     const first = randomWedToSatOfWeek(lastSaturdayOfAugust(baseYear));
-    st.schedule = buildSchedule(first, 38);
+    st.schedule = buildSchedule(first, 38, st.player.club);
     st.currentDate = st.schedule[0].date; // on season start marker
+    st.seasonMinutes=0; st.seasonGoals=0; st.seasonAssists=0;
+    Game.log(`Season ${st.season} begins. Age ${st.player.age}. Contract ${st.player.yearsLeft} season${st.player.yearsLeft!==1?'s':''} left.`);
+    Game.state.auto=false; updateAutoBtn();
     Game.save(); renderAll();
   };
 }
@@ -578,17 +609,14 @@ function toggleAuto(){ Game.state.auto=!Game.state.auto; Game.save(); updateAuto
 function autoTick(){
   if(!Game.state.auto) return;
   const entry = Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate));
-  if(entry && entry.isMatch && !entry.played){ // pause at matches
-    setTimeout(()=>{ Game.state.auto=false; updateAutoBtn(); }, 1200);
-    return;
-  }
+  if(entry && entry.type==='seasonEnd'){ Game.state.auto=false; updateAutoBtn(); return; }
   setTimeout(()=>{ if(Game.state.auto){ nextDay(); } }, 800+Math.floor(Math.random()*600));
 }
 function nextDay(){
   const st=Game.state;
   const entry=st.schedule.find(d=>sameDay(d.date, st.currentDate));
   if(entry && entry.isMatch && !entry.played){ simulateMatch(entry); return; }
-  if(entry && entry.type==='seasonEnd'){ openSeasonEnd(); return; }
+  if(entry && entry.type==='seasonEnd'){ Game.state.auto=false; updateAutoBtn(); openSeasonEnd(); return; }
   st.currentDate+=24*3600*1000; Game.save(); renderAll(); autoTick();
 }
 
