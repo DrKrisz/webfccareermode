@@ -1,13 +1,13 @@
-/* WebCareerGame • Pre-Alpha v0.0.6
+/* WebCareerGame • Pre-Alpha v0.0.7
    External JS (state, sim, UI). Mobile + desktop safe.
    Keep gameplay deterministic enough for testing but fun.
 */
 
 // Version string injected into the UI and document title.
-const APP_VERSION = 'v0.0.6';
+const APP_VERSION = 'v0.0.7';
 
 // ===== Storage / Globals =====
-const LS_KEY = 'webcareergame.save.v006';
+const LS_KEY = 'webcareergame.save.v007';
 
 const Game = {
   state: {
@@ -310,8 +310,11 @@ function renderCalendar(){
     const entry=st.schedule.find(x=>sameDay(x.date, d.getTime()));
     const item=document.createElement('div');
     item.className='day'+(entry&&entry.isMatch?' match':'')+(sameDay(d.getTime(), st.currentDate)?' today':'')+(entry&&entry.played&&entry.isMatch?' played':'');
+    if(entry && entry.played && entry.result){
+      item.classList.add(entry.result==='W'?'win':entry.result==='L'?'loss':'draw');
+    }
     const dateStr=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
-    let extra=''; if(entry&&entry.result){ extra=`<div style="font-size:11px">${entry.result} ${entry.scoreline}</div>`; }
+    let extra=''; if(entry&&entry.result){ extra=`<div class="res">${entry.result} ${entry.scoreline}</div>`; }
     let label='';
     if(entry){
       if(entry.type==='seasonStart') label='<div style="font-size:11px">Season start</div>';
@@ -341,7 +344,18 @@ function renderLiveLog(){
   if(!el) return;
   const st=Game.state;
   const last=st.eventLog.slice().reverse();
-  el.textContent = last.join('\n');
+  el.innerHTML='';
+  last.forEach(line=>{
+    const div=document.createElement('div');
+    div.textContent=line;
+    const low=line.toLowerCase();
+    if(low.includes(': w ')) div.className='log-win';
+    else if(low.includes(': l ')) div.className='log-loss';
+    else if(low.includes(': d ')) div.className='log-draw';
+    else if(low.includes('payday')) div.className='log-payday';
+    else if(low.includes('signed for')) div.className='log-sign';
+    el.append(div);
+  });
   el.scrollTop = 0;
 }
 
@@ -454,24 +468,27 @@ function openMatch(entry){
 
 // ===== Shop =====
 const SHOP_ITEMS=[
-  {id:'trainer',name:'Personal Trainer',desc:'+1 overall',cost:500,limit:3,perSeason:true,apply:st=>{st.player.overall=Math.min(100,st.player.overall+1);}},
-  {id:'boots',name:'Shiny Boots',desc:'+£500 value',cost:250,limit:2,perSeason:true,apply:st=>{st.player.value+=500;}},
-  {id:'sponsor',name:'Sponsorship Deal',desc:'+10% salary this season',cost:2000,limit:1,perSeason:true,apply:st=>{st.player.salaryMultiplier=(st.player.salaryMultiplier||1)*1.1;}},
-  {id:'house',name:'Small House',desc:'+£100 weekly income (keeps)',cost:10000,limit:3,perSeason:false,apply:st=>{st.player.passiveIncome=(st.player.passiveIncome||0)+100; st.player.houses=(st.player.houses||0)+1;}}
+  {id:'trainer',name:'Personal Trainer',desc:'Gain +1 overall instantly',cost:500,limit:3,perSeason:true,apply:st=>{st.player.overall=Math.min(100,st.player.overall+1);}},
+  {id:'boots',name:'Shiny Boots',desc:'Boost market value by £500',cost:250,limit:2,perSeason:true,apply:st=>{st.player.value+=500;}},
+  {id:'sponsor',name:'Sponsorship Deal',desc:'Salary +10% for this season',cost:2000,limit:1,perSeason:true,apply:st=>{st.player.salaryMultiplier=(st.player.salaryMultiplier||1)*1.1;}},
+  {id:'house',name:'Small House',desc:'Earn £100 weekly income forever',cost:10000,limit:3,perSeason:false,apply:st=>{st.player.passiveIncome=(st.player.passiveIncome||0)+100; st.player.houses=(st.player.houses||0)+1;}},
+  {id:'gym',name:'Gym Membership',desc:'Improve overall by +2 this season',cost:1500,limit:1,perSeason:true,apply:st=>{st.player.overall=Math.min(100,st.player.overall+2);}},
+  {id:'car',name:'Sports Car',desc:'Raise value by £2000',cost:3000,limit:1,perSeason:true,apply:st=>{st.player.value+=2000;}}
 ];
 
 function openShop(){
   const st=Game.state;
   const c=q('#shop-content'); if(c) c.innerHTML='';
   const box=document.createElement('div'); box.className='glass';
+  box.style.display='grid'; box.style.gap='12px';
   box.innerHTML='<div class="h">Club shop</div>';
   SHOP_ITEMS.forEach(item=>{
     const purchases = st.shopPurchases || (st.shopPurchases = {});
     const count=purchases[item.id]||0;
     const left=item.limit-count;
-    const row=document.createElement('div'); row.className='row spread center-v';
+    const row=document.createElement('div'); row.className='shop-item';
     const disabled=left<=0;
-    row.innerHTML=`<div>${item.name}<div class="muted" style="font-size:12px">${item.desc}</div></div><button class="btn" data-id="${item.id}" ${disabled?'disabled':''}>Buy ${Game.money(item.cost)}${item.limit>1?` (${left} left)`:''}</button>`;
+    row.innerHTML=`<div><div>${item.name}</div><div class="muted desc">${item.desc}</div></div><button class="btn" data-id="${item.id}" ${disabled?'disabled':''}>Buy ${Game.money(item.cost)}${item.limit>1?` (${left} left)`:''}</button>`;
     row.querySelector('button').onclick=()=>buyItem(item);
     box.append(row);
   });
@@ -543,7 +560,10 @@ function placeBubble(el, field){ const w=field.clientWidth||300; const h=field.c
 
 function payWeekly(st){
   const gain=Math.round((st.player.salary||0)*(st.player.salaryMultiplier||1)+(st.player.passiveIncome||0));
-  if(gain>0) st.player.balance=Math.round((st.player.balance||0)+gain);
+  if(gain>0){
+    st.player.balance=Math.round((st.player.balance||0)+gain);
+    Game.log(`Payday: +${Game.money(gain)}`);
+  }
 }
 
 function finishMatch(entry, minutes, mini){
