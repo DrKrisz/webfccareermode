@@ -416,6 +416,37 @@ function openMatch(entry){
   q('#match-modal').setAttribute('open','');
 }
 
+// ===== Shop =====
+const SHOP_ITEMS=[
+  {id:'trainer',name:'Personal Trainer',desc:'+1 overall',cost:500,apply:st=>{st.player.overall=Math.min(100,st.player.overall+1);}},
+  {id:'boots',name:'Shiny Boots',desc:'+£500 value',cost:250,apply:st=>{st.player.value+=500;}}
+];
+
+function openShop(){
+  const st=Game.state;
+  const c=q('#shop-content'); if(c) c.innerHTML='';
+  const box=document.createElement('div'); box.className='glass';
+  box.innerHTML='<div class="h">Club shop</div>';
+  SHOP_ITEMS.forEach(item=>{
+    const row=document.createElement('div'); row.className='row spread center-v';
+    row.innerHTML=`<div>${item.name}<div class="muted" style="font-size:12px">${item.desc}</div></div><button class="btn" data-id="${item.id}">Buy ${Game.money(item.cost)}</button>`;
+    row.querySelector('button').onclick=()=>buyItem(item);
+    box.append(row);
+  });
+  c.append(box);
+  q('#shop-modal').setAttribute('open','');
+}
+
+function buyItem(item){
+  const st=Game.state;
+  if((st.player.balance||0)<item.cost){ alert('Not enough funds.'); return; }
+  st.player.balance-=item.cost;
+  item.apply(st);
+  Game.log(`Bought ${item.name} for ${Game.money(item.cost)}`);
+  showMessage(`Bought ${item.name}!`);
+  Game.save(); renderAll();
+}
+
 function openTraining(){
   const st=Game.state;
   const todayEntry = st.schedule.find(d=>sameDay(d.date, st.currentDate));
@@ -691,7 +722,9 @@ function wireEvents(){
   }
   const click = (id, fn)=>{ const el=q(id); if(el) el.onclick=fn; };
   click('#btn-market', ()=>openMarket());
+  click('#btn-shop', ()=>openShop());
   click('#close-market', ()=>q('#market-modal').removeAttribute('open'));
+  click('#close-shop', ()=>q('#shop-modal').removeAttribute('open'));
   click('#btn-next', ()=>nextDay());
   click('#btn-auto', ()=>toggleAuto());
   click('#btn-train', ()=>openTraining());
