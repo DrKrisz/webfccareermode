@@ -252,7 +252,7 @@ function renderLiveLog(){ const el=q('#live-log'); if(!el) return; const st=Game
 // ===== Market UI =====
 function openMarket(){
   const st=Game.state; const info=q('#market-info'); const list=q('#market-list'); const empty=q('#market-empty');
-  list.innerHTML=''; empty.classList.add('hide');
+  list.innerHTML=''; empty.classList.add('hidden');
   if(st.player.club!=='Free Agent'){
     info.textContent = st.player.transferListed? 'You are listed for transfer. Teams may approach soon.' : 'You are under contract. Request a transfer listing if you want to move.';
     const action = btn(st.player.transferListed?'Refresh offers':'Request transfer listing', ()=>{
@@ -288,7 +288,7 @@ function openMarket(){
       list.append(row);
     });
   } else if(st.player.club==='Free Agent'){
-    empty.classList.remove('hide');
+    empty.classList.remove('hidden');
   }
   q('#market-modal').setAttribute('open','');
 }
