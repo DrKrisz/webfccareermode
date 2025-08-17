@@ -524,6 +524,8 @@ function wireEvents(){
 
 (function boot(){
   wireEvents();
-  if(Game.load()){ renderAll(); }
-  else { renderAll(); }
+  if(!Game.load()){
+    console.warn('Failed to load save state; starting fresh');
+  }
+  renderAll();
 })();
