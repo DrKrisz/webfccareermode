@@ -195,14 +195,14 @@ a{ color:var(--primary) }
 
 .week-panel{display:grid;gap:12px}
 .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-.day{padding:10px;text-align:center;border-radius:10px;border:1px solid var(--border);background:#0f1720;font-size:12px;min-height:68px;display:grid;align-content:start;gap:6px}
+.day{padding:10px;text-align:center;border-radius:10px;border:1px solid var(--border);background:#0f1720;font-size:12px;height:100px;display:grid;align-content:start;gap:6px;overflow:hidden}
 .day .dot{width:8px;height:8px;border-radius:999px;margin:0 auto;background:var(--text-dim)}
 .day.match .dot{background:var(--primary);box-shadow:0 0 16px rgba(78,156,255,.8)}
 .day.today{outline:2px solid var(--accent)}
 .day.played{background:linear-gradient(180deg,#111a25,#0f1720)}
 
 /* Live log */
-.live-log{max-height:180px;overflow:auto;white-space:pre-line}
+.live-log{height:180px;overflow-y:auto;white-space:pre-line}
 
 /* Modal */
 .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:16px}

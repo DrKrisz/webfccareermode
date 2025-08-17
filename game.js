@@ -269,7 +269,14 @@ function renderCalendar(){
   }
 }
 
-function renderLiveLog(){ const el=q('#live-log'); if(!el) return; const st=Game.state; const last=st.eventLog.slice(-30); el.textContent=last.join('\n'); }
+function renderLiveLog(){
+  const el=q('#live-log');
+  if(!el) return;
+  const st=Game.state;
+  const last=st.eventLog.slice(-30).reverse();
+  el.textContent = last.join('\n');
+  el.scrollTop = 0;
+}
 
 function injectVersion(){
   const before = document.title;
