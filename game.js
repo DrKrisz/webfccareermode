@@ -232,16 +232,15 @@ function renderCalendar(){
     item.innerHTML=`<div class="muted">${dateStr}</div><div class="dot"></div>${label}${extra||''}`;
 
     if(entry && entry.isMatch){
-    if(sameDay(entry.date, st.currentDate)){
-      item.style.cursor='pointer';
-      item.title = entry.played ? 'View match summary' : 'Play match';
-      item.onclick = ()=> entry.played ? viewMatchSummary(entry) : openMatch(entry);
-    }
-    // add this else-if:
-    else if(entry.played){
-      item.style.cursor='pointer';
-      item.title='View match summary';
-      item.onclick=()=> viewMatchSummary(entry);
+      if(sameDay(entry.date, st.currentDate)){
+        item.style.cursor='pointer';
+        item.title = entry.played ? 'View match summary' : 'Play match';
+        item.onclick = ()=> entry.played ? viewMatchSummary(entry) : openMatch(entry);
+      }
+      else if(entry.played){
+        item.style.cursor='pointer';
+        item.title='View match summary';
+        item.onclick=()=> viewMatchSummary(entry);
       }
     }
     grid.append(item);
