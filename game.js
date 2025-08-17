@@ -80,13 +80,13 @@ function buildSchedule(firstMatchDate, weeks){
   const seasonStart = new Date(firstMatchDate.getTime()); seasonStart.setDate(seasonStart.getDate()-1);
   out.push({date:seasonStart.getTime(), type:'seasonStart', isMatch:false, played:true});
   let last = new Date(firstMatchDate.getTime());
+  let current = firstMatchDate;
   for(let i=0;i<weeks;i++){
-    const weekAnchor = i===0 ? firstMatchDate : weekAfter(firstMatchDate);
-    firstMatchDate = weekAfter(firstMatchDate);
-    const d = randomWedToSatOfWeek(weekAnchor);
+    const d = randomWedToSatOfWeek(current);
     if(d.getTime() <= last.getTime()) d.setDate(last.getDate()+2); // ensure increasing
     last = d;
     out.push({date:d.getTime(), opponent:opponents[i%opponents.length], isMatch:true, played:false, result:null, scoreline:null, type:'match'});
+    current = weekAfter(current);
   }
   // Season end marker two days after final match
   const end=new Date(last.getTime()); end.setDate(end.getDate()+2);
