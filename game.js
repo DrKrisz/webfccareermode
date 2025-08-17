@@ -1,13 +1,13 @@
-/* WebCareerGame • Pre‑Alpha v0.0.3
+/* WebCareerGame • Pre‑Alpha v0.0.4
    External JS (state, sim, UI). Mobile + desktop safe.
    Keep gameplay deterministic enough for testing but fun.
 */
 
 // Version string injected into the UI and document title.
-const APP_VERSION = 'v0.0.3';
+const APP_VERSION = 'v0.0.4';
 
 // ===== Storage / Globals =====
-const LS_KEY = 'webcareergame.save.v003';
+const LS_KEY = 'webcareergame.save.v004';
 
 const Game = {
   state: {
@@ -99,7 +99,13 @@ function buildSchedule(firstMatchDate, weeks){
 
 // ===== Data / RNG helpers =====
 function makeOpponents(){
-  return ['North London FC','Rivergate City','Bluecastle United','Mersey Rovers','Seaside Albion','Manchester Borough','Kingsport Athletic','Greenwich Park','Steelbridge FC','South Coast Town','Highbury Hill','Birmingham Tower','Yorkshire Vale','Bristol Dockers','Leeds Cross','Wolves Heath','Everfield City','Newcastle Quay','Brighton Shore'];
+  // 20 Premier League teams (2023/24 season)
+  return [
+    'Arsenal','Aston Villa','Bournemouth','Brentford','Brighton & Hove Albion',
+    'Burnley','Chelsea','Crystal Palace','Everton','Fulham',
+    'Liverpool','Luton Town','Manchester City','Manchester United','Newcastle United',
+    'Nottingham Forest','Sheffield United','Tottenham Hotspur','West Ham United','Wolverhampton Wanderers'
+  ];
 }
 function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
 function randNorm(mu=0, sigma=1){ const u=1-Math.random(); const v=1-Math.random(); return mu+sigma*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
@@ -227,6 +233,13 @@ function renderAll(){
     const hasMatch=todayEntry && todayEntry.isMatch;
     const injured=st.player.status && st.player.status.toLowerCase().includes('injur');
     trainBtn.disabled = hasMatch || injured;
+  }
+
+  const nextBtn=q('#btn-next');
+  if(nextBtn){
+    if(todayEntry && todayEntry.isMatch && !todayEntry.played) nextBtn.textContent='Simulate match';
+    else if(todayEntry && todayEntry.type==='seasonEnd') nextBtn.textContent='Season summary';
+    else nextBtn.textContent='Next day';
   }
 
   q('#date-label').textContent = today.toDateString();
@@ -475,6 +488,42 @@ function finishMatch(entry, minutes, mini){
   Game.save(); renderAll();
 }
 
+function simulateMatch(entry){
+  const st=Game.state;
+  if(entry.played || !sameDay(entry.date, st.currentDate)) return;
+  const youStart = st.player.alwaysPlay ? true : decideStarting(st.player.timeBand);
+  const willSubIn = youStart?false:Math.random()<subChance(st.player.timeBand);
+  let minutes=0;
+  if(youStart) minutes=90;
+  else if(willSubIn) minutes=randInt(12,28);
+  const mini={score:Math.random()};
+  const hasMinutes=minutes>0; let rating=null;
+  if(hasMinutes){ rating=randNorm(6.4,.6); if(minutes>=60) rating+=.3; rating+=(mini.score||0)*2.0; rating=Math.max(5.0, Math.min(9.8, +rating.toFixed(1))); }
+  else { rating=6.0; }
+  let goals=0,assists=0; if(hasMinutes){
+    const baseG=st.player.pos==='Attacker'?0.22: st.player.pos==='Midfield'?0.10: 0.06;
+    const baseA=st.player.pos==='Attacker'?0.10: st.player.pos==='Midfield'?0.18: 0.08;
+    const perfBoost=Math.max(0,(rating-6.5)*0.15);
+    goals = Math.random()<baseG+perfBoost ? (Math.random()<0.12?2:1) : 0;
+    assists = Math.random()<baseA+perfBoost ? 1 : 0;
+  }
+  const teamBase=Math.max(0, Math.round(randNorm(1.4,1.0)));
+  const oppBase=Math.max(0, Math.round(randNorm(1.2,1.0)));
+  const teamGoals=teamBase+(goals>0?1:0);
+  const oppGoals=oppBase;
+  const result=teamGoals>oppGoals?'W': teamGoals<oppGoals?'L':'D';
+  const scoreline=`${teamGoals}-${oppGoals}`;
+  entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
+  st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists;
+  applyPostMatchGrowth(st, minutes, rating, goals, assists);
+  st.player.value=Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
+  if(st.player.salary>0) st.player.balance=Math.round((st.player.balance||0)+st.player.salary);
+  st.week=Math.min(38, st.week+1);
+  Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${goals?`, G${goals}`:''}${assists?`, A${assists}`:''}`);
+  Game.save(); renderAll();
+  setTimeout(()=>{ nextDay(); },300);
+}
+
 function viewMatchSummary(entry){
   const st=Game.state; const c=q('#match-content'); c.innerHTML='';
   const box=document.createElement('div'); box.className='glass';
@@ -535,7 +584,13 @@ function autoTick(){
   }
   setTimeout(()=>{ if(Game.state.auto){ nextDay(); } }, 800+Math.floor(Math.random()*600));
 }
-function nextDay(){ Game.state.currentDate+=24*3600*1000; Game.save(); renderAll(); autoTick(); }
+function nextDay(){
+  const st=Game.state;
+  const entry=st.schedule.find(d=>sameDay(d.date, st.currentDate));
+  if(entry && entry.isMatch && !entry.played){ simulateMatch(entry); return; }
+  if(entry && entry.type==='seasonEnd'){ openSeasonEnd(); return; }
+  st.currentDate+=24*3600*1000; Game.save(); renderAll(); autoTick();
+}
 
 // ===== Download / Retire =====
 function downloadLog(){ const st=Game.state; const text=(st.eventLog||[]).join('\n'); const blob=new Blob([text],{type:'text/plain'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='webcareergame-log.txt'; a.click(); URL.revokeObjectURL(url); }
