@@ -236,3 +236,11 @@ a{ color:var(--primary) }
 
 /* Footer */
 .app-footer{text-align:center;color:var(--text-dim);padding:24px 0 60px}
+
+/* Small screen adjustments */
+@media(max-width:600px){
+  body{font-size:14px}
+  .container{padding:12px}
+  .card{padding:12px}
+  .btn{padding:8px 12px;font-size:14px}
+}
