@@ -1,7 +1,10 @@
 /* WebCareerGame • Pre‑Alpha v0.0.3
-   External JS (state, sim, UI). Mobile + desktop safe.  
+   External JS (state, sim, UI). Mobile + desktop safe.
    Keep gameplay deterministic enough for testing but fun.
 */
+
+// Version string injected into the UI and document title.
+const APP_VERSION = 'v0.0.3';
 
 // ===== Storage / Globals =====
 const LS_KEY = 'webcareergame.save.v003';
@@ -248,6 +251,13 @@ function renderCalendar(){
 }
 
 function renderLiveLog(){ const el=q('#live-log'); if(!el) return; const st=Game.state; const last=st.eventLog.slice(-30); el.textContent=last.join('\n'); }
+
+function injectVersion(){
+  document.title = document.title.replace(/v[\d.]+/, APP_VERSION);
+  document.querySelectorAll('.app-version').forEach(el => {
+    el.textContent = APP_VERSION;
+  });
+}
 
 // ===== Market UI =====
 function openMarket(){
@@ -523,6 +533,7 @@ function wireEvents(){
 
 (function boot(){
   wireEvents();
+  injectVersion();
   if(!Game.load()){
     console.warn('Failed to load save state; starting fresh');
   }
