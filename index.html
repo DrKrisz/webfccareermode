@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WebCareerGame • Pre‑Alpha v0.0.1</title>
+  
+  <!-- fonts: prefer system ui for an iOS-like feeling -->
+  <style>
+    /* color system: dark minimalist with subtle elevation */
+    :root {
+      --bg: #0b0f14;
+      --surface: #0f141b;
+      --surface-2: #131a22;
+      --elev: rgba(255,255,255,0.05);
+      --text: #e6eef8;
+      --text-dim: #9fb0c3;
+      --primary: #4e9cff;
+      --success: #7bd88f;
+      --warning: #ffcf5c;
+      --danger: #ff7a7a;
+      --muted: #1a222c;
+      --glass: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+      --accent: #9aa6ff;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 800px at 70% -10%, rgba(78,156,255,0.12), transparent 60%),
+                  radial-gradient(1000px 700px at -10% 110%, rgba(154,166,255,0.12), transparent 60%),
+                  var(--bg);
+      color: var(--text);
+      font: 500 16px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, Segoe UI, Roboto, Arial, sans-serif;
+      letter-spacing: .2px;
+    }
+
+    /* layout */
+    .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    header {
+      position: sticky; top: 0; z-index: 10;
+      backdrop-filter: saturate(140%) blur(10px);
+      background: linear-gradient(180deg, rgba(15,20,27,0.9), rgba(15,20,27,0.7));
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+    .brand .logo { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--accent)); box-shadow: 0 8px 20px rgba(78,156,255,.3); }
+    .brand h1 { font-size: 18px; margin: 0; font-weight: 700; }
+    .version { margin-left: auto; color: var(--text-dim); font-size: 13px; }
+
+    .grid {
+      display: grid; gap: 16px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 960px) {
+      .grid { grid-template-columns: 320px 1fr; }
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--surface), var(--surface-2));
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(10px) saturate(140%);
+      border: 1px solid var(--border);
+      border-radius: 16px; padding: 12px 14px;
+    }
+    .muted { color: var(--text-dim); }
+    .h { margin: 0 0 8px 0; font-size: 14px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .12em; }
+    .title { font-weight: 700; font-size: 22px; margin: 8px 0 12px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* common controls */
+    .btn {
+      appearance: none; border: 1px solid var(--border);
+      background: linear-gradient(180deg, #18212b, #141b24);
+      color: var(--text); padding: 10px 14px; border-radius: 12px;
+      font-weight: 700; cursor: pointer;
+      transition: transform .06s ease, box-shadow .2s ease, background .2s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 6px 16px rgba(0,0,0,.3);
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn.primary { background: linear-gradient(180deg, #2a6df1, #204fb3); border-color: rgba(78,156,255,.4); }
+    .btn.ghost { background: transparent; }
+
+    .field { display: grid; gap: 6px; margin-bottom: 12px; }
+    .field label { font-size: 13px; color: var(--text-dim); }
+    .input, select {
+      width: 100%; padding: 12px 12px; border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #0d141c; color: var(--text);
+    }
+    .help { font-size: 12px; color: var(--text-dim); }
+
+    .badge { padding: 4px 8px; border-radius: 999px; font-size: 12px; border: 1px solid var(--border); background: #101821; }
+
+    /* modal */
+    .modal { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 16px; }
+    .modal[open] { display: flex; }
+    .modal .sheet { width: 100%; max-width: 720px; background: linear-gradient(180deg, var(--surface), var(--surface-2)); border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 40px 80px rgba(0,0,0,.5); }
+    .sheet header { position: sticky; top: 0; background: transparent; border-bottom: 1px solid var(--border); border-radius: 16px 16px 0 0; }
+    .sheet .content { padding: 16px; }
+
+    /* layout: manager page */
+    #manager .left { display: grid; gap: 16px; }
+
+    .kv { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: center; }
+    .kv .k { color: var(--text-dim); font-size: 13px; }
+    .kv .v { font-weight: 700; }
+
+    .week-panel { display: grid; gap: 12px; }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+    .day { padding: 10px; text-align: center; border-radius: 10px; border: 1px solid var(--border); background: #0f1720; font-size: 12px; min-height: 64px; display: grid; align-content: start; gap: 8px; }
+    .day .dot { width: 8px; height: 8px; border-radius: 999px; margin: 0 auto; background: var(--text-dim); }
+    .day.match .dot { background: var(--primary); box-shadow: 0 0 16px rgba(78,156,255,.8); }
+    .day.today { outline: 2px solid var(--accent); }
+
+    .flex-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+
+    /* mini-game */
+    .minigame { position: relative; width: 100%; height: 260px; border-radius: 12px; background: #0e1620; border: 1px dashed var(--border); overflow: hidden; }
+    .bubble { position: absolute; width: 34px; height: 34px; border-radius: 999px; background: linear-gradient(180deg, #2a6df1, #204fb3); display: grid; place-items: center; font-weight: 800; user-select: none; cursor: pointer; }
+
+    /* footer */
+    footer { text-align: center; color: var(--text-dim); padding: 24px 0 60px; }
+
+    /* landing layout tweaks */
+    .landing { display: grid; gap: 16px; }
+    @media (min-width: 1000px) {
+      .landing { grid-template-columns: 1.2fr .8fr; align-items: start; }
+    }
+
+    .updates li { margin: 6px 0; }
+
+    .pill { border: 1px solid var(--border); background: #0f1620; padding: 6px 10px; border-radius: 999px; font-size: 12px; }
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container brand">
+      <div class="logo" aria-hidden="true"></div>
+      <h1>WebCareerGame</h1>
+      <div class="version">Pre‑Alpha v0.0.1</div>
+    </div>
+  </header>
+
+  <main class="container" id="app">
+    <!-- landing page -->
+    <section id="landing" class="landing">
+      <div class="card">
+        <div class="title">Build your football story</div>
+        <p class="muted" style="margin:0 0 16px 0">Start as a 16 year old free agent and sign your first deal. Train, earn minutes, grow your overall, and climb the leagues. This is a tiny slice of the bigger game.
+        </p>
+
+        <div class="glass" style="margin-bottom:12px;">
+          <div class="row" style="align-items:center; justify-content:space-between;">
+            <div>
+              <div class="h">Current version</div>
+              <div class="row">
+                <span class="pill">v0.0.1</span>
+                <span class="pill">pre‑alpha</span>
+                <span class="pill">save system enabled</span>
+              </div>
+            </div>
+            <button class="btn ghost" id="btn-reset" title="Clear local save">Reset save</button>
+          </div>
+        </div>
+
+        <div class="glass">
+          <div class="h">What's new</div>
+          <ul class="updates">
+            <li>Landing page with player setup.</li>
+            <li>Career desk with left info panel and THIS WEEK panel.</li>
+            <li>Free agent market with 1 to 5 offers and realistic status, time, salary, and value.</li>
+            <li>Calendar that starts in late August with 38 game weeks.</li>
+            <li>Match sim with quick mini‑game. Rating and growth tie to minutes and performance.</li>
+          </ul>
+          <div class="h" style="margin-top:12px;">Before</div>
+          <ul class="updates muted">
+            <li>v0.0.0: idea phase.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="title">Player setup</div>
+        <form id="setup-form">
+          <div class="field">
+            <label for="name">Player name</label>
+            <input id="name" class="input" required placeholder="Your name" maxlength="24" />
+          </div>
+          <div class="field">
+            <label for="age">Age</label>
+            <input id="age" class="input" type="number" min="16" max="40" value="16" />
+            <div class="help">start at 16 for the free agent intro</div>
+          </div>
+          <div class="field">
+            <label for="origin">Origin continent</label>
+            <select id="origin">
+              <option value="Europe">Europe</option>
+              <option value="South America">South America</option>
+              <option value="North America">North America</option>
+              <option value="Africa">Africa</option>
+              <option value="Asia">Asia</option>
+              <option value="Oceania">Oceania</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Position</label>
+            <div class="row">
+              <label class="pill"><input type="radio" name="pos" value="Attacker" checked /> Attacker</label>
+              <label class="pill"><input type="radio" name="pos" value="Midfield" /> Midfield</label>
+              <label class="pill"><input type="radio" name="pos" value="Defender" /> Defender</label>
+              <label class="pill muted" title="Goalkeeper disabled for now"><input type="radio" name="pos" value="Goalkeeper" disabled /> Goalkeeper</label>
+            </div>
+          </div>
+          <div class="row" style="justify-content:flex-end; margin-top:12px;">
+            <button class="btn primary" type="submit">Start career</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- manager page -->
+    <section id="manager" style="display:none;">
+      <div class="grid">
+        <!-- left info panel -->
+        <div class="left">
+          <div class="card" id="player-card">
+            <div class="h">Player</div>
+            <div class="kv">
+              <div class="k">Name</div><div class="v" id="v-name">—</div>
+              <div class="k">Age</div><div class="v" id="v-age">—</div>
+              <div class="k">Position</div><div class="v" id="v-pos">—</div>
+              <div class="k">Club</div><div class="v" id="v-club">Free Agent</div>
+              <div class="k">League</div><div class="v" id="v-league">—</div>
+              <div class="k">Status</div><div class="v" id="v-status">—</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="h">Career</div>
+            <div class="kv">
+              <div class="k">Season</div><div class="v" id="v-season">1</div>
+              <div class="k">Week</div><div class="v" id="v-week">1 / 38</div>
+              <div class="k">Overall</div><div class="v" id="v-overall">—</div>
+              <div class="k">Play time</div><div class="v" id="v-playtime">0 min</div>
+              <div class="k">Salary</div><div class="v" id="v-salary">£0 /week</div>
+              <div class="k">Value</div><div class="v" id="v-value">£0</div>
+              <div class="k">Balance</div><div class="v" id="v-balance">£0</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="h">Actions</div>
+            <div class="row">
+              <button class="btn" id="btn-market">Market</button>
+              <button class="btn ghost" id="btn-save">Save</button>
+              <button class="btn ghost" id="btn-menu">Back to menu</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- main content -->
+        <div class="card">
+          <div class="flex-between">
+            <div>
+              <div class="h">This week</div>
+              <div id="week-summary" class="title" style="font-size:18px;">—</div>
+            </div>
+            <div class="row" id="week-cta"></div>
+          </div>
+
+          <div class="week-panel">
+            <div class="glass">
+              <div class="flex-between">
+                <div>
+                  <div class="h">Calendar</div>
+                  <div class="muted" id="date-label">—</div>
+                </div>
+                <div class="row">
+                  <button class="btn" id="btn-prev">Prev day</button>
+                  <button class="btn primary" id="btn-next">Next day</button>
+                </div>
+              </div>
+              <div class="calendar" id="calendar"></div>
+            </div>
+
+            <div class="glass">
+              <div class="h">Notes</div>
+              <div id="notes" class="muted">Train, rest, and watch the market. Big moments come on match days.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container">
+    v0.0.1 • pre‑alpha • made for fun
+  </footer>
+
+  <!-- modal: market -->
+  <dialog id="market-modal" class="modal">
+    <div class="sheet">
+      <header class="brand container" style="padding:10px 16px;">
+        <div class="logo" aria-hidden="true"></div>
+        <h1 style="font-size:16px;">Transfer market</h1>
+        <button class="btn ghost" id="close-market" style="margin-left:auto;">Close</button>
+      </header>
+      <div class="content">
+        <div id="market-list" class="row" style="flex-direction:column; gap:12px;"></div>
+        <div id="market-empty" class="muted" style="display:none;">No offers right now. Try again tomorrow.</div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- modal: match -->
+  <dialog id="match-modal" class="modal">
+    <div class="sheet">
+      <header class="brand container" style="padding:10px 16px;">
+        <div class="logo" aria-hidden="true"></div>
+        <h1 style="font-size:16px;">Match day</h1>
+        <button class="btn ghost" id="close-match" style="margin-left:auto;">Close</button>
+      </header>
+      <div class="content" id="match-content">
+        <!-- dynamic -->
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    // state model: single object persisted in localStorage
+    const LS_KEY = 'webcareergame.save.v001';
+
+    const Game = {
+      state: {
+        player: null,          // { name, age, origin, pos, overall, club, league, status, timeBand, salary, value, balance }
+        season: 1,
+        week: 1,
+        currentDate: null,     // ms timestamp
+        schedule: [],          // array of { date: ms, opponent: string, isMatch: boolean }
+        minutesPlayed: 0,
+        goals: 0,
+        assists: 0,
+        lastOffers: [],        // cache of market offers for the current day
+      },
+
+      // util: formatters
+      money(n) { try { return '£' + Math.round(n).toLocaleString('en-GB'); } catch { return '£' + Math.round(n); } },
+      moneyK(n) { return '£' + (Math.round(n/100)/10).toLocaleString('en-GB') + 'k'; },
+
+      save() { localStorage.setItem(LS_KEY, JSON.stringify(this.state)); },
+      load() {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return false;
+        try { this.state = JSON.parse(raw); return true; } catch { return false; }
+      },
+      reset() { localStorage.removeItem(LS_KEY); location.reload(); },
+
+      // init new game
+      newGame(setup) {
+        // compute a starting overall based on age and a bit of randomness
+        const base = 55 + Math.floor(Math.random()*6); // 55 to 60
+        const overall = Math.min(60, base + (setup.pos === 'Defender' ? 1 : 0));
+        this.state.player = {
+          name: setup.name.trim(), age: Number(setup.age), origin: setup.origin, pos: setup.pos,
+          overall, club: 'Free Agent', league: '', status: '—', timeBand: '—', salary: 0, value: 0, balance: 0
+        };
+        this.state.season = 1;
+        this.state.week = 1;
+        this.state.minutesPlayed = 0;
+        this.state.goals = 0;
+        this.state.assists = 0;
+        this.state.lastOffers = [];
+        // set calendar to last Saturday of August of current year
+        const today = new Date();
+        const year = today.getFullYear();
+        const start = lastSaturdayOfAugust(year);
+        this.state.currentDate = start.getTime();
+        this.state.schedule = buildSchedule(start, 38);
+        this.save();
+      },
+    };
+
+    // helpers: calendar
+    function lastSaturdayOfAugust(year) {
+      // find last day of august then step back to saturday
+      const d = new Date(year, 7, 31); // month index 7 = august
+      while (d.getDay() !== 6) d.setDate(d.getDate() - 1);
+      return d;
+    }
+    function buildSchedule(startDate, weeks) {
+      // build 38 weekly entries. match every saturday.
+      const opponents = makeOpponents();
+      const out = [];
+      for (let i=0; i<weeks; i++) {
+        const d = new Date(startDate.getTime());
+        d.setDate(d.getDate() + i*7);
+        out.push({ date: d.getTime(), opponent: opponents[i % opponents.length], isMatch: true });
+      }
+      return out;
+    }
+
+    // opponents: simple list of fictional teams to avoid licensing
+    function makeOpponents() {
+      return [
+        'North London FC', 'Rivergate City', 'Bluecastle United', 'Mersey Rovers', 'Seaside Albion',
+        'Manchester Borough', 'Kingsport Athletic', 'Greenwich Park', 'Steelbridge FC', 'South Coast Town',
+        'Highbury Hill', 'Birmingham Tower', 'Yorkshire Vale', 'Bristol Dockers', 'Leeds Cross',
+        'Wolves Heath', 'Everfield City', 'Newcastle Quay', 'Brighton Shore'
+      ];
+    }
+
+    // market logic
+    function rollMarketOffers(p) {
+      // create 1 to 5 offers influenced by player overall and age
+      const count = 1 + Math.floor(Math.random()*5); // 1..5
+      const clubs = makeOpponents().sort(() => Math.random() - 0.5).slice(0, count);
+      const offers = clubs.map(c => makeOfferFor(p, c));
+      return offers;
+    }
+
+    function makeOfferFor(player, club) {
+      // derive status from overall
+      const o = player.overall;
+      const status = o >= 88 ? pick(['important','star player'])
+                   : o >= 80 ? pick(['key player','important'])
+                   : o >= 72 ? 'key player'
+                   : o >= 65 ? 'decent'
+                   : 'rookie';
+      // time band mapping
+      const timeMap = {
+        'rookie': 'second bench',
+        'decent': pick(['bench','rotater']),
+        'key player': pick(['rotater','match player']),
+        'important': pick(['match player','match starter']),
+        'star player': 'match starter'
+      };
+      const timeBand = timeMap[status];
+      const years = Math.min(5, Math.max(1, Math.round(randNorm(2.2, 1.2))));
+      const league = 'Premier League';
+      const salary = computeSalary(player.age, player.overall, league, status, timeBand);
+      const value = computeValue(player.overall, league, salary);
+      return { club, league, years, status, timeBand, salary, value };
+    }
+
+    function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+    function randNorm(mu=0, sigma=1) {
+      // box-muller
+      const u = 1 - Math.random();
+      const v = 1 - Math.random();
+      return mu + sigma*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+    }
+
+    // salary and value formulas tuned to match the examples roughly
+    function computeSalary(age, overall, league, status, timeBand) {
+      const overSq = overall*overall;
+      const coef = 15; // base scaler
+      const leagueFactor = league === 'Premier League' ? 1.5 : 1.0;
+      const statusFactor = { 'rookie': 0.10, 'decent': 0.18, 'key player': 0.35, 'important': 0.60, 'star player': 1.00 }[status] || 0.2;
+      const timeFactor = { 'second bench': 0.30, 'bench': 0.50, 'rotater': 0.80, 'match player': 1.00, 'match starter': 1.20 }[timeBand] || 0.6;
+      const ageFactor = age <= 18 ? 0.75 : age <= 23 ? 0.95 : age <= 28 ? 1.10 : age <= 31 ? 1.00 : 0.85;
+      const weekly = overSq * coef * timeFactor * leagueFactor * statusFactor * ageFactor; // £/week
+      // clamp to safe range
+      return Math.max(500, Math.min(weekly, 600000));
+    }
+
+    function computeValue(overall, league, weeklySalary) {
+      const leagueFactor = league === 'Premier League' ? 1.15 : 1.0;
+      const base = (overall*overall) * 330 * leagueFactor; // floor value by potential
+      const fromSalary = weeklySalary * 52 * 4; // rough 4-year value
+      return Math.max(base, fromSalary);
+    }
+
+    // growth logic
+    function applyPostMatchGrowth(st, minutes, rating, goals, assists) {
+      // minute target depends on timeBand
+      const targetMap = { 'second bench': 10, 'bench': 20, 'rotater': 45, 'match player': 70, 'match starter': 90 };
+      const target = targetMap[st.player.timeBand] || 30;
+      let delta = 0;
+      // reward meeting or exceeding the target
+      if (minutes >= target) delta += 0.2;
+      // rating bonus
+      if (rating >= 7) delta += 0.2;
+      if (rating >= 8) delta += 0.2;
+      // goals and assists help attackers more
+      if (st.player.pos === 'Attacker') delta += goals*0.25 + assists*0.15;
+      if (st.player.pos === 'Midfield') delta += goals*0.18 + assists*0.2;
+      if (st.player.pos === 'Defender') delta += goals*0.12 + assists*0.08;
+      // diminish for low minutes
+      if (minutes < target*0.4) delta -= 0.15;
+      // age decay after 31 does small negative over time (very mild here)
+      if (st.player.age >= 31) delta -= 0.05;
+
+      // apply and clamp
+      st.player.overall = Math.max(55, Math.min(100, +(st.player.overall + delta).toFixed(2)));
+    }
+
+    // rendering
+    function renderAll() {
+      const st = Game.state;
+      const onLanding = !st.player;
+      document.getElementById('landing').style.display = onLanding ? 'grid' : 'none';
+      document.getElementById('manager').style.display = onLanding ? 'none' : 'block';
+      if (onLanding) return;
+
+      // left cards
+      q('#v-name').textContent = st.player.name;
+      q('#v-age').textContent = st.player.age;
+      q('#v-pos').textContent = st.player.pos;
+      q('#v-club').textContent = st.player.club;
+      q('#v-league').textContent = st.player.league || '—';
+      q('#v-status').textContent = st.player.status;
+
+      q('#v-season').textContent = st.season;
+      q('#v-week').textContent = `${st.week} / 38`;
+      q('#v-overall').textContent = st.player.overall;
+      q('#v-playtime').textContent = `${st.minutesPlayed} min`;
+      q('#v-salary').textContent = Game.money(st.player.salary) + ' /week';
+      q('#v-value').textContent = fmtValue(st.player.value);
+      q('#v-balance').textContent = Game.money(st.player.balance || 0);
+
+      // week summary and cta
+      const today = new Date(st.currentDate);
+      const todayEntry = st.schedule.find(d => sameDay(d.date, st.currentDate));
+      const cta = document.getElementById('week-cta');
+      cta.innerHTML = '';
+
+      if (st.player.club === 'Free Agent') {
+        q('#week-summary').textContent = 'You are a free agent. Explore offers and sign your first deal.';
+        cta.append(btn('Open market', () => openMarket()));
+      } else if (todayEntry && todayEntry.isMatch) {
+        q('#week-summary').textContent = `Match day: ${st.player.club} vs ${todayEntry.opponent}`;
+        cta.append(btn('Play match', () => openMatch(todayEntry)));
+      } else {
+        q('#week-summary').textContent = 'Training and recovery. Prepare for the next game.';
+      }
+
+      // date label and calendar
+      q('#date-label').textContent = today.toDateString();
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const grid = q('#calendar');
+      grid.innerHTML = '';
+      const st = Game.state;
+      const start = new Date(st.schedule[0].date);
+      // render 28 days window around current day
+      const winStart = new Date(st.currentDate); winStart.setDate(winStart.getDate() - 14);
+      for (let i=0; i<28; i++) {
+        const d = new Date(winStart.getTime());
+        d.setDate(d.getDate() + i);
+        const item = document.createElement('div');
+        const entry = st.schedule.find(x => sameDay(x.date, d.getTime()));
+        item.className = 'day' + (entry && entry.isMatch ? ' match' : '') + (sameDay(d.getTime(), st.currentDate) ? ' today' : '');
+        item.innerHTML = `<div class="muted">${d.toLocaleDateString('en-GB', { day:'2-digit', month:'short' })}</div>
+                          <div class="dot"></div>
+                          ${entry && entry.isMatch ? `<div style="font-size:11px;">vs ${entry.opponent}</div>` : ''}`;
+        if (entry && entry.isMatch) {
+          item.style.cursor = 'pointer';
+          item.title = 'Open match';
+          item.onclick = () => openMatch(entry);
+        }
+        grid.append(item);
+      }
+    }
+
+    function fmtValue(v) {
+      if (v >= 1_000_000) return '£' + (v/1_000_000).toFixed(1) + 'm';
+      if (v >= 1_000) return '£' + Math.round(v/100)/10 + 'k';
+      return Game.money(v);
+    }
+
+    function sameDay(a,b) {
+      const da = new Date(a), db = new Date(b);
+      return da.getFullYear()===db.getFullYear() && da.getMonth()===db.getMonth() && da.getDate()===db.getDate();
+    }
+
+    function q(s) { return document.querySelector(s); }
+    function btn(label, onClick, cls='btn primary') { const b=document.createElement('button'); b.className=cls; b.textContent=label; b.onclick=onClick; return b; }
+
+    // market ui
+    function openMarket() {
+      const st = Game.state;
+      if (!st.player || st.player.club !== 'Free Agent') return;
+      if (!st.lastOffers.length) st.lastOffers = rollMarketOffers(st.player);
+      const $list = document.getElementById('market-list');
+      const $empty = document.getElementById('market-empty');
+      $list.innerHTML = '';
+      if (!st.lastOffers.length) {
+        $empty.style.display = 'block';
+      } else {
+        $empty.style.display = 'none';
+        st.lastOffers.forEach((o, idx) => {
+          const row = document.createElement('div');
+          row.className = 'glass';
+          row.innerHTML = `
+            <div class="flex-between" style="align-items:flex-start;">
+              <div>
+                <div style="font-weight:800; font-size:16px;">${o.club} <span class="badge" style="margin-left:6px;">${o.league}</span></div>
+                <div class="muted" style="margin-top:4px; display:flex; gap:8px; flex-wrap:wrap;">
+                  <span class="badge">${o.years} season${o.years>1?'s':''}</span>
+                  <span class="badge">${o.status}</span>
+                  <span class="badge">${o.timeBand}</span>
+                  <span class="badge">${Game.money(o.salary)}/week</span>
+                  <span class="badge">value ${fmtValue(o.value)}</span>
+                </div>
+              </div>
+              <div class="row">
+                <button class="btn" data-i="${idx}">Accept</button>
+              </div>
+            </div>`;
+          row.querySelector('button').onclick = () => acceptOffer(idx);
+          $list.append(row);
+        });
+      }
+      document.getElementById('market-modal').setAttribute('open','');
+    }
+
+    function acceptOffer(i) {
+      const o = Game.state.lastOffers[i];
+      const st = Game.state;
+      // apply the offer to the player
+      st.player.club = o.club;
+      st.player.league = o.league;
+      st.player.status = o.status;
+      st.player.timeBand = o.timeBand;
+      st.player.salary = Math.round(o.salary);
+      st.player.value = Math.round(o.value);
+      // clear offers and close
+      st.lastOffers = [];
+      Game.save();
+      renderAll();
+      document.getElementById('market-modal').removeAttribute('open');
+    }
+
+    // match ui
+    function openMatch(entry) {
+      const st = Game.state;
+      const youStart = decideStarting(st.player.timeBand);
+      const willSubIn = youStart ? false : Math.random() < subChance(st.player.timeBand);
+
+      const baseTeamRating = +(randNorm(6.8, 0.4).toFixed(1));
+      const ballPoss = Math.max(35, Math.min(65, Math.round(randNorm(50, 8))));
+      const teamPasses = Math.round(randNorm(480, 90));
+      const opponentPasses = Math.max(180, Math.round(teamPasses* (100-ballPoss)/ballPoss));
+
+      const $content = document.getElementById('match-content');
+      $content.innerHTML = '';
+
+      const wrap = document.createElement('div');
+      wrap.innerHTML = `
+        <div class="title">${Game.state.player.club} vs ${entry.opponent}</div>
+        <div class="muted" style="margin-bottom:12px;">Kickoff: ${new Date(entry.date).toDateString()}</div>
+        <div class="glass" style="margin-bottom:12px;">
+          <div class="row" style="flex-wrap:wrap; gap:10px;">
+            <span class="badge">Team rating ~ ${baseTeamRating}</span>
+            <span class="badge">Possession ${ballPoss}%</span>
+            <span class="badge">Passes ${teamPasses}</span>
+            <span class="badge">Opp passes ${opponentPasses}</span>
+          </div>
+        </div>
+        <div id="match-phase"></div>
+      `;
+      $content.append(wrap);
+
+      const phase = q('#match-phase');
+
+      if (youStart) {
+        // start mini-game immediately as you are in the starting eleven
+        phase.append(minigameView('You start the match. Quick impact mini‑game!', result => finishMatch(entry, 90, result)));
+      } else if (willSubIn) {
+        const info = document.createElement('div');
+        info.className = 'glass';
+        info.innerHTML = `<div class="h">Update</div><div>You start on the bench. You may be subbed on later. Stay ready.</div>`;
+        phase.append(info);
+        // trigger sub around minute 60 to 75
+        setTimeout(() => {
+          info.innerHTML = `<div class="h">Substitution</div><div>You are coming on. Make it count.</div>`;
+          phase.append(minigameView('You have limited time. Quick impact mini‑game!', result => finishMatch(entry, randInt(12,28), result)));
+        }, 800);
+      } else {
+        const info = document.createElement('div');
+        info.className = 'glass';
+        info.innerHTML = `<div class="h">Update</div><div>You stayed on the bench this time. Keep working.</div>`;
+        phase.append(info);
+        // finish with zero minutes
+        setTimeout(() => finishMatch(entry, 0, { clicks:0, success:false }), 700);
+      }
+
+      document.getElementById('match-modal').setAttribute('open','');
+    }
+
+    function decideStarting(timeBand) {
+      // strong chance to start if match player or starter
+      const map = { 'second bench': 0.02, 'bench': 0.10, 'rotater': 0.35, 'match player': 0.72, 'match starter': 0.92 };
+      return Math.random() < (map[timeBand] || 0.2);
+    }
+    function subChance(timeBand) {
+      const map = { 'second bench': 0.20, 'bench': 0.35, 'rotater': 0.50, 'match player': 0.35, 'match starter': 0.10 };
+      return map[timeBand] || 0.3;
+    }
+    function randInt(a,b) { return a + Math.floor(Math.random()*(b-a+1)); }
+
+    function minigameView(title, onDone) {
+      const box = document.createElement('div');
+      box.className = 'glass';
+      box.innerHTML = `<div class="h">Moment</div><div style="margin-bottom:8px;">${title}</div>`;
+      const field = document.createElement('div');
+      field.className = 'minigame';
+      box.append(field);
+
+      // create 10 bubbles you need to click in ~5 seconds
+      const target = 10;
+      let clicked = 0;
+      let over = false;
+      const start = performance.now();
+      const duration = 5000;
+
+      // spawn bubbles at random places
+      for (let i=0; i<target; i++) {
+        const b = document.createElement('div');
+        b.className = 'bubble';
+        b.textContent = i+1;
+        placeBubble(b, field);
+        b.onclick = () => {
+          if (over) return;
+          b.remove();
+          clicked++;
+          if (clicked >= target) finish(true);
+        };
+        field.append(b);
+      }
+
+      const timer = setTimeout(() => finish(false), duration);
+
+      function finish(win) {
+        if (over) return; over = true; clearTimeout(timer);
+        // compute a simple performance score
+        const t = performance.now() - start;
+        const success = win;
+        const score = Math.max(0, Math.min(1, clicked/target)) * (success ? 1 : 0.5) * (1 - (t/duration - 0.5)*0.3);
+        const data = { clicks: clicked, success, score };
+        const note = document.createElement('div');
+        note.className = 'glass';
+        note.style.marginTop = '10px';
+        note.innerHTML = `<div class="h">Result</div><div>Clicks ${clicked}/${target}. ${success ? 'Nice impact.' : 'Could be better.'}</div>`;
+        box.append(note);
+        // hand over
+        setTimeout(() => onDone(data), 600);
+      }
+
+      return box;
+    }
+
+    function placeBubble(el, field) {
+      const r = field.getBoundingClientRect();
+      const x = Math.random() * (r.width - 34);
+      const y = Math.random() * (r.height - 34);
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+    }
+
+    function finishMatch(entry, minutes, mini) {
+      const st = Game.state;
+      // compute rating influenced by mini-game performance and overall
+      let rating = randNorm(6.4, 0.6);
+      if (minutes >= 60) rating += 0.3;
+      rating += (mini.score || 0) * 2.0; // strong boost if you nailed it
+      rating = Math.max(5.0, Math.min(9.8, +rating.toFixed(1)));
+
+      // goals and assists chance based on position and performance
+      const baseG = st.player.pos === 'Attacker' ? 0.22 : st.player.pos === 'Midfield' ? 0.10 : 0.06;
+      const baseA = st.player.pos === 'Attacker' ? 0.10 : st.player.pos === 'Midfield' ? 0.18 : 0.08;
+      const perfBoost = Math.max(0, (rating - 6.5) * 0.15);
+      const goals = Math.random() < baseG + perfBoost ? (Math.random() < 0.12 ? 2 : 1) : 0;
+      const assists = Math.random() < baseA + perfBoost ? 1 : 0;
+
+      // update stats
+      st.minutesPlayed += minutes;
+      st.goals += goals;
+      st.assists += assists;
+
+      // growth and updated market value
+      applyPostMatchGrowth(st, minutes, rating, goals, assists);
+      st.player.value = Math.round(computeValue(st.player.overall, st.player.league || 'Premier League', st.player.salary || 1000));
+
+      // wages for the week if under contract
+      if (st.player.salary > 0) st.player.balance = Math.round((st.player.balance || 0) + st.player.salary);
+
+      // progress week and day
+      st.week = Math.min(38, st.week + 1);
+      // advance to next day
+      nextDay();
+
+      // show summary
+      const $c = document.getElementById('match-content');
+      const box = document.createElement('div');
+      box.className = 'glass';
+      box.innerHTML = `
+        <div class="h">Full time</div>
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+          <div class="kv"><div class="k">Minutes</div><div class="v">${minutes}</div></div>
+          <div class="kv"><div class="k">Rating</div><div class="v">${rating}</div></div>
+          <div class="kv"><div class="k">Goals</div><div class="v">${goals}</div></div>
+          <div class="kv"><div class="k">Assists</div><div class="v">${assists}</div></div>
+          <div class="kv"><div class="k">New overall</div><div class="v">${st.player.overall}</div></div>
+          <div class="kv"><div class="k">Balance</div><div class="v">${Game.money(st.player.balance || 0)}</div></div>
+        </div>`;
+      $c.append(box);
+
+      Game.save();
+      renderAll();
+    }
+
+    // time controls
+    function prevDay() {
+      Game.state.currentDate -= 24*3600*1000;
+      Game.save();
+      renderAll();
+    }
+    function nextDay() {
+      Game.state.currentDate += 24*3600*1000;
+      Game.save();
+      renderAll();
+    }
+
+    // wire up ui
+    document.getElementById('setup-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const name = q('#name').value || 'Player';
+      const age = q('#age').value || 16;
+      const origin = q('#origin').value;
+      const pos = [...document.querySelectorAll('input[name=pos]')].find(x => x.checked)?.value || 'Attacker';
+      Game.newGame({ name, age, origin, pos });
+      renderAll();
+      // open market automatically if free agent
+      openMarket();
+    });
+
+    document.getElementById('btn-market').onclick = () => openMarket();
+    document.getElementById('close-market').onclick = () => document.getElementById('market-modal').removeAttribute('open');
+
+    document.getElementById('btn-prev').onclick = prevDay;
+    document.getElementById('btn-next').onclick = nextDay;
+
+    document.getElementById('btn-menu').onclick = () => { Game.save(); location.reload(); };
+    document.getElementById('btn-save').onclick = () => { Game.save(); alert('Saved'); };
+    document.getElementById('btn-reset').onclick = () => {
+      if (confirm('Delete your local save and restart')) Game.reset();
+    };
+
+    document.getElementById('close-match').onclick = () => document.getElementById('match-modal').removeAttribute('open');
+
+    // boot
+    (function boot(){
+      if (Game.load()) {
+        renderAll();
+      } else {
+        renderAll();
+      }
+    })();
+  </script>
+</body>
+</html>
