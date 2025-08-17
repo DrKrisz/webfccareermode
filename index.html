@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WebCareerGame • Pre-Alpha v0.0.4</title>
+  <title>WebCareerGame • Pre-Alpha v0.0.5</title>
   <!-- Split build: external CSS & JS -->
   <link rel="stylesheet" href="style.css">
   <script src="game.js" defer></script>
@@ -35,7 +35,7 @@
         </div>
 
         <div class="glass">
-          <div class="h">What's new</div>
+          <div class="h">What's new <span class="app-version"></span></div>
           <ul class="updates">
             <li>Next day simulates scheduled matches automatically.</li>
             <li>Includes all Premier League clubs.</li>
@@ -201,6 +201,17 @@
         <button class="btn ghost" id="retire-cancel">Cancel</button>
         <button class="btn danger" id="retire-confirm">Confirm retire</button>
       </div>
+    </div>
+  </dialog>
+
+  <!-- Message modal -->
+  <dialog id="message-modal" class="modal">
+    <div class="sheet">
+      <header class="brand sheet-head">
+        <div class="logo"></div><h1 class="sheet-title">Manager message</h1>
+        <button class="btn ghost" id="close-message">✕</button>
+      </header>
+      <div class="content" id="message-content"></div>
     </div>
   </dialog>
 </body>
