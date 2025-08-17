@@ -1,0 +1,122 @@
+/* WebCareerGame • Pre-Alpha v0.0.3
+   External stylesheet (dark, minimalist, iOS‑ish)
+   Mobile-first, responsive up to desktop
+*/
+
+:root{
+  --bg:#0b0f14;
+  --surface:#0f141b;
+  --surface-2:#131a22;
+  --glass:rgba(255,255,255,.06);
+  --border:rgba(255,255,255,.10);
+  --text:#e9f1fb;
+  --text-dim:#a6b8cc;
+  --primary:#4e9cff;
+  --accent:#9aa6ff;
+  --danger:#ff7a7a;
+  --warning:#ffd06a;
+  --success:#79d88f;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 800px at 70% -10%, rgba(78,156,255,.12), transparent 60%),
+    radial-gradient(1000px 700px at -10% 110%, rgba(154,166,255,.12), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font:500 16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,Segoe UI,Roboto,Arial,sans-serif;
+  letter-spacing:.2px;
+}
+
+.container{max-width:1200px;margin:0 auto;padding:16px}
+
+/* Header */
+.app-header{position:sticky;top:0;z-index:10;backdrop-filter:saturate(140%) blur(10px);background:linear-gradient(180deg, rgba(15,20,27,.92), rgba(15,20,27,.75));border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:12px;padding:10px 0}
+.logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));box-shadow:0 8px 20px rgba(78,156,255,.3)}
+.brand h1{font-size:18px;margin:0;font-weight:800}
+.version{margin-left:auto;color:var(--text-dim);font-size:13px}
+
+/* Layout & cards */
+.grid{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:960px){.grid{grid-template-columns:320px 1fr}}
+.card{background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.glass{background:var(--glass);backdrop-filter:blur(10px) saturate(140%);border:1px solid var(--border);border-radius:16px;padding:12px 14px}
+.h{margin:0 0 8px 0;font-size:13px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.12em}
+.title{font-weight:800;font-size:22px;margin:8px 0 12px}
+.title.sub{font-size:18px}
+.muted{color:var(--text-dim)}
+.intro{margin:0 0 16px 0}
+
+/* Flex helpers */
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row.wrap{flex-wrap:wrap}
+.row.column{flex-direction:column;gap:12px}
+.row.spread{justify-content:space-between}
+.row.center-v{align-items:center}
+.row.end{justify-content:flex-end}
+.mt{margin-top:12px}
+
+/* Buttons */
+.btn{appearance:none;border:1px solid var(--border);background:linear-gradient(180deg,#18212b,#141b24);color:var(--text);padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:transform .06s ease, box-shadow .2s ease, background .2s;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 6px 16px rgba(0,0,0,.3)}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn.primary{background:linear-gradient(180deg,#2a6df1,#204fb3);border-color:rgba(78,156,255,.4)}
+.btn.ghost{background:transparent}
+.btn.danger{background:linear-gradient(180deg,#ff7a7a,#d85a5a);border-color:rgba(255,122,122,.4)}
+
+/* Inputs */
+.field{display:grid;gap:6px;margin-bottom:12px}
+.field label{font-size:13px;color:var(--text-dim)}
+.input, select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--border);background:#0d141c;color:var(--text)}
+.pill{border:1px solid var(--border);background:#0f1620;padding:6px 10px;border-radius:999px;font-size:12px}
+.pill.radio{display:inline-flex;align-items:center;gap:6px}
+.pill.checkbox{display:inline-flex;align-items:center;gap:8px}
+.pills .pill{margin-right:6px}
+.hint{font-size:12px}
+
+/* Panels */
+.left{display:grid;gap:16px}
+.kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center}
+.kv .k{color:var(--text-dim);font-size:13px}
+.kv .v{font-weight:800}
+
+/* Calendar */
+.week-panel{display:grid;gap:12px}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.day{padding:10px;text-align:center;border-radius:10px;border:1px solid var(--border);background:#0f1720;font-size:12px;min-height:68px;display:grid;align-content:start;gap:6px}
+.day .dot{width:8px;height:8px;border-radius:999px;margin:0 auto;background:var(--text-dim)}
+.day.match .dot{background:var(--primary);box-shadow:0 0 16px rgba(78,156,255,.8)}
+.day.today{outline:2px solid var(--accent)}
+.day.played{background:linear-gradient(180deg,#111a25,#0f1720)}
+
+/* Live log */
+.live-log{max-height:180px;overflow:auto;white-space:pre-line}
+
+/* Modal */
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:16px}
+.modal[open]{display:flex}
+.modal .sheet{width:100%;max-width:760px;background:linear-gradient(180deg,#0f141b,#121923);border:1px solid var(--border);border-radius:16px;box-shadow:0 40px 80px rgba(0,0,0,.6);color:var(--text)}
+.sheet-head{padding:10px 16px}
+.sheet-title{font-size:16px}
+.sheet .content{padding:16px}
+.sheet-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:0}
+
+/* Minigame */
+.minigame{position:relative;width:100%;height:260px;border-radius:12px;background:#0e1620;border:1px dashed var(--border);overflow:hidden}
+.bubble{position:absolute;width:34px;height:34px;border-radius:999px;background:linear-gradient(180deg,#2a6df1,#204fb3);display:grid;place-items:center;font-weight:900;user-select:none;cursor:pointer}
+
+/* Utilities */
+.hide{display:none}
+.hidden{display:none}
+.gold{color:var(--warning);font-weight:800}
+
+/* Landing layout */
+.landing{display:grid;gap:16px}
+@media(min-width:1000px){.landing{grid-template-columns:1.2fr .8fr;align-items:start}}
+
+/* Footer */
+.app-footer{text-align:center;color:var(--text-dim);padding:24px 0 60px}

@@ -4,78 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WebCareerGame • Pre-Alpha v0.0.3</title>
-  <style>
-    :root{
-      --bg:#0b0f14;--surface:#0f141b;--surface-2:#131a22;--glass:rgba(255,255,255,.06);--border:rgba(255,255,255,.10);
-      --text:#e9f1fb;--text-dim:#a6b8cc;--primary:#4e9cff;--accent:#9aa6ff;--danger:#ff7a7a;--warning:#ffd06a;--success:#79d88f;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;background:
-      radial-gradient(1200px 800px at 70% -10%, rgba(78,156,255,.12), transparent 60%),
-      radial-gradient(1000px 700px at -10% 110%, rgba(154,166,255,.12), transparent 60%),
-      var(--bg);color:var(--text);
-      font:500 16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,Segoe UI,Roboto,Arial,sans-serif;letter-spacing:.2px
-    }
-    .container{max-width:1200px;margin:0 auto;padding:16px}
-    header{position:sticky;top:0;z-index:10;backdrop-filter:saturate(140%) blur(10px);background:linear-gradient(180deg, rgba(15,20,27,.92), rgba(15,20,27,.75));border-bottom:1px solid var(--border)}
-    .brand{display:flex;align-items:center;gap:12px;padding:10px 0}
-    .brand .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));box-shadow:0 8px 20px rgba(78,156,255,.3)}
-    .brand h1{font-size:18px;margin:0;font-weight:800}
-    .version{margin-left:auto;color:var(--text-dim);font-size:13px}
-
-    .grid{display:grid;gap:16px;grid-template-columns:1fr}
-    @media(min-width:960px){.grid{grid-template-columns:320px 1fr}}
-
-    .card{background:linear-gradient(180deg,var(--surface),var(--surface-2));border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    .glass{background:var(--glass);backdrop-filter:blur(10px) saturate(140%);border:1px solid var(--border);border-radius:16px;padding:12px 14px}
-    .h{margin:0 0 8px 0;font-size:13px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.12em}
-    .title{font-weight:800;font-size:22px;margin:8px 0 12px}
-    .muted{color:var(--text-dim)}
-    .row{display:flex;gap:12px;flex-wrap:wrap}
-
-    .btn{appearance:none;border:1px solid var(--border);background:linear-gradient(180deg,#18212b,#141b24);color:var(--text);padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;transition:transform .06s ease, box-shadow .2s ease, background .2s;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 6px 16px rgba(0,0,0,.3)}
-    .btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0)}
-    .btn.primary{background:linear-gradient(180deg,#2a6df1,#204fb3);border-color:rgba(78,156,255,.4)}
-    .btn.ghost{background:transparent}
-    .btn.danger{background:linear-gradient(180deg,#ff7a7a,#d85a5a);border-color:rgba(255,122,122,.4)}
-
-    .field{display:grid;gap:6px;margin-bottom:12px}
-    .field label{font-size:13px;color:var(--text-dim)}
-    .input,select{width:100%;padding:12px 12px;border-radius:12px;border:1px solid var(--border);background:#0d141c;color:var(--text)}
-
-    .badge{padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border);background:#101821}
-    .pill{border:1px solid var(--border);background:#0f1620;padding:6px 10px;border-radius:999px;font-size:12px}
-
-    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:16px}
-    .modal[open]{display:flex}
-    .modal .sheet{width:100%;max-width:760px;background:linear-gradient(180deg,#0f141b,#121923);border:1px solid var(--border);border-radius:16px;box-shadow:0 40px 80px rgba(0,0,0,.6);color:var(--text)}
-    .sheet header{position:sticky;top:0;background:rgba(16,22,32,.95);border-bottom:1px solid var(--border);border-radius:16px 16px 0 0}
-    .sheet .content{padding:16px}
-
-    #manager .left{display:grid;gap:16px}
-    .kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center}
-    .kv .k{color:var(--text-dim);font-size:13px}
-    .kv .v{font-weight:800}
-
-    .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-    .day{padding:10px;text-align:center;border-radius:10px;border:1px solid var(--border);background:#0f1720;font-size:12px;min-height:68px;display:grid;align-content:start;gap:6px}
-    .day .dot{width:8px;height:8px;border-radius:999px;margin:0 auto;background:var(--text-dim)}
-    .day.match .dot{background:var(--primary);box-shadow:0 0 16px rgba(78,156,255,.8)}
-    .day.today{outline:2px solid var(--accent)}
-    .day.played{background:linear-gradient(180deg,#111a25,#0f1720)}
-
-    .minigame{position:relative;width:100%;height:260px;border-radius:12px;background:#0e1620;border:1px dashed var(--border);overflow:hidden}
-
-    footer{text-align:center;color:var(--text-dim);padding:24px 0 60px}
-    .landing{display:grid;gap:16px}
-    @media(min-width:1000px){.landing{grid-template-columns:1.2fr .8fr;align-items:start}}
-    .updates li{margin:6px 0}
-  </style>
+  <!-- Split build: external CSS & JS -->
+  <link rel="stylesheet" href="style.css">
+  <script src="game.js" defer></script>
 </head>
 <body>
-  <header>
+  <header class="app-header">
     <div class="container brand">
       <div class="logo" aria-hidden="true"></div>
       <h1>WebCareerGame</h1>
@@ -84,17 +18,17 @@
   </header>
 
   <main class="container" id="app">
-    <!-- landing page -->
+    <!-- Landing page -->
     <section id="landing" class="landing">
       <div class="card">
         <div class="title">Build your football story</div>
-        <p class="muted" style="margin:0 0 16px 0">Start as a 16 year old free agent and sign your first deal. Train, earn minutes, grow your overall, and climb the leagues.</p>
+        <p class="muted intro">Start as a 16 year old free agent and sign your first deal. Train, earn minutes, grow your overall, and climb the leagues. This is still tiny and buggy on purpose so we can iterate fast.</p>
 
-        <div class="glass" style="margin-bottom:12px;">
-          <div class="row" style="align-items:center;justify-content:space-between;">
+        <div class="glass">
+          <div class="row spread">
             <div>
               <div class="h">Current version</div>
-              <div class="row"><span class="pill">v0.0.3</span><span class="pill">pre-alpha</span><span class="pill">auto-advance + season</span></div>
+              <div class="row pills"><span class="pill">v0.0.3</span><span class="pill">pre-alpha</span><span class="pill">auto-advance + season</span></div>
             </div>
             <button class="btn ghost" id="btn-reset" title="Clear local save">Reset save</button>
           </div>
@@ -104,13 +38,13 @@
           <div class="h">What's new</div>
           <ul class="updates">
             <li>Match days vary between Wed and Sat.</li>
-            <li>Auto advance days pauses on match days with a short delay.</li>
+            <li>Auto advance days: pauses on match days with a short delay.</li>
             <li>Live event log panel under Notes.</li>
-            <li>Season start and season end days with summary and rollover.</li>
-            <li>Offer variety: budgets, contract length tradeoffs, position bonuses.</li>
-            <li>Landing option: Always play to force starting XI.</li>
+            <li>Season start and season end days added with summary and next season rollover.</li>
+            <li>Offer variety: club budgets, contract length tradeoffs, position bonuses.</li>
+            <li>Landing option: "Always play" to force starting XI.</li>
           </ul>
-          <div class="h" style="margin-top:12px;">Before</div>
+          <div class="h before">Before</div>
           <ul class="updates muted"><li>v0.0.2: retire flow, calendar protections, market respecting contracts, logs.</li></ul>
         </div>
       </div>
@@ -119,38 +53,40 @@
         <div class="title">Player setup</div>
         <form id="setup-form">
           <div class="field"><label for="name">Player name</label><input id="name" class="input" required placeholder="Your name" maxlength="24" /></div>
-          <div class="field"><label for="age">Age</label><input id="age" class="input" type="number" min="16" max="40" value="16" /><div class="muted" style="font-size:12px">start at 16 for free agent intro</div></div>
+          <div class="field"><label for="age">Age</label><input id="age" class="input" type="number" min="16" max="40" value="16" /><div class="muted hint">start at 16 for free agent intro</div></div>
           <div class="field"><label for="origin">Origin continent</label>
-            <select id="origin"><option>Europe</option><option>South America</option><option>North America</option><option>Africa</option><option>Asia</option><option>Oceania</option></select>
+            <select id="origin">
+              <option>Europe</option><option>South America</option><option>North America</option><option>Africa</option><option>Asia</option><option>Oceania</option>
+            </select>
           </div>
           <div class="field"><label>Position</label>
-            <div class="row">
-              <label class="pill"><input type="radio" name="pos" value="Attacker" checked /> Attacker</label>
-              <label class="pill"><input type="radio" name="pos" value="Midfield" /> Midfield</label>
-              <label class="pill"><input type="radio" name="pos" value="Defender" /> Defender</label>
-              <label class="pill muted" title="Goalkeeper disabled"><input type="radio" name="pos" value="Goalkeeper" disabled /> Goalkeeper</label>
+            <div class="row wrap">
+              <label class="pill radio"><input type="radio" name="pos" value="Attacker" checked> Attacker</label>
+              <label class="pill radio"><input type="radio" name="pos" value="Midfield"> Midfield</label>
+              <label class="pill radio"><input type="radio" name="pos" value="Defender"> Defender</label>
+              <label class="pill radio muted" title="Goalkeeper disabled"><input type="radio" name="pos" value="Goalkeeper" disabled> Goalkeeper</label>
             </div>
           </div>
-          <label class="pill" style="display:inline-flex;align-items:center;gap:8px"><input type="checkbox" id="always-play"/> Always play</label>
-          <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn primary" type="submit">Start career</button></div>
+          <label class="pill checkbox"><input type="checkbox" id="always-play"> Always play</label>
+          <div class="row end mt"><button class="btn primary" type="submit">Start career</button></div>
         </form>
       </div>
     </section>
 
-    <!-- manager page -->
-    <section id="manager" style="display:none;">
+    <!-- Manager page -->
+    <section id="manager" class="manager hidden">
       <div class="grid">
         <div class="left">
           <div class="card" id="player-card">
             <div class="h">Player</div>
             <div class="kv">
-              <div class="k">Name</div><div class="v" id="v-name">-</div>
-              <div class="k">Age</div><div class="v" id="v-age">-</div>
-              <div class="k">Position</div><div class="v" id="v-pos">-</div>
+              <div class="k">Name</div><div class="v" id="v-name">—</div>
+              <div class="k">Age</div><div class="v" id="v-age">—</div>
+              <div class="k">Position</div><div class="v" id="v-pos">—</div>
               <div class="k">Club</div><div class="v" id="v-club">Free Agent</div>
-              <div class="k">League</div><div class="v" id="v-league">-</div>
-              <div class="k">Status</div><div class="v" id="v-status">-</div>
-              <div class="k">Contract</div><div class="v" id="v-years">-</div>
+              <div class="k">League</div><div class="v" id="v-league">—</div>
+              <div class="k">Status</div><div class="v" id="v-status">—</div>
+              <div class="k">Contract</div><div class="v" id="v-years">—</div>
             </div>
           </div>
 
@@ -159,7 +95,7 @@
             <div class="kv">
               <div class="k">Season</div><div class="v" id="v-season">1</div>
               <div class="k">Week</div><div class="v" id="v-week">1 / 38</div>
-              <div class="k">Overall</div><div class="v" id="v-overall">-</div>
+              <div class="k">Overall</div><div class="v" id="v-overall">—</div>
               <div class="k">Play time</div><div class="v" id="v-playtime">0 min</div>
               <div class="k">Salary</div><div class="v" id="v-salary">£0 /week</div>
               <div class="k">Value</div><div class="v" id="v-value">£0</div>
@@ -169,7 +105,7 @@
 
           <div class="card">
             <div class="h">Actions</div>
-            <div class="row">
+            <div class="row wrap">
               <button class="btn" id="btn-market">Market</button>
               <button class="btn ghost" id="btn-save">Save</button>
               <button class="btn danger" id="btn-retire">Retire</button>
@@ -179,756 +115,84 @@
         </div>
 
         <div class="card">
-          <div class="row" style="justify-content:space-between;align-items:center">
+          <div class="row spread center-v">
             <div>
               <div class="h">This week</div>
-              <div id="week-summary" class="title" style="font-size:18px">-</div>
+              <div id="week-summary" class="title sub">—</div>
             </div>
             <div class="row" id="week-cta"></div>
           </div>
-          <div class="row" style="justify-content:space-between;align-items:center">
-            <div>
-              <div class="h">Calendar</div>
-              <div class="muted" id="date-label">-</div>
-            </div>
-            <div class="row">
-              <button class="btn" id="btn-auto">Auto advance: Off</button>
-              <button class="btn primary" id="btn-next">Next day</button>
-            </div>
-          </div>
-          <div class="calendar" id="calendar"></div>
 
-          <div class="glass" style="margin-top:12px">
-            <div class="h">Notes</div>
-            <div id="notes" class="muted">Training between fixtures. You can only play on match days. Results appear on the calendar.</div>
-          </div>
-          <div class="glass" style="margin-top:12px">
-            <div class="h">Event log</div>
-            <div id="live-log" class="muted" style="max-height:180px; overflow:auto; white-space:pre-line"></div>
+          <div class="week-panel">
+            <div class="glass">
+              <div class="row spread center-v">
+                <div>
+                  <div class="h">Calendar</div>
+                  <div class="muted" id="date-label">—</div>
+                </div>
+                <div class="row">
+                  <button class="btn" id="btn-auto">Auto advance: Off</button>
+                  <button class="btn primary" id="btn-next">Next day</button>
+                </div>
+              </div>
+              <div class="calendar" id="calendar"></div>
+            </div>
+
+            <div class="glass">
+              <div class="h">Notes</div>
+              <div id="notes" class="muted">Training between fixtures. You can only play on match days. Results appear on the calendar.</div>
+            </div>
+
+            <div class="glass">
+              <div class="h">Event log</div>
+              <div id="live-log" class="live-log muted"></div>
+            </div>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="container">v0.0.3 • pre-alpha • made for fun</footer>
+  <footer class="container app-footer">v0.0.3 • pre-alpha • made for fun</footer>
 
-  <!-- market modal -->
+  <!-- Market modal -->
   <dialog id="market-modal" class="modal">
     <div class="sheet">
-      <header class="brand container" style="padding:10px 16px;">
-        <div class="logo"></div><h1 style="font-size:16px">Transfer market</h1>
-        <button class="btn ghost" id="close-market" style="margin-left:auto">Close</button>
+      <header class="brand sheet-head">
+        <div class="logo"></div><h1 class="sheet-title">Transfer market</h1>
+        <button class="btn ghost" id="close-market">Close</button>
       </header>
       <div class="content">
-        <div id="market-info" class="muted" style="margin-bottom:8px"></div>
-        <div id="market-list" class="row" style="flex-direction:column;gap:12px"></div>
-        <div id="market-empty" class="muted" style="display:none">No offers right now.</div>
+        <div id="market-info" class="muted"></div>
+        <div id="market-list" class="row column"></div>
+        <div id="market-empty" class="muted hide">No offers right now.</div>
       </div>
     </div>
   </dialog>
 
-  <!-- match modal -->
+  <!-- Match modal -->
   <dialog id="match-modal" class="modal">
     <div class="sheet">
-      <header class="brand container" style="padding:10px 16px;">
-        <div class="logo"></div><h1 style="font-size:16px">Match day</h1>
-        <button class="btn ghost" id="close-match" style="margin-left:auto">Close</button>
+      <header class="brand sheet-head">
+        <div class="logo"></div><h1 class="sheet-title">Match day</h1>
+        <button class="btn ghost" id="close-match">Close</button>
       </header>
       <div class="content" id="match-content"></div>
     </div>
   </dialog>
 
-  <!-- retire modal -->
+  <!-- Retire modal -->
   <dialog id="retire-modal" class="modal">
     <div class="sheet">
-      <header class="brand container" style="padding:10px 16px;">
-        <div class="logo"></div><h1 style="font-size:16px">Retire</h1>
+      <header class="brand sheet-head">
+        <div class="logo"></div><h1 class="sheet-title">Retire</h1>
       </header>
       <div class="content" id="retire-content"></div>
-      <div class="content" style="display:flex;justify-content:flex-end;gap:8px;padding-top:0">
+      <div class="content sheet-actions">
         <button class="btn ghost" id="retire-cancel">Cancel</button>
         <button class="btn danger" id="retire-confirm">Confirm retire</button>
       </div>
     </div>
   </dialog>
-
-  <script>
-    const LS_KEY = 'webcareergame.save.v003';
-
-    const Game = {
-      state:{
-        player:null,
-        season:1, week:1, currentDate:null, schedule:[],
-        minutesPlayed:0, goals:0, assists:0,
-        lastOffers:[], playedMatchDates:[], eventLog:[],
-        auto:false
-      },
-      money(n){ try{ return '£'+Math.round(n).toLocaleString('en-GB'); } catch { return '£'+Math.round(n); } },
-      save(){ localStorage.setItem(LS_KEY, JSON.stringify(this.state)); },
-      load(){
-        const raw = localStorage.getItem(LS_KEY);
-        if(!raw) return false;
-        try { this.state = JSON.parse(raw); return true; } catch { return false; }
-      },
-      reset(){ localStorage.removeItem(LS_KEY); location.reload(); },
-      log(msg){
-        const stamp = new Date(this.state.currentDate || Date.now()).toDateString();
-        this.state.eventLog.push(`[${stamp}] ${msg}`);
-      },
-      newGame(setup){
-        const base = 55 + Math.floor(Math.random()*6);
-        const overall = Math.min(60, base + (setup.pos==='Defender'?1:0));
-        this.state.player = {
-          name: setup.name.trim(),
-          age: +setup.age,
-          origin: setup.origin,
-          pos: setup.pos,
-          overall,
-          club: 'Free Agent',
-          league: '',
-          status: '-',
-          timeBand: '-',
-          salary: 0,
-          value: 0,
-          balance: 0,
-          yearsLeft: 0,
-          transferListed: false,
-          alwaysPlay: !!setup.alwaysPlay,
-          goldenClub: false
-        };
-        this.state.season = 1;
-        this.state.week = 1;
-        this.state.minutesPlayed = 0;
-        this.state.goals = 0;
-        this.state.assists = 0;
-        this.state.lastOffers = [];
-        this.state.playedMatchDates = [];
-        this.state.eventLog = [];
-
-        const year = new Date().getFullYear();
-        const first = randomWedToSatOfWeek(lastSaturdayOfAugust(year));
-        this.state.schedule = buildSchedule(first, 38);
-        this.state.currentDate = this.state.schedule[0].date - 24*3600*1000;
-
-        this.log(`Career started: ${this.state.player.name}, ${this.state.player.age}, ${this.state.player.pos}, ${this.state.player.origin}`);
-        this.save();
-      }
-    };
-
-    // dates and season schedule
-    function lastSaturdayOfAugust(year){
-      const d = new Date(year,7,31);
-      while(d.getDay() !== 6) d.setDate(d.getDate()-1);
-      return d;
-    }
-    function randomWedToSatOfWeek(anchor){
-      const base = new Date(anchor.getTime());
-      base.setDate(base.getDate() - ((base.getDay()+6)%7));
-      const offset = [3,4,5,6][Math.floor(Math.random()*4)];
-      const d = new Date(base.getTime());
-      d.setDate(base.getDate()+offset);
-      return d;
-    }
-    function weekAfter(d){
-      const n = new Date(d.getTime());
-      n.setDate(n.getDate()+7);
-      return n;
-    }
-    function buildSchedule(firstMatchDate, weeks){
-      const opponents = makeOpponents();
-      const out = [];
-      const seasonStart = new Date(firstMatchDate.getTime());
-      seasonStart.setDate(seasonStart.getDate()-1);
-      out.push({ date: seasonStart.getTime(), type:'seasonStart', isMatch:false, played:true });
-
-      let last = new Date(firstMatchDate.getTime());
-      for(let i=0;i<weeks;i++){
-        const weekAnchor = i===0 ? firstMatchDate : weekAfter(firstMatchDate);
-        firstMatchDate = weekAfter(firstMatchDate);
-        const d = randomWedToSatOfWeek(weekAnchor);
-        if(d.getTime() <= last.getTime()) d.setDate(last.getDate()+2);
-        last = d;
-        out.push({
-          date: d.getTime(),
-          opponent: opponents[i % opponents.length],
-          isMatch: true, played: false, result: null, scoreline: null, type:'match'
-        });
-      }
-      const end = new Date(last.getTime());
-      end.setDate(end.getDate()+2);
-      out.push({ date: end.getTime(), type:'seasonEnd', isMatch:false, played:true });
-      return out;
-    }
-    function makeOpponents(){
-      return [
-        'North London FC','Rivergate City','Bluecastle United','Mersey Rovers','Seaside Albion',
-        'Manchester Borough','Kingsport Athletic','Greenwich Park','Steelbridge FC','South Coast Town',
-        'Highbury Hill','Birmingham Tower','Yorkshire Vale','Bristol Dockers','Leeds Cross',
-        'Wolves Heath','Everfield City','Newcastle Quay','Brighton Shore'
-      ];
-    }
-
-    // utils
-    function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
-    function randNorm(mu=0,sigma=1){
-      const u=1-Math.random(); const v=1-Math.random();
-      return mu + sigma*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
-    }
-    function q(s){ return document.querySelector(s); }
-    function btn(label, onClick, cls='btn primary'){ const b=document.createElement('button'); b.className=cls; b.textContent=label; b.onclick=onClick; return b; }
-    function sameDay(a,b){ const da=new Date(a), db=new Date(b); return da.getFullYear()===db.getFullYear() && da.getMonth()===db.getMonth() && da.getDate()===db.getDate(); }
-    function fmtValue(v){ if(v>=1_000_000) return '£'+(v/1_000_000).toFixed(1)+'m'; if(v>=1_000) return '£'+Math.round(v/100)/10+'k'; return Game.money(v); }
-
-    // economics
-    function computeSalary(age,overall,league,status,timeBand){
-      const overSq = overall*overall;
-      const coef = 15;
-      const leagueFactor = league==='Premier League'?1.5:1;
-      const statusFactor = {'rookie':0.10,'decent':0.18,'key player':0.35,'important':0.60,'star player':1.00}[status] || 0.2;
-      const timeFactor = {'second bench':0.30,'bench':0.50,'rotater':0.80,'match player':1.00,'match starter':1.20}[timeBand] || 0.6;
-      const ageFactor = age<=18?0.75:age<=23?0.95:age<=28?1.10:age<=31?1.00:0.85;
-      const weekly = overSq*coef*timeFactor*leagueFactor*statusFactor*ageFactor;
-      return Math.max(500, Math.min(weekly, 600000));
-    }
-    function computeValue(overall,league,weeklySalary){
-      const leagueFactor = league==='Premier League'?1.15:1;
-      const base = (overall*overall)*330*leagueFactor;
-      const fromSalary = weeklySalary*52*4;
-      return Math.max(base, fromSalary);
-    }
-
-    function makeOfferFor(player, club){ return makeOfferForVaried(player, club); }
-    function makeOfferForVaried(player, club){
-      const o = player.overall;
-      const status =
-        o >= 88 ? pick(['important','star player']) :
-        o >= 80 ? pick(['key player','important']) :
-        o >= 72 ? 'key player' :
-        o >= 65 ? 'decent' : 'rookie';
-
-      const timeMap = {
-        'rookie':'second bench',
-        'decent': pick(['bench','rotater']),
-        'key player': pick(['rotater','match player']),
-        'important': pick(['match player','match starter']),
-        'star player':'match starter'
-      };
-      const timeBand = timeMap[status];
-
-      const clubFactor = 0.8 + Math.random()*0.6;
-      const posBonus = player.pos==='Attacker' ? 1.15 : player.pos==='Midfield' ? 1.05 : 1.0;
-      const years = Math.min(5, Math.max(1, Math.round(randNorm(2.2,1.2))));
-      const league = 'Premier League';
-
-      let salary = computeSalary(player.age, player.overall, league, status, timeBand) * clubFactor * posBonus;
-      const lengthFactor = years >= 4 ? 0.9 : years === 3 ? 1.0 : years === 2 ? 1.08 : 1.15;
-      salary *= lengthFactor;
-
-      const value = computeValue(player.overall, league, salary);
-      return { club, league, years, status, timeBand, salary, value };
-    }
-    function rollMarketOffers(p){
-      const count = 1 + Math.floor(Math.random()*5);
-      const clubs = makeOpponents().sort(()=>Math.random()-0.5).slice(0,count);
-      return clubs.map(c => makeOfferForVaried(p,c));
-    }
-
-    function applyPostMatchGrowth(st, minutes, rating, goals, assists){
-      const targetMap={'second bench':10,'bench':20,'rotater':45,'match player':70,'match starter':90};
-      const target=targetMap[st.player.timeBand]||30;
-      let delta=0;
-      if(minutes>=target) delta+=0.2;
-      if(rating>=7) delta+=0.2;
-      if(rating>=8) delta+=0.2;
-      if(st.player.pos==='Attacker') delta+=goals*.25+assists*.15;
-      if(st.player.pos==='Midfield') delta+=goals*.18+assists*.2;
-      if(st.player.pos==='Defender') delta+=goals*.12+assists*.08;
-      if(minutes<target*.4) delta-=0.15;
-      if(st.player.age>=31) delta-=0.05;
-      st.player.overall=Math.max(55, Math.min(100, +(st.player.overall+delta).toFixed(2)));
-    }
-
-    // render
-    function renderAll(){
-      const st=Game.state;
-      const onLanding = !st.player;
-      q('#landing').style.display = onLanding ? 'grid' : 'none';
-      q('#manager').style.display = onLanding ? 'none' : 'block';
-      if(onLanding) return;
-
-      q('#v-name').textContent = st.player.name;
-      q('#v-age').textContent = st.player.age;
-      q('#v-pos').textContent = st.player.pos;
-      q('#v-club').textContent = st.player.club;
-      q('#v-league').textContent = st.player.league || '-';
-      q('#v-status').textContent = st.player.status;
-      q('#v-years').textContent = st.player.yearsLeft ? `${st.player.yearsLeft} season${st.player.yearsLeft>1?'s':''}` : '-';
-
-      q('#v-season').textContent = st.season;
-      q('#v-week').textContent = `${st.week} / 38`;
-      q('#v-overall').textContent = st.player.overall;
-      q('#v-playtime').textContent = `${st.minutesPlayed} min`;
-      q('#v-salary').textContent = Game.money(st.player.salary) + ' /week';
-      q('#v-value').textContent = fmtValue(st.player.value);
-      q('#v-balance').textContent = Game.money(st.player.balance || 0);
-
-      const today = new Date(st.currentDate);
-      const todayEntry = st.schedule.find(d=>sameDay(d.date, st.currentDate));
-
-      const cta = q('#week-cta'); if(cta) cta.innerHTML = '';
-      if(st.player.club === 'Free Agent'){
-        q('#week-summary').textContent = 'You are a free agent. Explore offers and sign your first deal.';
-        if(cta) cta.append(btn('Open market', ()=>openMarket()));
-      } else if(todayEntry && todayEntry.isMatch){
-        q('#week-summary').textContent = `Match day: ${st.player.club} vs ${todayEntry.opponent}`;
-        if(!todayEntry.played && cta) cta.append(btn('Play match', ()=>openMatch(todayEntry)));
-      } else if(todayEntry && todayEntry.type === 'seasonEnd'){
-        q('#week-summary').textContent = 'Season ended. View summary and continue.';
-        if(cta) cta.append(btn('Season summary', ()=>openSeasonEnd()));
-      } else {
-        q('#week-summary').textContent = 'Training and recovery. Prepare for the next game.';
-      }
-
-      q('#date-label').textContent = today.toDateString();
-      renderCalendar();
-      renderLiveLog();
-      updateAutoBtn();
-    }
-
-    function renderCalendar(){
-      const grid = q('#calendar');
-      grid.innerHTML = '';
-      const st = Game.state;
-
-      const winStart = new Date(st.currentDate);
-      winStart.setDate(winStart.getDate()-14);
-
-      for(let i=0;i<28;i++){
-        const d = new Date(winStart.getTime());
-        d.setDate(d.getDate()+i);
-
-        const entry = st.schedule.find(x=>sameDay(x.date, d.getTime()));
-        const item = document.createElement('div');
-        item.className = 'day'
-          + (entry && entry.isMatch ? ' match' : '')
-          + (sameDay(d.getTime(), st.currentDate) ? ' today' : '')
-          + (entry && entry.played && entry.isMatch ? ' played' : '');
-
-        const dateStr = d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
-
-        let label = '';
-        if(entry){
-          if(entry.type==='seasonStart') label = '<div style="font-size:11px">Season start</div>';
-          else if(entry.type==='seasonEnd') label = '<div style="font-size:11px">Season end</div>';
-          else if(entry.isMatch) label = `<div style="font-size:11px;">vs ${entry.opponent}</div>`;
-        }
-        const extra = entry && entry.result ? `<div style="font-size:11px">${entry.result} ${entry.scoreline}</div>` : '';
-
-        item.innerHTML = `<div class="muted">${dateStr}</div><div class="dot"></div>${label}${extra}`;
-
-        if(entry && entry.isMatch && sameDay(entry.date, st.currentDate)){
-          item.style.cursor='pointer';
-          item.title = entry.played ? 'View match summary' : 'Play match';
-          item.onclick = () => entry.played ? viewMatchSummary(entry) : openMatch(entry);
-        }
-
-        grid.append(item);
-      }
-    }
-
-    function renderLiveLog(){
-      const el=q('#live-log'); if(!el) return;
-      const st=Game.state;
-      const last=(st.eventLog||[]).slice(-30);
-      el.textContent = last.join('\n');
-    }
-
-    // market
-    function openMarket(){
-      const st=Game.state;
-      const info=q('#market-info');
-      const list=q('#market-list');
-      const empty=q('#market-empty');
-      list.innerHTML=''; empty.style.display='none';
-
-      if(st.player.club!=='Free Agent'){
-        info.textContent = st.player.transferListed
-          ? 'You are listed for transfer. Teams may approach soon.'
-          : 'You are under contract. Request a transfer listing if you want to move.';
-        list.append(btn(st.player.transferListed?'Refresh offers':'Request transfer listing', ()=>{
-          if(st.player.transferListed){
-            st.lastOffers = Math.random()<0.6 ? rollMarketOffers(st.player) : [];
-          } else {
-            const approve = Math.random()<0.6;
-            if(approve){
-              st.player.transferListed = true;
-              Game.log('Club approved transfer listing');
-              alert('Your club listed you for transfer.');
-            } else {
-              Game.log('Club denied transfer request');
-              alert('Club denied your request right now. Perform well and ask again.');
-            }
-          }
-          Game.save(); renderAll(); openMarket();
-        }, 'btn primary'));
-      } else {
-        info.textContent='You are a free agent. Choose a club to sign for.';
-        if(!st.lastOffers.length) st.lastOffers = rollMarketOffers(st.player);
-      }
-
-      if(st.lastOffers.length){
-        st.lastOffers.forEach((o,i)=>{
-          const row=document.createElement('div');
-          row.className='glass';
-          row.innerHTML=`
-            <div class="flex-between" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-              <div>
-                <div style="font-weight:800;font-size:16px">${o.club} <span class="badge" style="margin-left:6px">${o.league}</span></div>
-                <div class="muted" style="margin-top:4px;display:flex;gap:8px;flex-wrap:wrap">
-                  <span class="badge">${o.years} season${o.years>1?'s':''}</span>
-                  <span class="badge">${o.status}</span>
-                  <span class="badge">${o.timeBand}</span>
-                  <span class="badge">${Game.money(o.salary)}/week</span>
-                  <span class="badge">value ${fmtValue(o.value)}</span>
-                </div>
-              </div>
-              <div class="row"><button class="btn" data-i="${i}">Accept</button></div>
-            </div>`;
-          row.querySelector('button').onclick=()=>acceptOffer(i);
-          list.append(row);
-        });
-      } else if(st.player.club==='Free Agent'){
-        empty.style.display='block';
-      }
-
-      q('#market-modal').setAttribute('open','');
-    }
-    function acceptOffer(i){
-      const o=Game.state.lastOffers[i];
-      const st=Game.state;
-      st.player.club=o.club;
-      st.player.league=o.league;
-      st.player.status=o.status;
-      st.player.timeBand=o.timeBand;
-      st.player.salary=Math.round(o.salary);
-      st.player.value=Math.round(o.value);
-      st.player.yearsLeft=o.years;
-      st.player.transferListed=false;
-      st.lastOffers=[];
-      Game.log(`Signed for ${o.club}, ${o.years}y, ${o.status}, ${o.timeBand}, ${Game.money(o.salary)}/w`);
-      Game.save(); renderAll();
-      q('#market-modal').removeAttribute('open');
-    }
-
-    // match flow
-    function openMatch(entry){
-      const st=Game.state;
-      if(entry.played){ viewMatchSummary(entry); return; }
-      if(!sameDay(entry.date, st.currentDate)) return;
-
-      const youStart = st.player.alwaysPlay ? true : decideStarting(st.player.timeBand);
-      const willSubIn = youStart ? false : Math.random() < subChance(st.player.timeBand);
-      const baseTeamRating=+(randNorm(6.8,.4).toFixed(1));
-      const ballPoss=Math.max(35,Math.min(65,Math.round(randNorm(50,8))));
-      const teamPasses=Math.round(randNorm(480,90));
-      const opponentPasses=Math.max(180, Math.round(teamPasses*(100-ballPoss)/ballPoss));
-
-      const c=q('#match-content');
-      c.innerHTML='';
-      const wrap=document.createElement('div');
-      wrap.innerHTML=`
-        <div class="title">${st.player.club} vs ${entry.opponent}</div>
-        <div class="muted" style="margin-bottom:12px">Kickoff: ${new Date(entry.date).toDateString()}</div>
-        <div class="glass" style="margin-bottom:12px">
-          <div class="row" style="flex-wrap:wrap;gap:10px">
-            <span class="badge">Team rating ~ ${baseTeamRating}</span>
-            <span class="badge">Possession ${ballPoss}%</span>
-            <span class="badge">Passes ${teamPasses}</span>
-            <span class="badge">Opp passes ${opponentPasses}</span>
-          </div>
-        </div>
-        <div id="match-phase"></div>
-      `;
-      c.append(wrap);
-
-      const phase=q('#match-phase');
-      const startMini=(minutesPlanned)=>requestAnimationFrame(()=>phase.append(minigameView('Make an impact in this moment!', res=>finishMatch(entry, minutesPlanned, res))));
-
-      if(youStart){
-        startMini(90);
-      } else if(willSubIn){
-        const info=document.createElement('div');
-        info.className='glass';
-        info.innerHTML='<div class="h">Update</div><div>You start on the bench. Stay ready.</div>';
-        phase.append(info);
-        setTimeout(()=>{
-          info.innerHTML='<div class="h">Substitution</div><div>You are coming on. Make it count.</div>';
-          startMini(randInt(12,28));
-        },500);
-      } else {
-        const info=document.createElement('div');
-        info.className='glass';
-        info.innerHTML='<div class="h">Update</div><div>You stayed on the bench. Keep working.</div>';
-        phase.append(info);
-        setTimeout(()=>finishMatch(entry, 0, {clicks:0,success:false,score:0}),500);
-      }
-
-      q('#match-modal').setAttribute('open','');
-    }
-    function viewMatchSummary(entry){
-      const st=Game.state;
-      const c=q('#match-content');
-      c.innerHTML='';
-      const box=document.createElement('div');
-      box.className='glass';
-      box.innerHTML=`
-        <div class="h">Match summary</div>
-        <div>${st.player.club} ${entry.scoreline?entry.scoreline:''} ${entry.opponent}</div>
-        <div class="muted">${new Date(entry.date).toDateString()}</div>
-        ${entry.played?`<div style="margin-top:8px">Result: ${entry.result}</div>`:''}
-      `;
-      c.append(box);
-      q('#match-modal').setAttribute('open','');
-    }
-    function openSeasonEnd(){
-      const st=Game.state;
-      const bias=Math.max(0,100-st.player.overall);
-      const pos=Math.max(1,Math.min(20,Math.round(randNorm(10+bias*0.05,4))));
-      const won=pos===1;
-      if(won){ st.player.goldenClub=true; Game.log('🏆 League won! Club marked gold.'); }
-      else { st.player.goldenClub=false; }
-
-      if(st.player.yearsLeft>0){
-        st.player.yearsLeft -= 1;
-        if(st.player.yearsLeft<=0){
-          st.player.yearsLeft=0;
-          st.player.club='Free Agent';
-          st.player.league='';
-          st.player.status='-';
-          st.player.timeBand='-';
-          st.player.salary=0;
-          Game.log('Contract ended. You are a Free Agent.');
-        }
-      }
-
-      const c=q('#match-content');
-      c.innerHTML='';
-      const box=document.createElement('div');
-      box.className='glass';
-      box.innerHTML=`
-        <div class="h">Season ${st.season} summary</div>
-        <div>League position: ${pos}/20 ${won?' • <span class="badge">CHAMPIONS</span>':''}</div>
-        <div class="muted" style="margin-top:8px">Minutes ${st.minutesPlayed}, Goals ${st.goals}, Assists ${st.assists}, Overall ${st.player.overall}</div>
-        <div style="margin-top:10px"><button class="btn primary" id="btn-next-season">Start next season</button></div>
-      `;
-      c.append(box);
-      q('#match-modal').setAttribute('open','');
-
-      q('#btn-next-season').onclick=()=>{
-        q('#match-modal').removeAttribute('open');
-        st.season += 1;
-        st.week = 1;
-        const baseYear = new Date(new Date(st.schedule[0].date).getFullYear()+1,7,31).getFullYear();
-        const first = randomWedToSatOfWeek(lastSaturdayOfAugust(baseYear));
-        st.schedule = buildSchedule(first, 38);
-        st.currentDate = st.schedule[0].date - 24*3600*1000;
-        Game.save(); renderAll();
-      };
-    }
-
-    function decideStarting(tb){
-      const map={'second bench':0.02,'bench':0.10,'rotater':0.35,'match player':0.72,'match starter':0.92};
-      return Math.random() < (map[tb]||0.2);
-    }
-    function subChance(tb){
-      const map={'second bench':0.20,'bench':0.35,'rotater':0.50,'match player':0.35,'match starter':0.10};
-      return map[tb]||0.3;
-    }
-    function randInt(a,b){ return a+Math.floor(Math.random()*(b-a+1)); }
-
-    // minigame
-    function minigameView(title, onDone){
-      const box=document.createElement('div');
-      box.className='glass';
-      box.innerHTML=`<div class="h">Moment</div><div style="margin-bottom:8px">${title}</div>`;
-      const field=document.createElement('div');
-      field.className='minigame';
-      box.append(field);
-
-      const target=10; let clicked=0; let over=false; const start=performance.now(); const duration=5000;
-
-      function placeBubble(el, field){
-        const w=field.clientWidth||300; const h=field.clientHeight||220;
-        const x=Math.random()*(w-34); const y=Math.random()*(h-34);
-        el.style.position='absolute'; el.style.width='34px'; el.style.height='34px'; el.style.borderRadius='999px';
-        el.style.left=x+'px'; el.style.top=y+'px';
-        el.style.background='linear-gradient(180deg,#2a6df1,#204fb3)';
-        el.style.display='grid'; el.style.placeItems='center'; el.style.fontWeight='900'; el.style.userSelect='none'; el.style.cursor='pointer';
-      }
-      function spawn(){
-        for(let i=0;i<target;i++){
-          const b=document.createElement('div');
-          b.className='bubble';
-          b.textContent=i+1;
-          field.append(b);
-          placeBubble(b, field);
-          b.onclick=()=>{ if(over) return; b.remove(); clicked++; if(clicked>=target) finish(true); };
-        }
-      }
-      setTimeout(spawn, 0);
-      const reshuff=setInterval(()=>{ field.querySelectorAll('.bubble').forEach(b=>placeBubble(b, field)); }, 900);
-      const timer=setTimeout(()=>finish(false), duration);
-
-      function finish(win){
-        if(over) return;
-        over=true;
-        clearTimeout(timer); clearInterval(reshuff);
-        const t=performance.now()-start;
-        const success=win;
-        const score=Math.max(0, Math.min(1, clicked/target))*(success?1:0.5)*(1-((t/duration)-0.5)*0.3);
-        const data={clicks:clicked,success,score};
-        const note=document.createElement('div');
-        note.className='glass'; note.style.marginTop='10px';
-        note.innerHTML=`<div class="h">Result</div><div>Clicks ${clicked}/${target}. ${success?'Nice impact.':'Could be better.'}</div>`;
-        box.append(note);
-        setTimeout(()=>onDone(data), 500);
-      }
-
-      return box;
-    }
-
-    // match finalize
-    function finishMatch(entry, minutes, mini){
-      const st=Game.state;
-      const hasMinutes=minutes>0;
-      let rating=null;
-      if(hasMinutes){
-        rating=randNorm(6.4,.6);
-        if(minutes>=60) rating+=.3;
-        rating+=(mini.score||0)*2.0;
-        rating=Math.max(5.0, Math.min(9.8, +rating.toFixed(1)));
-      } else rating=6.0;
-
-      let goals=0,assists=0;
-      if(hasMinutes){
-        const baseG=st.player.pos==='Attacker'?0.22:st.player.pos==='Midfield'?0.10:0.06;
-        const baseA=st.player.pos==='Attacker'?0.10:st.player.pos==='Midfield'?0.18:0.08;
-        const perfBoost=Math.max(0,(rating-6.5)*0.15);
-        goals=Math.random()<baseG+perfBoost?(Math.random()<0.12?2:1):0;
-        assists=Math.random()<baseA+perfBoost?1:0;
-      }
-
-      const teamBase=Math.max(0, Math.round(randNorm(1.4,1.0)));
-      const oppBase=Math.max(0, Math.round(randNorm(1.2,1.0)));
-      const teamGoals=teamBase+(goals>0?1:0);
-      const oppGoals=oppBase;
-      const result=teamGoals>oppGoals?'W':teamGoals<oppGoals?'L':'D';
-      const scoreline=`${teamGoals}-${oppGoals}`;
-
-      entry.played=true; entry.result=result; entry.scoreline=scoreline;
-      Game.state.playedMatchDates.push(entry.date);
-
-      st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists;
-      applyPostMatchGrowth(st, minutes, rating, goals, assists);
-      st.player.value=Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
-      if(st.player.salary>0) st.player.balance=Math.round((st.player.balance||0)+st.player.salary);
-      st.week=Math.min(38, st.week+1);
-
-      Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${goals?`, G${goals}`:''}${assists?`, A${assists}`:''}`);
-      setTimeout(()=>{ nextDay(); },300);
-
-      const c=q('#match-content');
-      const box=document.createElement('div');
-      box.className='glass';
-      box.innerHTML=`
-        <div class="h">Full time</div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
-          <div class="kv"><div class="k">Minutes</div><div class="v">${minutes}</div></div>
-          <div class="kv"><div class="k">Rating</div><div class="v">${rating?.toFixed?rating.toFixed(1):rating}</div></div>
-          <div class="kv"><div class="k">Goals</div><div class="v">${goals}</div></div>
-          <div class="kv"><div class="k">Assists</div><div class="v">${assists}</div></div>
-          <div class="kv"><div class="k">New overall</div><div class="v">${st.player.overall}</div></div>
-        </div>`;
-      c.append(box);
-      Game.save(); renderAll();
-    }
-
-    // flow
-    function nextDay(){ Game.state.currentDate += 24*3600*1000; Game.save(); renderAll(); autoTick(); }
-    function updateAutoBtn(){ const b=q('#btn-auto'); if(!b) return; b.textContent = `Auto advance: ${Game.state.auto?'On':'Off'}`; }
-    function toggleAuto(){ Game.state.auto = !Game.state.auto; Game.save(); updateAutoBtn(); if(Game.state.auto) autoTick(); }
-    function autoTick(){
-      if(!Game.state.auto) return;
-      const entry=Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate));
-      if(entry && entry.isMatch && !entry.played){
-        setTimeout(()=>{ Game.state.auto=false; updateAutoBtn(); },1200);
-        return;
-      }
-      setTimeout(()=>{ if(Game.state.auto){ nextDay(); } }, 800 + Math.floor(Math.random()*600));
-    }
-
-    function downloadLog(){
-      const st=Game.state;
-      const text=(st.eventLog||[]).join('\n');
-      const blob=new Blob([text],{type:'text/plain'});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url; a.download='webcareergame-log.txt'; a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    function retirePrompt(){
-      const st=Game.state;
-      const c=q('#retire-content');
-      c.innerHTML='';
-      const box=document.createElement('div');
-      box.className='glass';
-      box.innerHTML=`
-        <div class="h">Career summary</div>
-        <div class="kv">
-          <div class="k">Name</div><div class="v">${st.player.name}</div>
-          <div class="k">Overall</div><div class="v">${st.player.overall}</div>
-          <div class="k">Club</div><div class="v">${st.player.club}</div>
-          <div class="k">Minutes</div><div class="v">${st.minutesPlayed}</div>
-          <div class="k">Goals</div><div class="v">${st.goals}</div>
-          <div class="k">Assists</div><div class="v">${st.assists}</div>
-          <div class="k">Balance</div><div class="v">${Game.money(st.player.balance||0)}</div>
-        </div>`;
-      c.append(box);
-      q('#retire-modal').setAttribute('open','');
-    }
-
-    // events
-    document.getElementById('setup-form').addEventListener('submit', e=>{
-      e.preventDefault();
-      const name=q('#name').value||'Player';
-      const age=q('#age').value||16;
-      const origin=q('#origin').value;
-      const pos=[...document.querySelectorAll('input[name=pos]')].find(x=>x.checked)?.value||'Attacker';
-      const alwaysPlay=q('#always-play').checked;
-      Game.newGame({name,age,origin,pos,alwaysPlay});
-      renderAll(); openMarket();
-    });
-
-    q('#btn-market').onclick=()=>openMarket();
-    q('#close-market').onclick=()=>q('#market-modal').removeAttribute('open');
-
-    q('#btn-next').onclick=()=>{ nextDay(); };
-    q('#btn-auto').onclick=()=>toggleAuto();
-
-    q('#btn-save').onclick=()=>{ Game.save(); alert('Saved'); };
-    q('#btn-reset').onclick=()=>{ if(confirm('Delete your local save and restart')) Game.reset(); };
-
-    q('#btn-retire').onclick=()=>retirePrompt();
-    q('#retire-cancel').onclick=()=>q('#retire-modal').removeAttribute('open');
-    q('#retire-confirm').onclick=()=>{ q('#retire-modal').removeAttribute('open'); Game.reset(); };
-
-    q('#btn-log').onclick=()=>downloadLog();
-    q('#close-match').onclick=()=>q('#match-modal').removeAttribute('open');
-
-    // boot
-    (function boot(){ if(Game.load()){ renderAll(); } else { renderAll(); } })();
-  </script>
 </body>
 </html>
