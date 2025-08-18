@@ -4,7 +4,7 @@ function toggleAuto(){ Game.state.auto=!Game.state.auto; Game.save(); updateAuto
 function autoTick(){
   if(!Game.state.auto) return;
   const entry = Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate));
-  if(entry && entry.type==='seasonEnd'){ Game.state.auto=false; updateAutoBtn(); return; }
+  if(entry && entry.type==='seasonEnd'){ Game.state.auto=false; updateAutoBtn(); renderAll(); return; }
   setTimeout(()=>{ if(Game.state.auto){ nextDay(); } }, 800+Math.floor(Math.random()*600));
 }
 function nextDay(){
