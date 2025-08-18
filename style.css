@@ -276,3 +276,11 @@ a{ color:var(--primary) }
   .card{padding:12px}
   .btn{padding:8px 12px;font-size:14px}
 }
+
+/* Contract modal */
+.option{cursor:pointer}
+.option.selected{outline:2px solid var(--accent)}
+.prob-high{color:var(--success)}
+.prob-med{color:var(--warning)}
+.prob-low{color:var(--danger)}
+.prob-none{color:#000}

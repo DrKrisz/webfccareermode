@@ -65,7 +65,7 @@
       <div class="card">
         <div class="title">Player setup</div>
         <form id="setup-form">
-          <div class="field"><label for="name">Player name</label><input id="name" class="input" required placeholder="Your name" maxlength="24" /></div>
+          <div class="field"><label for="name">Player name</label><input id="name" class="input" required placeholder="Your name" value="Kris" maxlength="24" /></div>
           <div class="field"><label for="age">Age</label><input id="age" class="input" type="number" min="16" max="40" value="16" /><div class="muted hint">start at 16 for free agent intro</div></div>
           <div class="field"><label for="origin">Origin continent</label>
             <select id="origin">
@@ -212,6 +212,39 @@
         <button class="btn ghost" id="close-shop">Close</button>
       </header>
       <div class="content" id="shop-content"></div>
+    </div>
+  </dialog>
+
+  <!-- Contract modal -->
+  <dialog id="contract-modal" class="modal">
+    <div class="sheet">
+      <header class="brand sheet-head">
+        <div class="logo"></div><h1 class="sheet-title">Contract</h1>
+        <button class="btn ghost" id="close-contract">Close</button>
+      </header>
+      <div class="content">
+        <div class="field">
+          <label for="contract-salary">Desired weekly salary?</label>
+          <input type="range" id="contract-salary">
+          <div id="contract-salary-info"></div>
+        </div>
+        <div class="field">
+          <label>Contract years</label>
+          <div id="contract-years" class="row wrap"></div>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <div id="contract-status" class="row wrap"></div>
+        </div>
+        <div class="field">
+          <label>Time band</label>
+          <div id="contract-time" class="row wrap"></div>
+        </div>
+      </div>
+      <div class="content sheet-actions">
+        <button class="btn ghost" id="contract-cancel">Cancel</button>
+        <button class="btn primary" id="contract-confirm">Submit</button>
+      </div>
     </div>
   </dialog>
 
