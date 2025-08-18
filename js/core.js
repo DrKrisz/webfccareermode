@@ -1,13 +1,13 @@
-/* WebCareerGame • Pre-Alpha v0.0.7
+/* WebCareerGame • Pre-Alpha v0.0.8
    External JS (state, sim, UI). Mobile + desktop safe.
    Keep gameplay deterministic enough for testing but fun.
 */
 
 // Version string injected into the UI and document title.
-const APP_VERSION = 'v0.0.7';
+const APP_VERSION = 'v0.0.8';
 
 // ===== Storage / Globals =====
-const LS_KEY = 'webcareergame.save.v007';
+const LS_KEY = 'webcareergame.save.v008';
 
 const Game = {
   state: {
@@ -28,6 +28,7 @@ const Game = {
     eventLog: [],
     shopPurchases: {},
     auto: false,
+    lastTrainingDate: null,
   },
   money(n){ try { return '£' + Math.round(n).toLocaleString('en-GB'); } catch { return '£' + Math.round(n); } },
   save(){ localStorage.setItem(LS_KEY, JSON.stringify(this.state)); },
@@ -74,6 +75,7 @@ const Game = {
     this.state.lastOffers = []; this.state.playedMatchDates = []; this.state.eventLog = [];
     this.state.shopPurchases = {};
     this.state.auto = false;
+    this.state.lastTrainingDate = null;
     const year = new Date().getFullYear();
     const first = randomWedToSatOfWeek(lastSaturdayOfAugust(year));
     this.state.schedule = buildSchedule(first, 38);
@@ -90,6 +92,7 @@ function migrateState(st){
   st.playedMatchDates = st.playedMatchDates || [];
   st.shopPurchases = st.shopPurchases || {};
   st.auto = !!st.auto;
+  st.lastTrainingDate = st.lastTrainingDate || null;
   if(st.player){
     st.player.salaryMultiplier = st.player.salaryMultiplier || 1;
     st.player.passiveIncome = st.player.passiveIncome || 0;
