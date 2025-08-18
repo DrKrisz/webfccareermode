@@ -29,6 +29,7 @@ const Game = {
     shopPurchases: {},
     auto: false,
     lastTrainingDate: null,
+    seasonProcessed: false,
   },
   money(n){ try { return '£' + Math.round(n).toLocaleString('en-GB'); } catch { return '£' + Math.round(n); } },
   save(){ localStorage.setItem(LS_KEY, JSON.stringify(this.state)); },
@@ -76,6 +77,7 @@ const Game = {
     this.state.shopPurchases = {};
     this.state.auto = false;
     this.state.lastTrainingDate = null;
+    this.state.seasonProcessed = false;
     const year = new Date().getFullYear();
     const first = randomWedToSatOfWeek(lastSaturdayOfAugust(year));
     this.state.schedule = buildSchedule(first, 38);
@@ -93,6 +95,7 @@ function migrateState(st){
   st.shopPurchases = st.shopPurchases || {};
   st.auto = !!st.auto;
   st.lastTrainingDate = st.lastTrainingDate || null;
+  st.seasonProcessed = !!st.seasonProcessed;
   if(st.player){
     st.player.salaryMultiplier = st.player.salaryMultiplier || 1;
     st.player.passiveIncome = st.player.passiveIncome || 0;

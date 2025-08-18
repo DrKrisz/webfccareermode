@@ -1,6 +1,9 @@
 // ===== Season end summary & rollover =====
 function openSeasonEnd(){
   const st=Game.state;
+  if(st.seasonProcessed) return;
+  st.seasonProcessed = true;
+  Game.save();
 
   // compute player's team stats from season
   const stats={w:0,d:0,l:0,gf:0,ga:0};
@@ -44,7 +47,16 @@ function openSeasonEnd(){
     }
   }
 
-  const rows=teams.map((t,i)=>`<tr${t.team===club?' class="highlight"':''}><td>${i+1}</td><td>${t.team}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gf}</td><td>${t.ga}</td><td>${t.pts}</td></tr>`).join('');
+  const rows=teams.map((t,i)=>{
+    const cls=[];
+    if(t.team===club) cls.push('highlight');
+    if(i===0) cls.push('pos1');
+    else if(i===1) cls.push('pos2');
+    else if(i===2) cls.push('pos3');
+    else if(i===3 || i===4) cls.push('pos4-5');
+    else if(i>=17) cls.push('pos-bottom');
+    return `<tr${cls.length?` class="${cls.join(' ')}"`:''}><td>${i+1}</td><td>${t.team}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gf}</td><td>${t.ga}</td><td>${t.pts}</td></tr>`;
+  }).join('');
   const tableHtml=`<table class="league-table"><thead><tr><th>Pos</th><th>Team</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table>`;
 
   const c=q('#match-content'); c.innerHTML='';
@@ -79,6 +91,7 @@ function openSeasonEnd(){
     st.seasonMinutes=0; st.seasonGoals=0; st.seasonAssists=0;
     Object.keys(st.shopPurchases||{}).forEach(id=>{ const it=SHOP_ITEMS.find(i=>i.id===id); if(it && it.perSeason) delete st.shopPurchases[id]; });
     st.player.salaryMultiplier=1;
+    st.seasonProcessed = false;
     Game.log(`Season ${st.season} begins. Age ${st.player.age}. Contract ${st.player.yearsLeft} season${st.player.yearsLeft!==1?'s':''} left.`);
     Game.state.auto=false; updateAutoBtn();
     Game.save(); renderAll();
