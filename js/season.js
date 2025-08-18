@@ -66,6 +66,10 @@ function openSeasonEnd(){
     });
     teams.sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga));
 
+    // snapshot final table for consistency in week summary
+    st.leagueSnapshot = teams.map(t=>({...t}));
+    st.leagueSnapshotWeek = 38;
+
     // adjust team levels based on final positions
     teams.forEach((t,i)=>{
       const lvl=getTeamLevel(t.team);
