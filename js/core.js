@@ -213,6 +213,10 @@ function computeValue(overall,league,weeklySalary){
   const fromSalary=weeklySalary*52*4; // salary-derived valuation proxy
   return Math.max(base, fromSalary);
 }
+
+function weeklySalary(p){
+  return Math.round((p.salary||0)*(p.salaryMultiplier||1));
+}
 function applyPostMatchGrowth(st, minutes, rating, goals, assists){
   const targetMap={'second bench':10,'bench':20,'rotater':45,'match player':70,'match starter':90};
   const target=targetMap[st.player.timeBand]||30; let delta=0;
