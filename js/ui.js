@@ -3,10 +3,27 @@ function q(sel){ return document.querySelector(sel); }
 function btn(label, onClick, cls='btn primary'){ const b=document.createElement('button'); b.className=cls; b.textContent=label; b.onclick=onClick; return b; }
 function fmtValue(v){ if(v>=1_000_000) return '£'+(v/1_000_000).toFixed(1)+'m'; if(v>=1_000) return '£'+Math.round(v/100)/10+'k'; return Game.money(v); }
 
-function showMessage(msg){
+function showPopup(title, msg, onConfirm){
   const modal=q('#message-modal');
   const content=q('#message-content');
-  if(modal && content){ content.textContent=msg; modal.setAttribute('open',''); }
+  const titleEl=q('#message-modal .sheet-title');
+  const actions=q('#message-actions');
+  if(modal && content && titleEl && actions){
+    titleEl.textContent=title;
+    content.textContent=msg;
+    actions.innerHTML='';
+    if(onConfirm){
+      actions.append(
+        btn('Cancel', ()=>modal.removeAttribute('open'), 'btn ghost'),
+        btn('Confirm', ()=>{ modal.removeAttribute('open'); onConfirm(); })
+      );
+    } else {
+      actions.append(
+        btn('OK', ()=>modal.removeAttribute('open'))
+      );
+    }
+    modal.setAttribute('open','');
+  }
 }
 
 // ===== Rendering =====

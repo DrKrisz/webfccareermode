@@ -11,8 +11,8 @@ function openMarket(){
         if(st.player.transferListed){ st.lastOffers = Math.random()<0.6 ? rollMarketOffers(st.player) : []; }
         else {
           const approve = Math.random()<0.6; // 60% approve
-          if(approve){ st.player.transferListed=true; Game.log('Club approved transfer listing'); alert('Your club listed you for transfer.'); }
-          else { Game.log('Club denied transfer request'); alert('Club denied your request right now. Perform well and ask again.'); }
+          if(approve){ st.player.transferListed=true; Game.log('Club approved transfer listing'); showPopup('Transfer market', 'Your club listed you for transfer.'); }
+          else { Game.log('Club denied transfer request'); showPopup('Transfer market', 'Club denied your request right now. Perform well and ask again.'); }
         }
         Game.save(); renderAll(); openMarket();
       }, 'btn primary');

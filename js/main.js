@@ -41,8 +41,8 @@ function wireEvents(){
   click('#btn-train', ()=>openTraining());
   click('#close-training', ()=>q('#training-modal').removeAttribute('open'));
   click('#btn-play', ()=>{ const entry=Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate)); if(entry && entry.isMatch && !entry.played) openMatch(entry); });
-  click('#btn-save', ()=>{ Game.save(); alert('Saved'); });
-  click('#btn-reset', ()=>{ if(confirm('Delete your local save and restart')) Game.reset(); });
+  click('#btn-save', ()=>{ Game.save(); showPopup('Save', 'Game saved'); });
+  click('#btn-reset', ()=>{ showPopup('Reset save', 'Delete your local save and restart?', ()=>Game.reset()); });
   click('#btn-retire', ()=>retirePrompt());
   click('#retire-cancel', ()=>q('#retire-modal').removeAttribute('open'));
   click('#retire-confirm', ()=>{ q('#retire-modal').removeAttribute('open'); Game.reset(); });
