@@ -55,13 +55,12 @@ function renderAll(){
     q('#week-summary').textContent = 'You are a free agent. Explore offers and sign your first deal.';
     if(cta) cta.append(btn('Open market', ()=>openMarket()));
   }
-  else if(todayEntry && todayEntry.isMatch){
-    q('#week-summary').innerHTML = `Match day: ${st.player.club} vs ${todayEntry.opponent}<div class="muted" style="font-size:11px">${todayEntry.competition||'League'} game</div>`;
-    if(!todayEntry.played && cta) cta.append(btn('Play match', ()=>openMatch(todayEntry)));
-  }
   else if(todayEntry && todayEntry.type==='seasonEnd'){
     q('#week-summary').textContent = 'Season ended. View summary and continue.';
     if(cta) cta.append(btn('Season summary', ()=>openSeasonEnd()));
+  }
+  else if(todayEntry && todayEntry.isMatch){
+    q('#week-summary').innerHTML = `Match day: ${st.player.club} vs ${todayEntry.opponent}<div class="muted" style="font-size:11px">${todayEntry.competition||'League'} game</div>`;
   }
   else{
     q('#week-summary').textContent = 'Training and recovery. Prepare for the next game.';
@@ -71,14 +70,25 @@ function renderAll(){
   if(trainBtn){
     const hasMatch=todayEntry && todayEntry.isMatch;
     const injured=st.player.status && st.player.status.toLowerCase().includes('injur');
-    trainBtn.disabled = hasMatch || injured;
+    const cooldown=st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) < 2 : false;
+    trainBtn.disabled = hasMatch || injured || cooldown;
   }
 
   const nextBtn=q('#btn-next');
   if(nextBtn){
+    nextBtn.disabled = !!st.auto;
     if(todayEntry && todayEntry.isMatch && !todayEntry.played) nextBtn.textContent='Simulate match';
     else if(todayEntry && todayEntry.type==='seasonEnd') nextBtn.textContent='Season summary';
     else nextBtn.textContent='Next day';
+  }
+
+  const playBtn=q('#btn-play');
+  if(playBtn){
+    if(todayEntry && todayEntry.isMatch && !todayEntry.played && !st.auto){
+      playBtn.disabled=false;
+    } else {
+      playBtn.disabled=true;
+    }
   }
 
   q('#date-label').textContent = today.toDateString();

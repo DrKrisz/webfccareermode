@@ -2,6 +2,18 @@
 function decideStarting(tb){ const map={'second bench':0.02,'bench':0.10,'rotater':0.35,'match player':0.72,'match starter':0.92}; return Math.random()<(map[tb]||0.2); }
 function subChance(tb){ const map={'second bench':0.20,'bench':0.35,'rotater':0.50,'match player':0.35,'match starter':0.10}; return map[tb]||0.3; }
 
+function countdown(target, cb){
+  let s=3;
+  const label=document.createElement('div');
+  label.className='countdown';
+  target.append(label);
+  const step=()=>{
+    if(s>0){ label.textContent=s--; setTimeout(step,1000); }
+    else { label.remove(); cb(); }
+  };
+  step();
+}
+
 function openMatch(entry){
   const st=Game.state; if(entry.played){ viewMatchSummary(entry); return; }
   if(!sameDay(entry.date, st.currentDate)) return; // only today
@@ -29,7 +41,7 @@ function openMatch(entry){
   c.append(wrap);
   const phase=q('#match-phase');
 
-  const startMini=(minutesPlanned)=>requestAnimationFrame(()=>phase.append(minigameView('Make an impact in this moment!', res=>finishMatch(entry, minutesPlanned, res))));
+  const startMini=(minutesPlanned)=>countdown(phase, ()=>requestAnimationFrame(()=>phase.append(minigameView('Make an impact in this moment!', res=>finishMatch(entry, minutesPlanned, res)))));
   if(youStart){ startMini(90); }
   else if(willSubIn){
     const info=document.createElement('div'); info.className='glass';
@@ -49,15 +61,17 @@ function openTraining(){
   const st=Game.state;
   const todayEntry = st.schedule.find(d=>sameDay(d.date, st.currentDate));
   const injured = st.player.status && st.player.status.toLowerCase().includes('injur');
+  const daysSince = st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
   if(todayEntry && todayEntry.isMatch){ alert('Match scheduled today. Focus on the game.'); return; }
   if(injured){ alert('You are injured and cannot train.'); return; }
+  if(daysSince < 2){ alert(`Training available in ${Math.ceil(2-daysSince)} day(s).`); return; }
   const c=q('#training-content'); if(c) c.innerHTML='';
   const box=document.createElement('div');
   box.innerHTML='<div class="title">Training session</div>';
-  const mini=minigameView('Finish the drill to improve!', res=>finishTraining(res));
-  box.append(mini);
+  const phase=document.createElement('div'); box.append(phase);
   c.append(box);
   q('#training-modal').setAttribute('open','');
+  countdown(phase, ()=>phase.append(minigameView('Finish the drill to improve!', res=>finishTraining(res))));
 }
 
 function finishTraining(mini){
@@ -66,6 +80,7 @@ function finishTraining(mini){
   st.player.overall=Math.min(100, +(st.player.overall+gain).toFixed(2));
   Game.log(`Training session: overall +${gain.toFixed(2)}`);
   const notes=q('#notes'); if(notes) notes.textContent=`Trained today. Overall +${gain.toFixed(2)}.`;
+  st.lastTrainingDate = st.currentDate;
   Game.save();
   renderAll();
   setTimeout(()=>{ q('#training-modal').removeAttribute('open'); }, 600);

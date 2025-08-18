@@ -39,6 +39,7 @@ function wireEvents(){
   click('#btn-auto', ()=>toggleAuto());
   click('#btn-train', ()=>openTraining());
   click('#close-training', ()=>q('#training-modal').removeAttribute('open'));
+  click('#btn-play', ()=>{ const entry=Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate)); if(entry && entry.isMatch && !entry.played) openMatch(entry); });
   click('#btn-save', ()=>{ Game.save(); alert('Saved'); });
   click('#btn-reset', ()=>{ if(confirm('Delete your local save and restart')) Game.reset(); });
   click('#btn-retire', ()=>retirePrompt());

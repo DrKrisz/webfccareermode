@@ -1,6 +1,6 @@
 // ===== Time controls =====
 function updateAutoBtn(){ const b=q('#btn-auto'); if(!b) return; b.textContent = `Auto advance: ${Game.state.auto? 'On':'Off'}`; }
-function toggleAuto(){ Game.state.auto=!Game.state.auto; Game.save(); updateAutoBtn(); if(Game.state.auto) autoTick(); }
+function toggleAuto(){ Game.state.auto=!Game.state.auto; Game.save(); updateAutoBtn(); renderAll(); if(Game.state.auto) autoTick(); }
 function autoTick(){
   if(!Game.state.auto) return;
   const entry = Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate));
