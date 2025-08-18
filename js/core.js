@@ -1,13 +1,26 @@
-/* WebCareerGame • Pre-Alpha v0.0.8
+/* WebCareerGame • Pre-Alpha v0.0.9
    External JS (state, sim, UI). Mobile + desktop safe.
    Keep gameplay deterministic enough for testing but fun.
 */
 
 // Version string injected into the UI and document title.
-const APP_VERSION = 'v0.0.8';
+const APP_VERSION = 'v0.0.9';
 
 // ===== Storage / Globals =====
-const LS_KEY = 'webcareergame.save.v008';
+const LS_KEY = 'webcareergame.save.v009';
+
+// Base strength levels for each club (0-100 scale roughly reflecting squad quality)
+const TEAM_BASE_LEVELS = {
+  'Arsenal':85,'Aston Villa':78,'Bournemouth':70,'Brentford':74,
+  'Brighton & Hove Albion':78,'Burnley':68,'Chelsea':82,'Crystal Palace':72,
+  'Everton':72,'Fulham':73,'Liverpool':88,'Luton Town':65,
+  'Manchester City':90,'Manchester United':84,'Newcastle United':80,
+  'Nottingham Forest':70,'Sheffield United':67,'Tottenham Hotspur':80,
+  'West Ham United':75,'Wolverhampton Wanderers':71
+};
+function getTeamLevel(club){
+  return (Game.state.teamLevels && Game.state.teamLevels[club]) || TEAM_BASE_LEVELS[club] || 60;
+}
 
 const Game = {
   state: {
@@ -30,6 +43,10 @@ const Game = {
     auto: false,
     lastTrainingDate: null,
     seasonProcessed: false,
+    teamLevels: {},
+    leagueSnapshot: [],
+    leagueSnapshotWeek: 0,
+    seasonSummary: null,
   },
   money(n){ try { return '£' + Math.round(n).toLocaleString('en-GB'); } catch { return '£' + Math.round(n); } },
   save(){ localStorage.setItem(LS_KEY, JSON.stringify(this.state)); },
@@ -78,6 +95,10 @@ const Game = {
     this.state.auto = false;
     this.state.lastTrainingDate = null;
     this.state.seasonProcessed = false;
+    this.state.teamLevels = {...TEAM_BASE_LEVELS};
+    this.state.leagueSnapshot = [];
+    this.state.leagueSnapshotWeek = 0;
+    this.state.seasonSummary = null;
     const year = new Date().getFullYear();
     const first = randomWedToSatOfWeek(lastSaturdayOfAugust(year));
     this.state.schedule = buildSchedule(first, 38);
@@ -96,6 +117,10 @@ function migrateState(st){
   st.auto = !!st.auto;
   st.lastTrainingDate = st.lastTrainingDate || null;
   st.seasonProcessed = !!st.seasonProcessed;
+  st.teamLevels = st.teamLevels || {...TEAM_BASE_LEVELS};
+  st.leagueSnapshot = st.leagueSnapshot || [];
+  st.leagueSnapshotWeek = st.leagueSnapshotWeek || 0;
+  st.seasonSummary = st.seasonSummary || null;
   if(st.player){
     st.player.salaryMultiplier = st.player.salaryMultiplier || 1;
     st.player.passiveIncome = st.player.passiveIncome || 0;
@@ -196,11 +221,19 @@ function applyPostMatchGrowth(st, minutes, rating, goals, assists){
 // ===== Market / Contracts =====
 function rollMarketOffers(p){
   const count=1+Math.floor(Math.random()*5);
-  const clubs=makeOpponents().sort(()=>Math.random()-0.5).slice(0,count);
-  return clubs.map(c=>makeOfferForVaried(p,c));
+  const clubs=makeOpponents().sort(()=>Math.random()-0.5);
+  const offers=[];
+  for(const club of clubs){
+    if(offers.length>=count) break;
+    const lvl=getTeamLevel(club);
+    const diff=lvl - p.overall;
+    const chance = diff<=0?0.8: diff<5?0.6: diff<10?0.3: 0.05; // big clubs rarely approach weak players
+    if(Math.random()<chance) offers.push(makeOfferForVaried(p,club,lvl));
+  }
+  return offers;
 }
 function makeOfferFor(player, club){ return makeOfferForVaried(player, club); }
-function makeOfferForVaried(player, club){
+function makeOfferForVaried(player, club, level){
   const o=player.overall;
   const status = o>=88?pick(['important','star player'])
               : o>=80?pick(['key player','important'])
@@ -216,6 +249,7 @@ function makeOfferForVaried(player, club){
   const lengthFactor = years>=4?0.9: years===3?1.0: years===2?1.08:1.15; // shorter pays more
   salary*=lengthFactor;
   const value=computeValue(player.overall,league,salary);
-  return {club,league,years,status,timeBand,salary,value};
+  const lvl = level!=null?level:getTeamLevel(club);
+  return {club,league,years,status,timeBand,salary,value,level:lvl};
 }
 

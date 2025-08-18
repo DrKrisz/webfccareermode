@@ -128,8 +128,11 @@ function finishMatch(entry, minutes, mini){
     assists = Math.random()<baseA+perfBoost ? 1 : 0;
   }
   // Team scoreline
-  const teamBase=Math.max(0, Math.round(randNorm(1.4,1.0)));
-  const oppBase =Math.max(0, Math.round(randNorm(1.2,1.0)));
+  const myLvl=getTeamLevel(st.player.club);
+  const oppLvl=getTeamLevel(entry.opponent);
+  const diff=(myLvl-oppLvl)/20; // level difference biases score
+  const teamBase=Math.max(0, Math.round(randNorm(1.4+diff,1.0)));
+  const oppBase =Math.max(0, Math.round(randNorm(1.2-diff,1.0)));
   const teamGoals=teamBase+(goals>0?1:0);
   const oppGoals =oppBase;
   const result=teamGoals>oppGoals?'W': teamGoals<oppGoals?'L':'D';
@@ -179,8 +182,11 @@ function simulateMatch(entry){
     goals = Math.random()<baseG+perfBoost ? (Math.random()<0.12?2:1) : 0;
     assists = Math.random()<baseA+perfBoost ? 1 : 0;
   }
-  const teamBase=Math.max(0, Math.round(randNorm(1.4,1.0)));
-  const oppBase=Math.max(0, Math.round(randNorm(1.2,1.0)));
+  const myLvl=getTeamLevel(st.player.club);
+  const oppLvl=getTeamLevel(entry.opponent);
+  const diff=(myLvl-oppLvl)/20;
+  const teamBase=Math.max(0, Math.round(randNorm(1.4+diff,1.0)));
+  const oppBase=Math.max(0, Math.round(randNorm(1.2-diff,1.0)));
   const teamGoals=teamBase+(goals>0?1:0);
   const oppGoals=oppBase;
   const result=teamGoals>oppGoals?'W': teamGoals<oppGoals?'L':'D';

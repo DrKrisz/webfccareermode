@@ -1,42 +1,103 @@
-// ===== Season end summary & rollover =====
-function openSeasonEnd(){
+// ===== League snapshot during season =====
+function updateLeagueSnapshot(){
   const st=Game.state;
-  if(st.seasonProcessed) return;
-  st.seasonProcessed = true;
-  Game.save();
-
-  // compute player's team stats from season
-  const stats={w:0,d:0,l:0,gf:0,ga:0};
-  st.schedule.filter(e=>e.isMatch).forEach(e=>{
-    if(e.played){
-      if(e.result==='W') stats.w++;
-      else if(e.result==='D') stats.d++;
-      else stats.l++;
-      if(e.scoreline){ const [gf,ga]=e.scoreline.split('-').map(Number); stats.gf+=gf; stats.ga+=ga; }
-    } else {
-      stats.l++; // unplayed matches count as losses
-    }
-  });
-  stats.pts=stats.w*3+stats.d;
-
+  if(!st.player || st.player.club==='Free Agent') return;
+  const played = st.schedule.filter(e=>e.isMatch && e.played).length;
+  if(st.leagueSnapshotWeek===played) return;
   const club=st.player.club;
   const teams=makeOpponents().map(t=>({team:t}));
-  if(!teams.find(t=>t.team===club)){ teams.pop(); teams.push({team:club}); }
+  const stats={w:0,d:0,l:0,gf:0,ga:0};
+  st.schedule.filter(e=>e.isMatch && e.played).forEach(e=>{
+    if(e.result==='W') stats.w++;
+    else if(e.result==='D') stats.d++;
+    else stats.l++;
+    if(e.scoreline){ const [gf,ga]=e.scoreline.split('-').map(Number); stats.gf+=gf; stats.ga+=ga; }
+  });
+  stats.pts=stats.w*3+stats.d;
   teams.forEach(t=>{
     if(t.team===club){ Object.assign(t,stats); }
     else {
-      const w=randInt(5,25); const d=randInt(0,38-w); const l=38-w-d;
-      const gf=w*randInt(1,3)+d*randInt(0,2)+randInt(0,10);
-      const ga=l*randInt(1,3)+d*randInt(0,2)+randInt(0,10);
+      const lvl=getTeamLevel(t.team);
+      const w=randInt(0, Math.min(played, Math.round(played*(0.2+lvl/200))));
+      const d=randInt(0, Math.min(played-w, Math.round(played*0.3)));
+      const l=played-w-d;
+      const gf=w*randInt(1,3)+d*randInt(0,2)+randInt(0,5);
+      const ga=l*randInt(1,3)+d*randInt(0,2)+randInt(0,5);
       const pts=w*3+d;
       Object.assign(t,{w,d,l,gf,ga,pts});
     }
   });
   teams.sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga));
-  const pos=teams.findIndex(t=>t.team===club)+1;
-  const won=pos===1;
-  if(won){ st.player.goldenClub=true; Game.log('🏆 League won! Club marked gold.'); }
-  else { st.player.goldenClub=false; }
+  st.leagueSnapshot=teams;
+  st.leagueSnapshotWeek=played;
+  Game.save();
+}
+
+// ===== Season end summary & rollover =====
+function openSeasonEnd(){
+  const st=Game.state;
+  if(!st.seasonSummary){
+    // compute player's team stats from season
+    const stats={w:0,d:0,l:0,gf:0,ga:0};
+    st.schedule.filter(e=>e.isMatch).forEach(e=>{
+      if(e.played){
+        if(e.result==='W') stats.w++;
+        else if(e.result==='D') stats.d++;
+        else stats.l++;
+        if(e.scoreline){ const [gf,ga]=e.scoreline.split('-').map(Number); stats.gf+=gf; stats.ga+=ga; }
+      } else {
+        stats.l++; // unplayed matches count as losses
+      }
+    });
+    stats.pts=stats.w*3+stats.d;
+
+    const club=st.player.club;
+    const teams=makeOpponents().map(t=>({team:t}));
+    if(!teams.find(t=>t.team===club)){ teams.pop(); teams.push({team:club}); }
+    teams.forEach(t=>{
+      if(t.team===club){ Object.assign(t,stats); }
+      else {
+        const w=randInt(5,25); const d=randInt(0,38-w); const l=38-w-d;
+        const gf=w*randInt(1,3)+d*randInt(0,2)+randInt(0,10);
+        const ga=l*randInt(1,3)+d*randInt(0,2)+randInt(0,10);
+        const pts=w*3+d;
+        Object.assign(t,{w,d,l,gf,ga,pts});
+      }
+    });
+    teams.sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga));
+
+    // adjust team levels based on final positions
+    teams.forEach((t,i)=>{
+      const lvl=getTeamLevel(t.team);
+      if(i<3) st.teamLevels[t.team]=Math.min(99,lvl+2);
+      else if(i<10) st.teamLevels[t.team]=Math.min(99,lvl+1);
+      else if(i>=17) st.teamLevels[t.team]=Math.max(50,lvl-2);
+      else st.teamLevels[t.team]=Math.max(50,lvl);
+    });
+
+    const pos=teams.findIndex(t=>t.team===club)+1;
+    const won=pos===1;
+    if(won){ st.player.goldenClub=true; Game.log('🏆 League won! Club marked gold.'); }
+    else { st.player.goldenClub=false; }
+
+    const rows=teams.map((t,i)=>{
+      const cls=[];
+      if(t.team===club) cls.push('highlight');
+      if(i===0) cls.push('pos1');
+      else if(i===1) cls.push('pos2');
+      else if(i===2) cls.push('pos3');
+      else if(i===3 || i===4) cls.push('pos4-5');
+      else if(i>=17) cls.push('pos-bottom');
+      return `<tr${cls.length?` class="${cls.join(' ')}"`:''}><td>${i+1}</td><td>${t.team}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gf}</td><td>${t.ga}</td><td>${t.pts}</td></tr>`;
+    }).join('');
+    const tableHtml=`<table class="league-table"><thead><tr><th>Pos</th><th>Team</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table>`;
+
+    st.seasonSummary = {teams,pos,won,tableHtml};
+    st.seasonProcessed=true;
+    Game.save();
+  }
+
+  const {pos,won,tableHtml} = st.seasonSummary;
 
   // contract years decrement at season end
   if(st.player.yearsLeft>0){
@@ -46,18 +107,6 @@ function openSeasonEnd(){
       Game.log('Contract ended. You are a Free Agent.');
     }
   }
-
-  const rows=teams.map((t,i)=>{
-    const cls=[];
-    if(t.team===club) cls.push('highlight');
-    if(i===0) cls.push('pos1');
-    else if(i===1) cls.push('pos2');
-    else if(i===2) cls.push('pos3');
-    else if(i===3 || i===4) cls.push('pos4-5');
-    else if(i>=17) cls.push('pos-bottom');
-    return `<tr${cls.length?` class="${cls.join(' ')}"`:''}><td>${i+1}</td><td>${t.team}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gf}</td><td>${t.ga}</td><td>${t.pts}</td></tr>`;
-  }).join('');
-  const tableHtml=`<table class="league-table"><thead><tr><th>Pos</th><th>Team</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table>`;
 
   const c=q('#match-content'); c.innerHTML='';
   const box=document.createElement('div'); box.className='glass';
@@ -92,6 +141,9 @@ function openSeasonEnd(){
     Object.keys(st.shopPurchases||{}).forEach(id=>{ const it=SHOP_ITEMS.find(i=>i.id===id); if(it && it.perSeason) delete st.shopPurchases[id]; });
     st.player.salaryMultiplier=1;
     st.seasonProcessed = false;
+    st.seasonSummary = null;
+    st.leagueSnapshot = [];
+    st.leagueSnapshotWeek = 0;
     Game.log(`Season ${st.season} begins. Age ${st.player.age}. Contract ${st.player.yearsLeft} season${st.player.yearsLeft!==1?'s':''} left.`);
     Game.state.auto=false; updateAutoBtn();
     Game.save(); renderAll();
