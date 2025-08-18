@@ -36,6 +36,7 @@ function wireEvents(){
   click('#btn-contract', ()=>openContractRework());
   click('#close-market', ()=>q('#market-modal').removeAttribute('open'));
   click('#close-shop', ()=>q('#shop-modal').removeAttribute('open'));
+  click('#close-contract', ()=>q('#contract-modal').removeAttribute('open'));
   click('#btn-next', ()=>nextDay());
   click('#btn-auto', ()=>toggleAuto());
   click('#btn-train', ()=>openTraining());
