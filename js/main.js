@@ -33,6 +33,7 @@ function wireEvents(){
   const click = (id, fn)=>{ const el=q(id); if(el) el.onclick=fn; };
   click('#btn-market', ()=>openMarket());
   click('#btn-shop', ()=>openShop());
+  click('#btn-contract', ()=>openContractRework());
   click('#close-market', ()=>q('#market-modal').removeAttribute('open'));
   click('#close-shop', ()=>q('#shop-modal').removeAttribute('open'));
   click('#btn-next', ()=>nextDay());
