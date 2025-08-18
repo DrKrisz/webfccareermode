@@ -283,4 +283,4 @@ a{ color:var(--primary) }
 .prob-high{color:var(--success)}
 .prob-med{color:var(--warning)}
 .prob-low{color:var(--danger)}
-.prob-none{color:#000}
+.prob-none{color:var(--danger)}
