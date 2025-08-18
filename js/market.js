@@ -28,6 +28,7 @@ function openMarket(){
             <span class="pill">${o.years} season${o.years>1?'s':''}</span>
             <span class="pill">${o.status}</span>
             <span class="pill">${o.timeBand}</span>
+            <span class="pill">Lvl ${o.level||getTeamLevel(o.club)}</span>
             <span class="pill">${Game.money(o.salary)}/week</span>
             <span class="pill">value ${fmtValue(o.value)}</span>
           </div>

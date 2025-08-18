@@ -15,6 +15,7 @@ function renderAll(){
   q('#landing').style.display = onLanding ? 'grid' : 'none';
   q('#manager').style.display = onLanding ? 'none' : 'block';
   if(onLanding) return;
+  updateLeagueSnapshot();
 
   // Left info
   q('#v-name').textContent = st.player.name;
@@ -63,6 +64,16 @@ function renderAll(){
   }
   else{
     q('#week-summary').textContent = 'Training and recovery. Prepare for the next game.';
+  }
+
+  if(st.player.club!=='Free Agent' && st.leagueSnapshot && st.leagueSnapshot.length){
+    const pos = st.leagueSnapshot.findIndex(t=>t.team===st.player.club)+1;
+    const leader = st.leagueSnapshot[0];
+    const info = document.createElement('div');
+    info.className='muted';
+    info.style.fontSize='12px';
+    info.textContent = `Table: ${pos}/20 • Leader ${leader.team} ${leader.pts} pts`;
+    q('#week-summary').append(info);
   }
 
   const trainBtn=q('#btn-train');
