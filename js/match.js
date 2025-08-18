@@ -62,9 +62,9 @@ function openTraining(){
   const todayEntry = st.schedule.find(d=>sameDay(d.date, st.currentDate));
   const injured = st.player.status && st.player.status.toLowerCase().includes('injur');
   const daysSince = st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
-  if(todayEntry && todayEntry.isMatch){ alert('Match scheduled today. Focus on the game.'); return; }
-  if(injured){ alert('You are injured and cannot train.'); return; }
-  if(daysSince < 2){ alert(`Training available in ${Math.ceil(2-daysSince)} day(s).`); return; }
+  if(todayEntry && todayEntry.isMatch){ showPopup('Training', 'Match scheduled today. Focus on the game.'); return; }
+  if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
+  if(daysSince < 2){ showPopup('Training', `Training available in ${Math.ceil(2-daysSince)} day(s).`); return; }
   const c=q('#training-content'); if(c) c.innerHTML='';
   const box=document.createElement('div');
   box.innerHTML='<div class="title">Training session</div>';

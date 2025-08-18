@@ -125,7 +125,7 @@ function openSeasonEnd(){
     } else if(lastSeason.min<600){
       msg='Tough season. Salary stays the same.';
     }
-    showMessage(msg);
+    showPopup('Manager', msg);
     Game.log(`Manager: ${msg}`);
 
     if(st.player.club!=='Free Agent'){

@@ -32,13 +32,13 @@ function buyItem(item){
   const st=Game.state;
   const purchases = st.shopPurchases || (st.shopPurchases = {});
   const count=purchases[item.id]||0;
-  if(count>=item.limit){ alert('Item limit reached.'); return; }
-  if((st.player.balance||0)<item.cost){ alert('Not enough funds.'); return; }
+  if(count>=item.limit){ showPopup('Shop', 'Item limit reached.'); return; }
+  if((st.player.balance||0)<item.cost){ showPopup('Shop', 'Not enough funds.'); return; }
   st.player.balance-=item.cost;
   purchases[item.id]=count+1;
   item.apply(st);
   Game.log(`Bought ${item.name} for ${Game.money(item.cost)}`);
-  showMessage(`Bought ${item.name}!`);
+  showPopup('Shop', `Bought ${item.name}!`);
   Game.save(); renderAll(); openShop();
 }
 
