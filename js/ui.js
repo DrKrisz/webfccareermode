@@ -60,7 +60,7 @@ function renderAll(){
     if(cta) cta.append(btn('Season summary', ()=>openSeasonEnd()));
   }
   else if(todayEntry && todayEntry.isMatch){
-    q('#week-summary').innerHTML = `Match day: ${st.player.club} vs ${todayEntry.opponent}<div class="muted" style="font-size:11px">${todayEntry.competition||'League'} game</div>`;
+    q('#week-summary').innerHTML = `Match day: ${st.player.club} vs ${todayEntry.opponent}<div class="muted" style="font-size:11px"></div>`;
   }
   else{
     q('#week-summary').textContent = 'Training and recovery. Prepare for the next game.';
