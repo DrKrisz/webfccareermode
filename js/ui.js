@@ -57,7 +57,6 @@ function renderAll(){
   }
   else if(todayEntry && todayEntry.type==='seasonEnd'){
     q('#week-summary').textContent = 'Season ended. View summary and continue.';
-    if(cta) cta.append(btn('Season summary', ()=>openSeasonEnd()));
   }
   else if(todayEntry && todayEntry.isMatch){
     q('#week-summary').innerHTML = `Match day: ${st.player.club} vs ${todayEntry.opponent}<div class="muted" style="font-size:11px"></div>`;

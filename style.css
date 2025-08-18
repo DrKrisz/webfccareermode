@@ -252,9 +252,15 @@ a{ color:var(--primary) }
 .league-table th,.league-table td{padding:4px 8px;text-align:center}
 .league-table thead{color:var(--text-dim)}
 .league-table tr:nth-child(even){background:var(--surface-2)}
-.league-table tr.highlight{background:rgba(78,156,255,.15)}
+.league-table tr.highlight{outline:2px solid var(--primary)}
 .league-table td:first-child{text-align:right;width:32px}
 .league-table td:nth-child(2){text-align:left}
+
+.league-table tr.pos1{background:linear-gradient(180deg,#ffd700,#b8860b)}
+.league-table tr.pos2{background:rgba(192,192,192,.4)}
+.league-table tr.pos3{background:rgba(205,127,50,.4)}
+.league-table tr.pos4-5{background:rgba(78,156,255,.2)}
+.league-table tr.pos-bottom{background:rgba(255,122,122,.25)}
 
 /* Landing layout */
 .landing{display:grid;gap:16px}
