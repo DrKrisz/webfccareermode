@@ -1,6 +1,15 @@
 // ===== Contract rework =====
 function statusRank(s){ return ['rookie','decent','key player','important','star player'].indexOf(s); }
 function timeRank(t){ return ['second bench','bench','rotater','match player','match starter'].indexOf(t); }
+function allowedStatuses(age,overall,current){
+  const list=['rookie'];
+  if(overall>=60) list.push('decent');
+  if(overall>=70) list.push('key player');
+  if(overall>=80) list.push('important');
+  if(overall>=88 && age>=21) list.push('star player');
+  if(current && !list.includes(current)) list.push(current);
+  return list;
+}
 function contractChance(st,salary,years,status,time){
   const maxSalary=computeSalary(st.player.age, st.player.overall, st.player.league||'Premier League', status, time);
   if(salary>maxSalary*1.2) return 0;
@@ -39,8 +48,9 @@ function openContractRework(){
 
   slider.min=st.player.salary;
   const maxSal=computeSalary(st.player.age, st.player.overall, st.player.league||'Premier League', selStatus, selTime);
-  slider.max=Math.round(maxSal*1.2);
+  slider.max=Math.round(Math.max(maxSal, st.player.salary)*1.2);
   slider.value=st.player.salary;
+  slider.step=100;
 
   yearsDiv.innerHTML='';
   [0,1,2,3].forEach(n=>{
@@ -54,7 +64,7 @@ function openContractRework(){
   });
 
   statusDiv.innerHTML='';
-  ['rookie','decent','key player','important','star player'].forEach(s=>{
+  allowedStatuses(st.player.age, st.player.overall, st.player.status).forEach(s=>{
     const b=document.createElement('button');
     b.textContent=s;
     b.dataset.value=s;
@@ -83,7 +93,7 @@ function openContractRework(){
     const chance=contractChance(st,sal,selYear,selStatus,selTime);
     const diff=Math.round((sal-st.player.salary)/st.player.salary*100);
     info.textContent=`£${sal.toLocaleString()} (${diff>=0?'+':''}${diff}%)`;
-    info.className=chanceClass(chance);
+    info.className=sal===st.player.salary?'' : chanceClass(chance);
 
     yearsDiv.querySelectorAll('button').forEach(btn=>{
       const val=+btn.dataset.value;
