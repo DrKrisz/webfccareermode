@@ -3,17 +3,21 @@ function openMarket(){
   const st=Game.state; const info=q('#market-info'); const list=q('#market-list'); const empty=q('#market-empty');
   list.innerHTML=''; empty.classList.add('hidden');
   if(st.player.club!=='Free Agent'){
-    info.textContent = st.player.transferListed? 'You are listed for transfer. Teams may approach soon.' : 'You are under contract. Request a transfer listing if you want to move.';
-    const action = btn(st.player.transferListed?'Refresh offers':'Request transfer listing', ()=>{
-      if(st.player.transferListed){ st.lastOffers = Math.random()<0.6 ? rollMarketOffers(st.player) : []; }
-      else {
-        const approve = Math.random()<0.6; // 60% approve
-        if(approve){ st.player.transferListed=true; Game.log('Club approved transfer listing'); alert('Your club listed you for transfer.'); }
-        else { Game.log('Club denied transfer request'); alert('Club denied your request right now. Perform well and ask again.'); }
-      }
-      Game.save(); renderAll(); openMarket();
-    }, 'btn primary');
-    list.append(action);
+    if(st.player.marketBlocked>0){
+      info.textContent = `Contract locked for ${st.player.marketBlocked} more season${st.player.marketBlocked>1?'s':''}.`;
+    } else {
+      info.textContent = st.player.transferListed? 'You are listed for transfer. Teams may approach soon.' : 'You are under contract. Request a transfer listing if you want to move.';
+      const action = btn(st.player.transferListed?'Refresh offers':'Request transfer listing', ()=>{
+        if(st.player.transferListed){ st.lastOffers = Math.random()<0.6 ? rollMarketOffers(st.player) : []; }
+        else {
+          const approve = Math.random()<0.6; // 60% approve
+          if(approve){ st.player.transferListed=true; Game.log('Club approved transfer listing'); alert('Your club listed you for transfer.'); }
+          else { Game.log('Club denied transfer request'); alert('Club denied your request right now. Perform well and ask again.'); }
+        }
+        Game.save(); renderAll(); openMarket();
+      }, 'btn primary');
+      list.append(action);
+    }
   } else {
     info.textContent = 'You are a free agent. Choose a club to sign for.';
     if(!st.lastOffers.length) st.lastOffers = rollMarketOffers(st.player);
@@ -31,6 +35,7 @@ function openMarket(){
             <span class="pill">Lvl ${o.level||getTeamLevel(o.club)}</span>
             <span class="pill">${Game.money(o.salary)}/week</span>
             <span class="pill">value ${fmtValue(o.value)}</span>
+            ${o.releaseClauseFee?`<span class="pill">Release ${Game.money(o.releaseClauseFee)}</span>`:''}
           </div>
         </div>
         <div class="row"><button class="btn" data-i="${i}">Accept</button></div>`;
@@ -47,6 +52,9 @@ function acceptOffer(i){
   st.player.club=o.club; st.player.league=o.league; st.player.status=o.status; st.player.timeBand=o.timeBand;
   st.player.salary=Math.round(o.salary); st.player.value=Math.round(o.value);
   st.player.yearsLeft=o.years; st.player.transferListed=false; st.lastOffers=[];
+  st.player.releaseClause=Math.round((o.releaseClauseFee?o.releaseClauseFee:o.value)*1.5);
+  st.player.marketBlocked=0; st.player.contractReworkYear=0;
+  if(o.releaseClauseFee) Game.log(`Release clause of ${Game.money(o.releaseClauseFee)} activated by ${o.club}`);
   ensureNoSelfMatches(o.club);
   Game.log(`Signed for ${o.club}, ${o.years}y, ${o.status}, ${o.timeBand}, ${Game.money(o.salary)}/w`);
   Game.save(); renderAll(); q('#market-modal').removeAttribute('open');

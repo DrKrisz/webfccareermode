@@ -130,7 +130,8 @@ function finishMatch(entry, minutes, mini){
   // Team scoreline
   const myLvl=getTeamLevel(st.player.club);
   const oppLvl=getTeamLevel(entry.opponent);
-  const diff=(myLvl-oppLvl)/20; // level difference biases score
+  let diff=(myLvl-oppLvl)/20; // level difference biases score
+  if(myLvl<75) diff+=(75-myLvl)/50; // boost low level teams
   const teamBase=Math.max(0, Math.round(randNorm(1.4+diff,1.0)));
   const oppBase =Math.max(0, Math.round(randNorm(1.2-diff,1.0)));
   const teamGoals=teamBase+(goals>0?1:0);
@@ -184,7 +185,8 @@ function simulateMatch(entry){
   }
   const myLvl=getTeamLevel(st.player.club);
   const oppLvl=getTeamLevel(entry.opponent);
-  const diff=(myLvl-oppLvl)/20;
+  let diff=(myLvl-oppLvl)/20;
+  if(myLvl<75) diff+=(75-myLvl)/50;
   const teamBase=Math.max(0, Math.round(randNorm(1.4+diff,1.0)));
   const oppBase=Math.max(0, Math.round(randNorm(1.2-diff,1.0)));
   const teamGoals=teamBase+(goals>0?1:0);

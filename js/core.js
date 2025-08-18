@@ -25,7 +25,7 @@ function getTeamLevel(club){
 const Game = {
   state: {
     // player fields get filled on newGame
-    player: null, // {name, age, origin, pos, overall, club, league, status, timeBand, salary, value, balance, yearsLeft, transferListed, alwaysPlay, goldenClub}
+    player: null, // {name, age, origin, pos, overall, club, league, status, timeBand, salary, value, balance, yearsLeft, transferListed, alwaysPlay, goldenClub, releaseClause, marketBlocked, contractReworkYear}
     season: 1,
     week: 1,
     currentDate: null,
@@ -86,6 +86,9 @@ const Game = {
       transferListed: false,
       alwaysPlay: !!setup.alwaysPlay,
       goldenClub: false,
+      releaseClause: 0,
+      marketBlocked: 0,
+      contractReworkYear: 0,
     };
     this.state.season = 1; this.state.week = 1;
     this.state.minutesPlayed = 0; this.state.goals = 0; this.state.assists = 0;
@@ -127,6 +130,9 @@ function migrateState(st){
     st.player.houses = st.player.houses || 0;
     st.player.status = st.player.status || '-';
     st.player.timeBand = st.player.timeBand || '-';
+    st.player.releaseClause = st.player.releaseClause || 0;
+    st.player.marketBlocked = st.player.marketBlocked || 0;
+    st.player.contractReworkYear = st.player.contractReworkYear || 0;
   }
   if(typeof st.currentDate !== 'number'){
     const firstSched = Array.isArray(st.schedule) && st.schedule.length ? st.schedule[0] : null;
@@ -215,6 +221,8 @@ function applyPostMatchGrowth(st, minutes, rating, goals, assists){
   if(st.player.pos==='Midfield') delta+=goals*.18+assists*.20;
   if(st.player.pos==='Defender') delta+=goals*.12+assists*.08;
   if(minutes<target*.4) delta-=0.15; if(st.player.age>=31) delta-=0.05;
+  const clubLvl=getTeamLevel(st.player.club);
+  if(clubLvl<75) delta+=0.1; // lower level clubs boost growth
   st.player.overall = Math.max(55, Math.min(100, +(st.player.overall+delta).toFixed(2)));
 }
 
@@ -229,6 +237,15 @@ function rollMarketOffers(p){
     const diff=lvl - p.overall;
     const chance = diff<=0?0.8: diff<5?0.6: diff<10?0.3: 0.05; // big clubs rarely approach weak players
     if(Math.random()<chance) offers.push(makeOfferForVaried(p,club,lvl));
+  }
+  if(p.releaseClause && p.overall>=75 && Math.random()<0.15){
+    const big=makeOpponents().filter(c=>getTeamLevel(c)>85 && c!==p.club);
+    if(big.length){
+      const club=pick(big);
+      const o=makeOfferForVaried(p,club,getTeamLevel(club));
+      o.releaseClauseFee=p.releaseClause;
+      offers.push(o);
+    }
   }
   return offers;
 }
