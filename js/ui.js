@@ -42,13 +42,24 @@ function renderAll(){
   else { q('#v-club').textContent = st.player.club; }
   q('#v-league').textContent = st.player.league || '-';
   q('#v-status').textContent = st.player.status;
-  q('#v-years').textContent = st.player.yearsLeft ? `${st.player.yearsLeft} season${st.player.yearsLeft>1?'s':''}` : '-';
+  const yearsEl=q('#v-years');
+  const yearsKey=yearsEl?yearsEl.previousElementSibling:null;
+  if(st.player.club==='Free Agent'){
+    if(yearsEl) yearsEl.style.display='none';
+    if(yearsKey) yearsKey.style.display='none';
+  } else {
+    if(yearsEl){
+      yearsEl.style.display='';
+      yearsEl.textContent = st.player.yearsLeft ? `${st.player.yearsLeft} season${st.player.yearsLeft>1?'s':''}` : '-';
+    }
+    if(yearsKey) yearsKey.style.display='';
+  }
 
   q('#v-season').textContent = st.season;
   q('#v-week').textContent = `${Math.min(st.week,38)} / 38`;
   q('#v-overall').textContent = st.player.overall;
   q('#v-playtime').textContent = `${st.minutesPlayed} min`;
-  const weeklyIncome = Math.round((st.player.salary||0)*(st.player.salaryMultiplier||1)+(st.player.passiveIncome||0));
+  const weeklyIncome = weeklySalary(st.player)+(st.player.passiveIncome||0);
   q('#v-salary').textContent = Game.money(weeklyIncome) + ' /week';
   q('#v-value').textContent = fmtValue(st.player.value);
   q('#v-balance').textContent = Game.money(st.player.balance||0);

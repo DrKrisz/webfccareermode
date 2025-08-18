@@ -109,7 +109,8 @@ function minigameView(title, onDone){
 function placeBubble(el, field){ const w=field.clientWidth||300; const h=field.clientHeight||220; const x=Math.random()*(w-34); const y=Math.random()*(h-34); el.style.left=x+'px'; el.style.top=y+'px'; }
 
 function payWeekly(st){
-  const gain=Math.round((st.player.salary||0)*(st.player.salaryMultiplier||1)+(st.player.passiveIncome||0));
+  if(st.player.club==='Free Agent') return;
+  const gain=weeklySalary(st.player)+(st.player.passiveIncome||0);
   if(gain>0){
     st.player.balance=Math.round((st.player.balance||0)+gain);
     Game.log(`Payday: +${Game.money(gain)}`);
@@ -119,7 +120,6 @@ function payWeekly(st){
 function finishMatch(entry, minutes, mini){
   const st=Game.state; const hasMinutes=minutes>0; let rating=null;
   if(hasMinutes){ rating=randNorm(6.4,.6); if(minutes>=60) rating+=.3; rating+=(mini.score||0)*2.0; rating=Math.max(5.0, Math.min(9.8, +rating.toFixed(1))); }
-  else { rating=6.0; }
   let goals=0,assists=0; if(hasMinutes){
     const baseG=st.player.pos==='Attacker'?0.22: st.player.pos==='Midfield'?0.10: 0.06;
     const baseA=st.player.pos==='Attacker'?0.10: st.player.pos==='Midfield'?0.18: 0.08;
@@ -132,10 +132,12 @@ function finishMatch(entry, minutes, mini){
   const oppLvl=getTeamLevel(entry.opponent);
   let diff=(myLvl-oppLvl)/20; // level difference biases score
   if(myLvl<75) diff+=(75-myLvl)/50; // boost low level teams
-  const teamBase=Math.max(0, Math.round(randNorm(1.4+diff,1.0)));
-  const oppBase =Math.max(0, Math.round(randNorm(1.2-diff,1.0)));
-  const teamGoals=teamBase+(goals>0?1:0);
-  const oppGoals =oppBase;
+  let teamGoals=Math.max(0, Math.round(randNorm(1.4+diff,1.0)));
+  let oppGoals =Math.max(0, Math.round(randNorm(1.2-diff,1.0)));
+  goals = Math.min(goals, teamGoals);
+  assists = Math.min(assists, Math.max(0, teamGoals-goals));
+  if(teamGoals===0 && oppGoals===0){ goals=0; assists=0; }
+  if(minutes===0){ rating='DNP'; goals=0; assists=0; }
   const result=teamGoals>oppGoals?'W': teamGoals<oppGoals?'L':'D';
   const scoreline=`${teamGoals}-${oppGoals}`;
 
@@ -147,19 +149,22 @@ function finishMatch(entry, minutes, mini){
   st.player.value = Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   payWeekly(st);
   st.week = Math.min(38, st.week+1);
-  Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${goals?`, G${goals}`:''}${assists?`, A${assists}`:''}`);
+  const gaPart = rating==='DNP' ? '' : `, G${goals}, A${assists}`;
+  Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${gaPart}`);
 
   // Move day and show summary
   setTimeout(()=>{ nextDay(); }, 300);
   const c=q('#match-content'); const box=document.createElement('div'); box.className='glass';
-  box.innerHTML = `<div class="h">Full time</div>
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
-      <div class="kv"><div class="k">Minutes</div><div class="v">${minutes}</div></div>
-      <div class="kv"><div class="k">Rating</div><div class="v">${rating?.toFixed?rating.toFixed(1):rating}</div></div>
-      <div class="kv"><div class="k">Goals</div><div class="v">${goals}</div></div>
-      <div class="kv"><div class="k">Assists</div><div class="v">${assists}</div></div>
-      <div class="kv"><div class="k">New overall</div><div class="v">${st.player.overall}</div></div>
-    </div>`;
+  const stats=[
+    `<div class="kv"><div class="k">Minutes</div><div class="v">${minutes}</div></div>`,
+    `<div class="kv"><div class="k">Rating</div><div class="v">${rating?.toFixed?rating.toFixed(1):rating}</div></div>`,
+  ];
+  if(rating!=='DNP'){
+    stats.push(`<div class="kv"><div class="k">Goals</div><div class="v">${goals}</div></div>`);
+    stats.push(`<div class="kv"><div class="k">Assists</div><div class="v">${assists}</div></div>`);
+  }
+  stats.push(`<div class="kv"><div class="k">New overall</div><div class="v">${st.player.overall}</div></div>`);
+  box.innerHTML = `<div class="h">Full time</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">${stats.join('')}</div>`;
   c.append(box);
   Game.save(); renderAll();
 }
@@ -175,7 +180,6 @@ function simulateMatch(entry){
   const mini={score:Math.random()};
   const hasMinutes=minutes>0; let rating=null;
   if(hasMinutes){ rating=randNorm(6.4,.6); if(minutes>=60) rating+=.3; rating+=(mini.score||0)*2.0; rating=Math.max(5.0, Math.min(9.8, +rating.toFixed(1))); }
-  else { rating=6.0; }
   let goals=0,assists=0; if(hasMinutes){
     const baseG=st.player.pos==='Attacker'?0.22: st.player.pos==='Midfield'?0.10: 0.06;
     const baseA=st.player.pos==='Attacker'?0.10: st.player.pos==='Midfield'?0.18: 0.08;
@@ -187,10 +191,12 @@ function simulateMatch(entry){
   const oppLvl=getTeamLevel(entry.opponent);
   let diff=(myLvl-oppLvl)/20;
   if(myLvl<75) diff+=(75-myLvl)/50;
-  const teamBase=Math.max(0, Math.round(randNorm(1.4+diff,1.0)));
-  const oppBase=Math.max(0, Math.round(randNorm(1.2-diff,1.0)));
-  const teamGoals=teamBase+(goals>0?1:0);
-  const oppGoals=oppBase;
+  let teamGoals=Math.max(0, Math.round(randNorm(1.4+diff,1.0)));
+  let oppGoals=Math.max(0, Math.round(randNorm(1.2-diff,1.0)));
+  goals=Math.min(goals, teamGoals);
+  assists=Math.min(assists, Math.max(0, teamGoals-goals));
+  if(teamGoals===0 && oppGoals===0){ goals=0; assists=0; }
+  if(minutes===0){ rating='DNP'; goals=0; assists=0; }
   const result=teamGoals>oppGoals?'W': teamGoals<oppGoals?'L':'D';
   const scoreline=`${teamGoals}-${oppGoals}`;
   entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
@@ -200,7 +206,8 @@ function simulateMatch(entry){
   st.player.value=Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   payWeekly(st);
   st.week=Math.min(38, st.week+1);
-  Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${goals?`, G${goals}`:''}${assists?`, A${assists}`:''}`);
+  const gaPart = rating==='DNP' ? '' : `, G${goals}, A${assists}`;
+  Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${gaPart}`);
   Game.save(); renderAll();
   setTimeout(()=>{ nextDay(); },300);
 }
