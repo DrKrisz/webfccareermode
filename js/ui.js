@@ -26,6 +26,15 @@ function showPopup(title, msg, onConfirm){
   }
 }
 
+function showCooldownPopup(rest){
+  const modal=q('#cooldown-modal');
+  const content=q('#cooldown-content');
+  if(modal && content){
+    content.textContent=`You need to rest ${rest} more day${rest>1?'s':''} before training again.`;
+    modal.setAttribute('open','');
+  }
+}
+
 // ===== Rendering =====
 function renderAll(){
   const st = Game.state; const onLanding = !st.player;

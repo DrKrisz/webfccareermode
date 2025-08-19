@@ -81,7 +81,7 @@ function openTraining(){
     Game.log(msg);
     Game.save();
     renderAll();
-    showPopup('Training', `Training available in ${rest} day(s).`);
+    showCooldownPopup(rest);
     return;
   }
   const c=q('#training-content'); if(c) c.innerHTML='';
