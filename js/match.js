@@ -16,6 +16,7 @@ function countdown(target, cb){
 
 function openMatch(entry){
   const st=Game.state; if(entry.played){ viewMatchSummary(entry); return; }
+  if(st.player.club==='Free Agent'){ showPopup('Match', 'You need a club to play matches.'); return; }
   if(!sameDay(entry.date, st.currentDate)) return; // only today
 
   const youStart = st.player.alwaysPlay ? true : decideStarting(st.player.timeBand);
@@ -171,6 +172,7 @@ function finishMatch(entry, minutes, mini){
 
 function simulateMatch(entry){
   const st=Game.state;
+  if(st.player.club==='Free Agent'){ showPopup('Match day', 'You need a club to play matches.'); return; }
   if(entry.played || !sameDay(entry.date, st.currentDate)) return;
   const youStart = st.player.alwaysPlay ? true : decideStarting(st.player.timeBand);
   const willSubIn = youStart?false:Math.random()<subChance(st.player.timeBand);

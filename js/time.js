@@ -10,7 +10,15 @@ function autoTick(){
 function nextDay(){
   const st=Game.state;
   const entry=st.schedule.find(d=>sameDay(d.date, st.currentDate));
-  if(entry && entry.isMatch && !entry.played){ simulateMatch(entry); return; }
+  if(entry && entry.isMatch && !entry.played){
+    if(st.player.club==='Free Agent'){
+      showPopup('Match day', 'You need a club to play matches.');
+      st.week = Math.min(38, st.week+1);
+      st.currentDate+=24*3600*1000; Game.save(); renderAll(); autoTick();
+      return;
+    }
+    simulateMatch(entry); return;
+  }
   if(entry && entry.type==='seasonEnd'){ Game.state.auto=false; updateAutoBtn(); openSeasonEnd(); return; }
   st.currentDate+=24*3600*1000; Game.save(); renderAll(); autoTick();
 }
