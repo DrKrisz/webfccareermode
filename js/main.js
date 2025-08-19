@@ -40,7 +40,7 @@ function wireEvents(){
   click('#btn-next', ()=>nextDay());
   click('#btn-auto', ()=>toggleAuto());
   click('#btn-train', ()=>openTraining());
-  click('#close-training', ()=>q('#training-modal').removeAttribute('open'));
+  click('#close-training', ()=>cancelTraining());
   click('#btn-play', ()=>{ const entry=Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate)); if(entry && entry.isMatch && !entry.played) openMatch(entry); });
   click('#btn-save', ()=>{ Game.save(); showPopup('Save', 'Game saved'); });
   click('#btn-reset', ()=>{ showPopup('Reset save', 'Delete your local save and restart?', ()=>Game.reset()); });

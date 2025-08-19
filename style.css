@@ -231,6 +231,7 @@ a{ color:var(--primary) }
 .sheet-title{font-size:16px}
 .sheet .content{padding:16px}
 .sheet-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:0}
+#contract-salary-info{margin-top:4px;text-align:center}
 
 /* Minigame */
 .minigame{position:relative;width:100%;height:260px;border-radius:12px;background:#0e1620;border:1px dashed var(--border);overflow:hidden}

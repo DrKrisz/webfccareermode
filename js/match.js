@@ -7,12 +7,17 @@ function countdown(target, cb){
   const label=document.createElement('div');
   label.className='countdown';
   target.append(label);
+  let timer=null; let cancelled=false;
   const step=()=>{
-    if(s>0){ label.textContent=s--; setTimeout(step,1000); }
-    else { label.remove(); cb(); }
+    if(cancelled) return;
+    if(s>0){ label.textContent=s--; timer=setTimeout(step,1000); }
+    else { label.remove(); if(!cancelled) cb(); }
   };
   step();
+  return ()=>{ cancelled=true; if(timer) clearTimeout(timer); label.remove(); };
 }
+
+let trainingSession=null;
 
 function openMatch(entry){
   const st=Game.state; if(entry.played){ viewMatchSummary(entry); return; }
@@ -65,14 +70,31 @@ function openTraining(){
   const daysSince = st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
   if(todayEntry && todayEntry.isMatch){ showPopup('Training', 'Match scheduled today. Focus on the game.'); return; }
   if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
-  if(daysSince < 2){ showPopup('Training', `Training available in ${Math.ceil(2-daysSince)} day(s).`); return; }
+  if(daysSince < 2){
+    const rest = Math.ceil(2-daysSince);
+    const msg=`You have already trained. You must rest ${rest} day${rest>1?'s':''} before training again.`;
+    Game.log(msg);
+    showPopup('Training', `Training available in ${rest} day(s).`);
+    return;
+  }
   const c=q('#training-content'); if(c) c.innerHTML='';
   const box=document.createElement('div');
   box.innerHTML='<div class="title">Training session</div>';
   const phase=document.createElement('div'); box.append(phase);
   c.append(box);
   q('#training-modal').setAttribute('open','');
-  countdown(phase, ()=>phase.append(minigameView('Finish the drill to improve!', res=>finishTraining(res))));
+  trainingSession={cancelled:false};
+  const cancelCd=countdown(phase, ()=>{
+    if(trainingSession?.cancelled) return;
+    const mini=minigameView('Finish the drill to improve!', res=>{
+      if(trainingSession?.cancelled) return;
+      finishTraining(res);
+      trainingSession=null;
+    });
+    phase.append(mini.el);
+    trainingSession.miniCancel=mini.cancel;
+  });
+  trainingSession.countCancel=cancelCd;
 }
 
 function finishTraining(mini){
@@ -105,7 +127,17 @@ function minigameView(title, onDone){
     box.append(note);
     setTimeout(()=>onDone(data), 500);
   }
-  return box;
+  return {el:box, cancel:()=>{ over=true; clearTimeout(timer); clearInterval(reshuff); box.remove(); }};
+}
+
+function cancelTraining(){
+  if(trainingSession){
+    trainingSession.cancelled=true;
+    if(trainingSession.countCancel) trainingSession.countCancel();
+    if(trainingSession.miniCancel) trainingSession.miniCancel();
+    trainingSession=null;
+  }
+  q('#training-modal').removeAttribute('open');
 }
 function placeBubble(el, field){ const w=field.clientWidth||300; const h=field.clientHeight||220; const x=Math.random()*(w-34); const y=Math.random()*(h-34); el.style.left=x+'px'; el.style.top=y+'px'; }
 
@@ -146,7 +178,7 @@ function finishMatch(entry, minutes, mini){
   entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
   st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists;
   st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists;
-  applyPostMatchGrowth(st, minutes, rating, goals, assists);
+  applyPostMatchGrowth(st, minutes, rating, goals, assists, true);
   st.player.value = Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   payWeekly(st);
   st.week = Math.min(38, st.week+1);
@@ -204,7 +236,7 @@ function simulateMatch(entry){
   entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
   st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists;
   st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists;
-  applyPostMatchGrowth(st, minutes, rating, goals, assists);
+  applyPostMatchGrowth(st, minutes, rating, goals, assists, false);
   st.player.value=Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   payWeekly(st);
   st.week=Math.min(38, st.week+1);
