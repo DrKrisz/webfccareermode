@@ -20,6 +20,7 @@ function countdown(target, cb){
 let trainingSession=null;
 
 function openMatch(entry){
+  clearAutoTick();
   const st=Game.state; if(entry.played){ viewMatchSummary(entry); return; }
   if(st.player.club==='Free Agent'){ showPopup('Match', 'You need a club to play matches.'); return; }
   if(!sameDay(entry.date, st.currentDate)) return; // only today
@@ -64,6 +65,7 @@ function openMatch(entry){
 }
 
 function openTraining(){
+  clearAutoTick();
   const st=Game.state;
   const todayEntry = st.schedule.find(d=>sameDay(d.date, st.currentDate));
   const injured = st.player.status && st.player.status.toLowerCase().includes('injur');
