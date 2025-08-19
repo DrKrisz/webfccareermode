@@ -79,6 +79,8 @@ function openTraining(){
     const rest = Math.ceil(2-daysSince);
     const msg=`Tried to train but need to rest ${rest} day${rest>1?'s':''} before training again.`;
     Game.log(msg);
+    Game.save();
+    renderAll();
     showPopup('Training', `Training available in ${rest} day(s).`);
     return;
   }
