@@ -126,7 +126,7 @@ function renderAll(){
   const playBtn=q('#btn-play');
   if(playBtn){
     if(st.player.club==='Free Agent') playBtn.disabled=true;
-    else if(todayEntry && todayEntry.isMatch && !todayEntry.played && !st.auto){
+    else if(todayEntry && todayEntry.isMatch && !todayEntry.played && !st.auto && !autoTimeoutId){
       playBtn.disabled=false;
     } else {
       playBtn.disabled=true;
