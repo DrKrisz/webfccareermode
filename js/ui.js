@@ -115,14 +115,17 @@ function renderAll(){
   const nextBtn=q('#btn-next');
   if(nextBtn){
     nextBtn.disabled = !!st.auto;
-    if(todayEntry && todayEntry.isMatch && !todayEntry.played) nextBtn.textContent='Simulate match';
+    if(todayEntry && todayEntry.isMatch && !todayEntry.played){
+      nextBtn.textContent = st.player.club==='Free Agent' ? 'Skip match' : 'Simulate match';
+    }
     else if(todayEntry && todayEntry.type==='seasonEnd') nextBtn.textContent='Season summary';
     else nextBtn.textContent='Next day';
   }
 
   const playBtn=q('#btn-play');
   if(playBtn){
-    if(todayEntry && todayEntry.isMatch && !todayEntry.played && !st.auto){
+    if(st.player.club==='Free Agent') playBtn.disabled=true;
+    else if(todayEntry && todayEntry.isMatch && !todayEntry.played && !st.auto){
       playBtn.disabled=false;
     } else {
       playBtn.disabled=true;
