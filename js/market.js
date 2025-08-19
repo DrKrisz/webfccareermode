@@ -1,3 +1,47 @@
+// ===== Market generation =====
+function rollMarketOffers(p){
+  const count=1+Math.floor(Math.random()*5);
+  const clubs=makeOpponents().sort(()=>Math.random()-0.5);
+  const offers=[];
+  for(const club of clubs){
+    if(offers.length>=count) break;
+    const lvl=getTeamLevel(club);
+    const diff=lvl - p.overall;
+    const chance = diff<=0?0.8: diff<5?0.6: diff<10?0.3: 0.05; // big clubs rarely approach weak players
+    if(Math.random()<chance) offers.push(makeOfferForVaried(p,club,lvl));
+  }
+  if(p.releaseClause && p.overall>=75 && Math.random()<0.15){
+    const big=makeOpponents().filter(c=>getTeamLevel(c)>85 && c!==p.club);
+    if(big.length){
+      const club=pick(big);
+      const o=makeOfferForVaried(p,club,getTeamLevel(club));
+      o.releaseClauseFee=p.releaseClause;
+      offers.push(o);
+    }
+  }
+  return offers;
+}
+function makeOfferFor(player, club){ return makeOfferForVaried(player, club); }
+function makeOfferForVaried(player, club, level){
+  const o=player.overall;
+  const status = o>=88?pick(['important','star player'])
+              : o>=80?pick(['key player','important'])
+              : o>=72?'key player'
+              : o>=65?'decent':'rookie';
+  const timeMap={'rookie':'second bench','decent':pick(['bench','rotater']),'key player':pick(['rotater','match player']),'important':pick(['match player','match starter']),'star player':'match starter'};
+  const timeBand=timeMap[status];
+  const clubFactor = 0.8 + Math.random()*0.6; // 0.8..1.4
+  const posBonus = player.pos==='Attacker'?1.15: player.pos==='Midfield'?1.05: 1.0;
+  const years=Math.min(5, Math.max(1, Math.round(randNorm(2.2,1.2))));
+  const league='Premier League';
+  let salary=computeSalary(player.age,player.overall,league,status,timeBand)*clubFactor*posBonus;
+  const lengthFactor = years>=4?0.9: years===3?1.0: years===2?1.08:1.15; // shorter pays more
+  salary*=lengthFactor;
+  const value=computeValue(player.overall,league,salary);
+  const lvl = level!=null?level:getTeamLevel(club);
+  return {club,league,years,status,timeBand,salary,value,level:lvl};
+}
+
 // ===== Market UI =====
 function openMarket(){
   const st=Game.state; const info=q('#market-info'); const list=q('#market-list'); const empty=q('#market-empty');
