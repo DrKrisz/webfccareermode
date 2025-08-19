@@ -32,7 +32,7 @@ function renderAll(){
   q('#landing').style.display = onLanding ? 'grid' : 'none';
   q('#manager').style.display = onLanding ? 'none' : 'block';
   if(onLanding) return;
-  updateLeagueSnapshot();
+  if(!(st.seasonProcessed && st.leagueSnapshotWeek===38)) updateLeagueSnapshot();
 
   // Left info
   q('#v-name').textContent = st.player.name;
@@ -100,7 +100,8 @@ function renderAll(){
     const info = document.createElement('div');
     info.className='muted';
     info.style.fontSize='12px';
-    info.textContent = `Table: ${pos}/20 • Leader ${leader.team} ${leader.pts} pts`;
+    const finalFlag = st.seasonProcessed && st.leagueSnapshotWeek===38 ? ' (final)' : '';
+    info.textContent = `Table: ${pos}/20${finalFlag} • Leader ${leader.team} ${leader.pts} pts`;
     q('#week-summary').append(info);
   }
 

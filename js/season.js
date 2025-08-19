@@ -2,6 +2,8 @@
 function updateLeagueSnapshot(){
   const st=Game.state;
   if(!st.player || st.player.club==='Free Agent') return;
+  // Don't overwrite the final league table once the season is processed
+  if(st.seasonProcessed && st.week===38 && st.leagueSnapshotWeek===38) return;
   const played = st.schedule.filter(e=>e.isMatch && e.played).length;
   if(st.leagueSnapshotWeek===played) return;
   const club=st.player.club;
