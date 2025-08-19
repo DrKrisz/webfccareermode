@@ -48,7 +48,10 @@ function openMatch(entry){
   c.append(wrap);
   const phase=q('#match-phase');
 
-  const startMini=(minutesPlanned)=>countdown(phase, ()=>requestAnimationFrame(()=>phase.append(minigameView('Make an impact in this moment!', res=>finishMatch(entry, minutesPlanned, res)))));
+  const startMini=(minutesPlanned)=>countdown(phase, ()=>requestAnimationFrame(()=>{
+    const mini=minigameView('Make an impact in this moment!', res=>finishMatch(entry, minutesPlanned, res));
+    phase.append(mini.el);
+  }));
   if(youStart){ startMini(90); }
   else if(willSubIn){
     const info=document.createElement('div'); info.className='glass';
@@ -74,7 +77,7 @@ function openTraining(){
   if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
   if(daysSince < 2){
     const rest = Math.ceil(2-daysSince);
-    const msg=`You have already trained. You must rest ${rest} day${rest>1?'s':''} before training again.`;
+    const msg=`Tried to train but need to rest ${rest} day${rest>1?'s':''} before training again.`;
     Game.log(msg);
     showPopup('Training', `Training available in ${rest} day(s).`);
     return;
