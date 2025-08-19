@@ -82,7 +82,7 @@ function computeValue(overall,league,weeklySalary){
 function weeklySalary(p){
   return Math.round((p.salary||0)*(p.salaryMultiplier||1));
 }
-function applyPostMatchGrowth(st, minutes, rating, goals, assists){
+function applyPostMatchGrowth(st, minutes, rating, goals, assists, played){
   const targetMap={'second bench':10,'bench':20,'rotater':45,'match player':70,'match starter':90};
   const target=targetMap[st.player.timeBand]||30; let delta=0;
   if(minutes>=target) delta+=0.2; if(rating>=7) delta+=0.2; if(rating>=8) delta+=0.2;
@@ -92,6 +92,7 @@ function applyPostMatchGrowth(st, minutes, rating, goals, assists){
   if(minutes<target*.4) delta-=0.15; if(st.player.age>=31) delta-=0.05;
   const clubLvl=getTeamLevel(st.player.club);
   if(clubLvl<75) delta+=0.1; // lower level clubs boost growth
+  delta += played?0.1:-0.05;
   st.player.overall = Math.max(55, Math.min(100, +(st.player.overall+delta).toFixed(2)));
 }
 

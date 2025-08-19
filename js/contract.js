@@ -18,6 +18,9 @@ function contractChance(st,salary,years,status,time){
   if(years>st.player.yearsLeft) chance-=0.1*(years-st.player.yearsLeft);
   if(statusRank(status)>statusRank(st.player.status)) chance-=0.1;
   if(timeRank(time)>timeRank(st.player.timeBand)) chance-=0.1;
+  const avgMinutes = st.week>1 ? st.seasonMinutes/(st.week-1) : st.seasonMinutes;
+  const expect={'second bench':0,'bench':15,'rotater':40,'match player':65,'match starter':85}[time]||30;
+  if(avgMinutes < expect*0.5) chance-=0.3;
   return Math.max(0,chance);
 }
 function chanceClass(c){
