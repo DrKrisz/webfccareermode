@@ -3,7 +3,7 @@ function updateLeagueSnapshot(){
   const st=Game.state;
   if(!st.player || st.player.club==='Free Agent') return;
   // Don't overwrite the final league table once the season is processed
-  if(st.seasonProcessed && st.week===38 && st.leagueSnapshotWeek===38) return;
+  if(st.seasonProcessed && st.leagueSnapshotWeek===38) return;
   const played = st.schedule.filter(e=>e.isMatch && e.played).length;
   if(st.leagueSnapshotWeek===played) return;
   const club=st.player.club;
@@ -101,6 +101,7 @@ function openSeasonEnd(){
     st.seasonSummary = {teams,pos,won,tableHtml};
     st.seasonProcessed=true;
     Game.save();
+    renderAll();
   }
 
   const {pos,won,tableHtml} = st.seasonSummary;
