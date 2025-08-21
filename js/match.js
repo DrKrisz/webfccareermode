@@ -77,6 +77,13 @@ function openTraining(){
   const daysSince = st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
   if(todayEntry && todayEntry.isMatch){ showPopup('Training', 'Match scheduled today. Focus on the game.'); return; }
   if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
+  if(st.player.pos==='Goalkeeper' && daysSince < 1){
+    Game.log('Tried to train twice today. Come back tomorrow.');
+    Game.save();
+    renderAll();
+    showPopup('Training', 'Trained today. Come back tomorrow.');
+    return;
+  }
   if(daysSince < 2 && st.player.pos!=='Goalkeeper'){
     const rest = Math.ceil(2-daysSince);
     const msg=`Tried to train but need to rest ${rest} day${rest>1?'s':''} before training again.`;
@@ -93,7 +100,7 @@ function openTraining(){
   c.append(box);
   q('#training-modal').setAttribute('open','');
   trainingSession={cancelled:false};
-  const cancelCd=countdown(phase, ()=>{
+  const startMini=()=>{
     if(trainingSession?.cancelled) return;
     const mini = st.player.pos==='Goalkeeper'
       ? goalkeeperTrainingView(res=>{
@@ -108,8 +115,23 @@ function openTraining(){
         });
     phase.append(mini.el);
     trainingSession.miniCancel=mini.cancel;
-  });
-  trainingSession.countCancel=cancelCd;
+  };
+
+  if(st.player.pos==='Goalkeeper'){
+    const info=document.createElement('div');
+    info.className='glass';
+    info.innerHTML='<div class="h">How to play</div><div>Guess the side of the shot then tap quickly to parry it away.</div>';
+    phase.append(info);
+    const readyBtn=btn('Ready', ()=>{
+      phase.innerHTML='';
+      const cancelCd=countdown(phase, startMini);
+      trainingSession.countCancel=cancelCd;
+    });
+    phase.append(readyBtn);
+  } else {
+    const cancelCd=countdown(phase, startMini);
+    trainingSession.countCancel=cancelCd;
+  }
 }
 
 function finishTraining(mini){
@@ -121,7 +143,7 @@ function finishTraining(mini){
   st.lastTrainingDate = st.currentDate;
   Game.save();
   renderAll();
-  setTimeout(()=>{ q('#training-modal').removeAttribute('open'); }, 600);
+  setTimeout(()=>{ q('#training-modal').removeAttribute('open'); showPopup('Training complete', `Overall +${gain.toFixed(2)} (now ${st.player.overall.toFixed(2)})`); }, 600);
 }
 
 function minigameView(title, onDone){
