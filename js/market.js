@@ -7,8 +7,10 @@ function rollMarketOffers(p){
     if(offers.length>=count) break;
     const lvl=getTeamLevel(club);
     const diff=lvl - p.overall;
-    const chance = diff<=0?0.8: diff<5?0.6: diff<10?0.3: 0.05; // big clubs rarely approach weak players
-    if(Math.random()<chance) offers.push(makeOfferForVaried(p,club,lvl,league));
+    let chance = diff<=0?0.8: diff<5?0.6: diff<10?0.3: 0.05; // big clubs rarely approach weak players
+    if(league==='EFL Championship' && (p.overall<75 || p.age<=23)) chance+=0.2;
+    if(lvl>85 && p.overall>=80) chance+=0.1;
+    if(Math.random()<Math.min(chance,0.95)) offers.push(makeOfferForVaried(p,club,lvl,league));
   }
   if(p.releaseClause && p.overall>=75 && Math.random()<0.15){
     const big=ALL_CLUBS.filter(c=>getTeamLevel(c.club)>85 && c.club!==p.club);
@@ -40,6 +42,10 @@ function makeOfferForVaried(player, club, level, league){
             : o>=65?'decent':'rookie';
     const timeMap={'rookie':'second bench','decent':pick(['bench','rotater']),'key player':pick(['rotater','match player']),'important':pick(['match player','match starter']),'star player':'match starter'};
     timeBand=timeMap[status];
+  }
+  if(league==='EFL Championship' && (player.age<=23 || player.overall<75)){
+    const order=['second bench','bench','rotater','match player','match starter'];
+    let idx=order.indexOf(timeBand); if(idx<order.length-1) timeBand=order[idx+1];
   }
   const clubFactor = 0.8 + Math.random()*0.6; // 0.8..1.4
   const posBonus = player.pos==='Attacker'?1.15: player.pos==='Midfield'?1.05: 1.0;

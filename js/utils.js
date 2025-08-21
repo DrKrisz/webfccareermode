@@ -4,18 +4,19 @@
 
 // ===== League data =====
 const LEAGUES = {
+  // 2025/26 season line-ups
   'Premier League': [
     'Arsenal', 'Aston Villa', 'Bournemouth', 'Brentford', 'Brighton',
-    'Burnley', 'Chelsea', 'Crystal Palace', 'Everton', 'Fulham',
-    'Liverpool', 'Man City', 'Man Utd', 'Newcastle', 'Nottm Forest',
-    'Sheffield Utd', 'Tottenham', 'West Ham', 'Wolves', 'Luton Town'
+    'Chelsea', 'Crystal Palace', 'Everton', 'Fulham', 'Ipswich Town',
+    'Leicester City', 'Liverpool', 'Man City', 'Man Utd', 'Newcastle',
+    'Nottm Forest', 'Southampton', 'Tottenham', 'West Ham', 'Wolves'
   ],
   'EFL Championship': [
     'Birmingham City','Blackburn Rovers','Bristol City','Cardiff City','Coventry City',
-    'Huddersfield Town','Hull City','Ipswich Town','Leeds United','Leicester City',
-    'Middlesbrough','Millwall','Norwich City','Plymouth Argyle','Preston North End',
-    'Queens Park Rangers','Rotherham United','Sheffield Wednesday','Southampton',
-    'Stoke City','Sunderland','Swansea City','Watford','West Brom'
+    'Huddersfield Town','Hull City','Leeds United','Middlesbrough','Millwall',
+    'Norwich City','Plymouth Argyle','Preston North End','Queens Park Rangers','Rotherham United',
+    'Sheffield Wednesday','Stoke City','Sunderland','Swansea City','Watford',
+    'West Brom','Burnley','Luton Town','Sheffield Utd'
   ]
 };
 const CLUB_TO_LEAGUE = {};
@@ -84,7 +85,7 @@ function sameDay(a,b){ const da=new Date(a), db=new Date(b); return da.getFullYe
 function computeSalary(age,overall,league,status,timeBand){
   const overSq = overall*overall;
   const coef = 15;
-  const leagueFactor = league==='Premier League'?1.5:1;
+  const leagueFactor = league==='Premier League'?1.5: league==='EFL Championship'?0.9:1;
   const statusFactor = {
     'rookie':0.10,'decent':0.18,'key player':0.35,'important':0.60,'star player':1.00,
     'Backup keeper':0.05,'Reserve keeper':0.15,'First-choice':0.40,'World-class':1.00
@@ -95,7 +96,7 @@ function computeSalary(age,overall,league,status,timeBand){
   return Math.max(500, Math.min(weekly, 600000));
 }
 function computeValue(overall,league,weeklySalary){
-  const leagueFactor=league==='Premier League'?1.15:1;
+  const leagueFactor=league==='Premier League'?1.15: league==='EFL Championship'?0.9:1;
   const base=(overall*overall)*330*leagueFactor;
   const fromSalary=weeklySalary*52*4; // salary-derived valuation proxy
   return Math.max(base, fromSalary);
@@ -119,6 +120,7 @@ function applyPostMatchGrowth(st, minutes, rating, goals, assists, played, conce
   if(minutes<target*.4) delta-=0.15; if(st.player.age>=31) delta-=0.05;
   const clubLvl=getTeamLevel(st.player.club);
   if(clubLvl<75) delta+=0.1; // lower level clubs boost growth
+  if(st.player.league==='EFL Championship' && st.player.age<=23) delta+=0.05;
   delta += played?0.1:-0.05;
   st.player.overall = Math.max(55, Math.min(100, +(st.player.overall+delta).toFixed(2)));
 }
