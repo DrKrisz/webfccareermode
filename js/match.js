@@ -78,6 +78,7 @@ function openTraining(){
   if(todayEntry && todayEntry.isMatch){ showPopup('Training', 'Match scheduled today. Focus on the game.'); return; }
   if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
   if(daysSince < 1){
+    console.log('Tried to train twice today. Come back tomorrow.');
     Game.log('Tried to train twice today. Come back tomorrow.');
     Game.save();
     renderAll();

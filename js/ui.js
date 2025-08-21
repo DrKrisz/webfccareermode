@@ -116,11 +116,7 @@ function renderAll(){
 
   const trainBtn=q('#btn-train');
   if(trainBtn){
-    const hasMatch=todayEntry && todayEntry.isMatch;
-    const injured=st.player.status && st.player.status.toLowerCase().includes('injur');
-    const diff=st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
-    const cooldown = st.player.pos==='Goalkeeper' ? diff < 1 : diff < 2;
-    trainBtn.disabled = hasMatch || injured || cooldown;
+    trainBtn.disabled=false;
   }
 
   const nextBtn=q('#btn-next');
