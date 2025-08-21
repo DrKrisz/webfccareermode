@@ -10,12 +10,26 @@ const LS_KEY = 'webcareergame.save.v010';
 
 // Base strength levels for each club (0-100 scale roughly reflecting squad quality)
 const TEAM_BASE_LEVELS = {
-  'Arsenal':85,'Aston Villa':78,'Bournemouth':70,'Brentford':74,
-  'Brighton & Hove Albion':78,'Burnley':68,'Chelsea':82,'Crystal Palace':72,
-  'Everton':72,'Fulham':73,'Liverpool':88,'Luton Town':65,
-  'Manchester City':90,'Manchester United':84,'Newcastle United':80,
-  'Nottingham Forest':70,'Sheffield United':67,'Tottenham Hotspur':80,
-  'West Ham United':75,'Wolverhampton Wanderers':71
+  'Arsenal': 85,
+  'Aston Villa': 78,
+  'Bournemouth': 70,
+  'Brentford': 74,
+  'Brighton': 78,
+  'Burnley': 68,
+  'Chelsea': 82,
+  'Crystal Palace': 72,
+  'Everton': 72,
+  'Fulham': 73,
+  'Leeds United': 74,
+  'Liverpool': 88,
+  'Man City': 90,
+  'Man Utd': 84,
+  'Newcastle': 80,
+  'Nottm Forest': 70,
+  'Sunderland': 69,
+  'Tottenham': 80,
+  'West Ham': 75,
+  'Wolves': 71
 };
 
 const Game = {
