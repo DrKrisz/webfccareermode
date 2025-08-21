@@ -24,12 +24,23 @@ function rollMarketOffers(p){
 function makeOfferFor(player, club){ return makeOfferForVaried(player, club); }
 function makeOfferForVaried(player, club, level){
   const o=player.overall;
-  const status = o>=88?pick(['important','star player'])
-              : o>=80?pick(['key player','important'])
-              : o>=72?'key player'
-              : o>=65?'decent':'rookie';
-  const timeMap={'rookie':'second bench','decent':pick(['bench','rotater']),'key player':pick(['rotater','match player']),'important':pick(['match player','match starter']),'star player':'match starter'};
-  const timeBand=timeMap[status];
+  let status,timeBand;
+  if(player.pos==='Goalkeeper'){
+    status = o>=88?'World-class'
+            : o>=80?'First-choice'
+            : o>=72?'Reserve keeper'
+            : 'Backup keeper';
+    const timeMap={'Backup keeper':'second bench','Reserve keeper':pick(['bench','rotater']),
+      'First-choice':pick(['match player','match starter']),'World-class':'match starter'};
+    timeBand=timeMap[status];
+  } else {
+    status = o>=88?pick(['important','star player'])
+            : o>=80?pick(['key player','important'])
+            : o>=72?'key player'
+            : o>=65?'decent':'rookie';
+    const timeMap={'rookie':'second bench','decent':pick(['bench','rotater']),'key player':pick(['rotater','match player']),'important':pick(['match player','match starter']),'star player':'match starter'};
+    timeBand=timeMap[status];
+  }
   const clubFactor = 0.8 + Math.random()*0.6; // 0.8..1.4
   const posBonus = player.pos==='Attacker'?1.15: player.pos==='Midfield'?1.05: 1.0;
   const years=Math.min(5, Math.max(1, Math.round(randNorm(2.2,1.2))));

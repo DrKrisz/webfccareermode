@@ -49,8 +49,10 @@ function openMatch(entry){
   const phase=q('#match-phase');
 
   const startMini=(minutesPlanned)=>countdown(phase, ()=>requestAnimationFrame(()=>{
-    const mini=minigameView('Make an impact in this moment!', res=>finishMatch(entry, minutesPlanned, res));
-    phase.append(mini.el);
+    const view = st.player.pos==='Goalkeeper'
+      ? goalkeeperMatchMinigameView('Keep the sheet clean!', res=>finishMatch(entry, minutesPlanned, res))
+      : minigameView('Make an impact in this moment!', res=>finishMatch(entry, minutesPlanned, res));
+    phase.append(view.el);
   }));
   if(youStart){ startMini(90); }
   else if(willSubIn){
@@ -75,7 +77,7 @@ function openTraining(){
   const daysSince = st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
   if(todayEntry && todayEntry.isMatch){ showPopup('Training', 'Match scheduled today. Focus on the game.'); return; }
   if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
-  if(daysSince < 2){
+  if(daysSince < 2 && st.player.pos!=='Goalkeeper'){
     const rest = Math.ceil(2-daysSince);
     const msg=`Tried to train but need to rest ${rest} day${rest>1?'s':''} before training again.`;
     Game.log(msg);
@@ -93,11 +95,17 @@ function openTraining(){
   trainingSession={cancelled:false};
   const cancelCd=countdown(phase, ()=>{
     if(trainingSession?.cancelled) return;
-    const mini=minigameView('Finish the drill to improve!', res=>{
-      if(trainingSession?.cancelled) return;
-      finishTraining(res);
-      trainingSession=null;
-    });
+    const mini = st.player.pos==='Goalkeeper'
+      ? goalkeeperTrainingView(res=>{
+          if(trainingSession?.cancelled) return;
+          finishTraining(res);
+          trainingSession=null;
+        })
+      : minigameView('Finish the drill to improve!', res=>{
+          if(trainingSession?.cancelled) return;
+          finishTraining(res);
+          trainingSession=null;
+        });
     phase.append(mini.el);
     trainingSession.miniCancel=mini.cancel;
   });
@@ -161,8 +169,8 @@ function finishMatch(entry, minutes, mini){
   const st=Game.state; const hasMinutes=minutes>0; let rating=null;
   if(hasMinutes){ rating=randNorm(6.4,.6); if(minutes>=60) rating+=.3; rating+=(mini.score||0)*2.0; rating=Math.max(5.0, Math.min(9.8, +rating.toFixed(1))); }
   let goals=0,assists=0; if(hasMinutes){
-    const baseG=st.player.pos==='Attacker'?0.22: st.player.pos==='Midfield'?0.10: 0.06;
-    const baseA=st.player.pos==='Attacker'?0.10: st.player.pos==='Midfield'?0.18: 0.08;
+    const baseG=st.player.pos==='Attacker'?0.22: st.player.pos==='Midfield'?0.10: st.player.pos==='Defender'?0.06:0.01;
+    const baseA=st.player.pos==='Attacker'?0.10: st.player.pos==='Midfield'?0.18: st.player.pos==='Defender'?0.08:0.02;
     const perfBoost=Math.max(0,(rating-6.5)*0.15);
     goals = Math.random()<baseG+perfBoost ? (Math.random()<0.12?2:1) : 0;
     assists = Math.random()<baseA+perfBoost ? 1 : 0;
@@ -222,8 +230,8 @@ function simulateMatch(entry){
   const hasMinutes=minutes>0; let rating=null;
   if(hasMinutes){ rating=randNorm(6.4,.6); if(minutes>=60) rating+=.3; rating+=(mini.score||0)*2.0; rating=Math.max(5.0, Math.min(9.8, +rating.toFixed(1))); }
   let goals=0,assists=0; if(hasMinutes){
-    const baseG=st.player.pos==='Attacker'?0.22: st.player.pos==='Midfield'?0.10: 0.06;
-    const baseA=st.player.pos==='Attacker'?0.10: st.player.pos==='Midfield'?0.18: 0.08;
+    const baseG=st.player.pos==='Attacker'?0.22: st.player.pos==='Midfield'?0.10: st.player.pos==='Defender'?0.06:0.01;
+    const baseA=st.player.pos==='Attacker'?0.10: st.player.pos==='Midfield'?0.18: st.player.pos==='Defender'?0.08:0.02;
     const perfBoost=Math.max(0,(rating-6.5)*0.15);
     goals = Math.random()<baseG+perfBoost ? (Math.random()<0.12?2:1) : 0;
     assists = Math.random()<baseA+perfBoost ? 1 : 0;

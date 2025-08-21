@@ -1,12 +1,12 @@
-/* WebCareerGame • Pre-Alpha v0.0.9
+/* WebCareerGame • Pre-Alpha v0.1.0
    Game state and persistence helpers.
 */
 
 // Version string injected into the UI and document title.
-const APP_VERSION = 'v0.0.9';
+const APP_VERSION = 'v0.1.0';
 
 // ===== Storage / Globals =====
-const LS_KEY = 'webcareergame.save.v009';
+const LS_KEY = 'webcareergame.save.v010';
 
 // Base strength levels for each club (0-100 scale roughly reflecting squad quality)
 const TEAM_BASE_LEVELS = {
