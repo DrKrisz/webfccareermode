@@ -30,24 +30,26 @@ function goalkeeperTrainingView(onDone){
       if(side===target) correct++;
       ball.style.left = target==='left' ? '20%' : '80%';
       round++;
-      timers.push(setTimeout(()=>{ round<rounds?guessPhase():pushPhase(); },500));
+      if(round<rounds){
+        timers.push(setTimeout(guessPhase,500));
+      } else {
+        finish();
+      }
     }
     left.onclick=()=>choose('left');
     right.onclick=()=>choose('right');
     timers.push(setTimeout(()=>choose('none'),5000));
   }
 
-  function pushPhase(){
+  function finish(){
     field.className='minigame';
     field.innerHTML='';
-    let clicks=0;
-    const clicker=()=>{ clicks++; };
-    field.onclick=clicker;
-    timers.push(setTimeout(()=>{
-      field.onclick=null;
-      const score=(correct/rounds*0.5)+(Math.min(clicks,50)/50)*0.5;
-      onDone({guesses:correct, clicks, success:clicks>0, score});
-    },5000));
+    const score=correct/rounds;
+    const rating= correct===5 ? 'excellent' : correct>=4 ? 'good' : correct>=2 ? 'ok' : 'bad';
+    const note=document.createElement('div'); note.className='glass';
+    note.innerHTML=`<div class="h">Result</div><div>Guessed ${correct}/${rounds}. ${rating}.</div>`;
+    field.append(note);
+    timers.push(setTimeout(()=>onDone({guesses:correct, clicks:0, success:correct>=3, score}),500));
   }
 
   guessPhase();
