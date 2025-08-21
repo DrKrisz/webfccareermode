@@ -50,10 +50,10 @@ function ensureNoSelfMatches(club){
 function makeOpponents(){
   // 20 Premier League teams (2023/24 season)
   return [
-    'Arsenal','Aston Villa','Bournemouth','Brentford','Brighton & Hove Albion',
-    'Burnley','Chelsea','Crystal Palace','Everton','Fulham',
-    'Liverpool','Luton Town','Manchester City','Manchester United','Newcastle United',
-    'Nottingham Forest','Sheffield United','Tottenham Hotspur','West Ham United','Wolverhampton Wanderers'
+    'Arsenal', 'Aston Villa', 'Bournemouth', 'Brentford', 'Brighton',
+    'Burnley', 'Chelsea', 'Crystal Palace', 'Everton', 'Fulham',
+    'Leeds United', 'Liverpool', 'Man City', 'Man Utd', 'Newcastle',
+    'Nottm Forest', 'Sunderland', 'Tottenham', 'West Ham', 'Wolves'
   ];
 }
 function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
