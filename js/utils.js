@@ -8,11 +8,16 @@ function getTeamLevel(club){
 
 // ===== Date / Schedule helpers =====
 function lastSaturdayOfAugust(year){ const d = new Date(year,7,31); while(d.getDay()!==6) d.setDate(d.getDate()-1); return d; }
-function randomWedToSatOfWeek(anchor){ // returns a date between Wed..Sat of the week of anchor
+function realisticMatchDate(anchor){ // returns a plausible Premier League matchday for the week of anchor
   const base=new Date(anchor.getTime());
   // shift to Monday of that week
   base.setDate(base.getDate() - ((base.getDay()+6)%7));
-  const offset = [3,4,5,6][Math.floor(Math.random()*4)]; // Wed..Sat
+  const roll=Math.random();
+  let offset;
+  if(roll<0.75) offset=5;         // Saturday
+  else if(roll<0.95) offset=6;    // Sunday
+  else if(roll<0.98) offset=4;    // Friday night
+  else offset=7;                  // Monday night
   const d = new Date(base.getTime()); d.setDate(base.getDate()+offset); return d;
 }
 function weekAfter(d){ const n=new Date(d.getTime()); n.setDate(n.getDate()+7); return n; }
@@ -26,7 +31,7 @@ function buildSchedule(firstMatchDate, weeks, excludeClub){
   let last = new Date(firstMatchDate.getTime());
   let current = firstMatchDate;
   for(let i=0;i<weeks;i++){
-    const d = randomWedToSatOfWeek(current);
+    const d = realisticMatchDate(current);
     if(d.getTime() <= last.getTime()) d.setDate(last.getDate()+2); // ensure increasing
     last = d;
     out.push({date:d.getTime(), opponent:opponents[i%opponents.length], isMatch:true, played:false, result:null, scoreline:null, type:'match', competition:'League'});
