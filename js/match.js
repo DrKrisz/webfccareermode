@@ -192,8 +192,8 @@ function finishMatch(entry, minutes, mini){
   const st=Game.state; const hasMinutes=minutes>0; let rating=null;
   if(hasMinutes){ rating=randNorm(6.4,.6); if(minutes>=60) rating+=.3; rating+=(mini.score||0)*2.0; rating=Math.max(5.0, Math.min(9.8, +rating.toFixed(1))); }
   let goals=0,assists=0; if(hasMinutes){
-    const baseG=st.player.pos==='Attacker'?0.22: st.player.pos==='Midfield'?0.10: st.player.pos==='Defender'?0.06:0.01;
-    const baseA=st.player.pos==='Attacker'?0.10: st.player.pos==='Midfield'?0.18: st.player.pos==='Defender'?0.08:0.02;
+    const baseG=st.player.pos==='Attacker'?0.22: st.player.pos==='Midfield'?0.10: st.player.pos==='Defender'?0.06:0;
+    const baseA=st.player.pos==='Attacker'?0.10: st.player.pos==='Midfield'?0.18: st.player.pos==='Defender'?0.08:0;
     const perfBoost=Math.max(0,(rating-6.5)*0.15);
     goals = Math.random()<baseG+perfBoost ? (Math.random()<0.12?2:1) : 0;
     assists = Math.random()<baseA+perfBoost ? 1 : 0;
@@ -214,13 +214,14 @@ function finishMatch(entry, minutes, mini){
 
   // Commit outcome
   entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
-  st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists;
-  st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists;
-  applyPostMatchGrowth(st, minutes, rating, goals, assists, true);
+  const cleanSheet = st.player.pos==='Goalkeeper' && oppGoals===0 ? 1 : 0;
+  st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists; if(st.player.pos==='Goalkeeper') st.cleanSheets+=cleanSheet;
+  st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists; if(st.player.pos==='Goalkeeper') st.seasonCleanSheets+=cleanSheet;
+  applyPostMatchGrowth(st, minutes, rating, goals, assists, true, oppGoals);
   st.player.value = Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   payWeekly(st);
   st.week = Math.min(38, st.week+1);
-  const gaPart = rating==='DNP' ? '' : `, G${goals}, A${assists}`;
+  const gaPart = rating==='DNP' ? '' : (st.player.pos==='Goalkeeper' ? `, CS${cleanSheet}` : `, G${goals}, A${assists}`);
   Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${gaPart}`);
 
   // Move day and show summary
@@ -231,8 +232,12 @@ function finishMatch(entry, minutes, mini){
     `<div class="kv"><div class="k">Rating</div><div class="v">${rating?.toFixed?rating.toFixed(1):rating}</div></div>`,
   ];
   if(rating!=='DNP'){
-    stats.push(`<div class="kv"><div class="k">Goals</div><div class="v">${goals}</div></div>`);
-    stats.push(`<div class="kv"><div class="k">Assists</div><div class="v">${assists}</div></div>`);
+    if(st.player.pos==='Goalkeeper'){
+      stats.push(`<div class="kv"><div class="k">Clean sheet</div><div class="v">${cleanSheet}</div></div>`);
+    } else {
+      stats.push(`<div class="kv"><div class="k">Goals</div><div class="v">${goals}</div></div>`);
+      stats.push(`<div class="kv"><div class="k">Assists</div><div class="v">${assists}</div></div>`);
+    }
   }
   stats.push(`<div class="kv"><div class="k">New overall</div><div class="v">${st.player.overall}</div></div>`);
   box.innerHTML = `<div class="h">Full time</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">${stats.join('')}</div>`;
@@ -253,8 +258,8 @@ function simulateMatch(entry){
   const hasMinutes=minutes>0; let rating=null;
   if(hasMinutes){ rating=randNorm(6.4,.6); if(minutes>=60) rating+=.3; rating+=(mini.score||0)*2.0; rating=Math.max(5.0, Math.min(9.8, +rating.toFixed(1))); }
   let goals=0,assists=0; if(hasMinutes){
-    const baseG=st.player.pos==='Attacker'?0.22: st.player.pos==='Midfield'?0.10: st.player.pos==='Defender'?0.06:0.01;
-    const baseA=st.player.pos==='Attacker'?0.10: st.player.pos==='Midfield'?0.18: st.player.pos==='Defender'?0.08:0.02;
+    const baseG=st.player.pos==='Attacker'?0.22: st.player.pos==='Midfield'?0.10: st.player.pos==='Defender'?0.06:0;
+    const baseA=st.player.pos==='Attacker'?0.10: st.player.pos==='Midfield'?0.18: st.player.pos==='Defender'?0.08:0;
     const perfBoost=Math.max(0,(rating-6.5)*0.15);
     goals = Math.random()<baseG+perfBoost ? (Math.random()<0.12?2:1) : 0;
     assists = Math.random()<baseA+perfBoost ? 1 : 0;
@@ -272,13 +277,14 @@ function simulateMatch(entry){
   const result=teamGoals>oppGoals?'W': teamGoals<oppGoals?'L':'D';
   const scoreline=`${teamGoals}-${oppGoals}`;
   entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
-  st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists;
-  st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists;
-  applyPostMatchGrowth(st, minutes, rating, goals, assists, false);
+  const cleanSheet = st.player.pos==='Goalkeeper' && oppGoals===0 ? 1 : 0;
+  st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists; if(st.player.pos==='Goalkeeper') st.cleanSheets+=cleanSheet;
+  st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists; if(st.player.pos==='Goalkeeper') st.seasonCleanSheets+=cleanSheet;
+  applyPostMatchGrowth(st, minutes, rating, goals, assists, false, oppGoals);
   st.player.value=Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   payWeekly(st);
   st.week=Math.min(38, st.week+1);
-  const gaPart = rating==='DNP' ? '' : `, G${goals}, A${assists}`;
+  const gaPart = rating==='DNP' ? '' : (st.player.pos==='Goalkeeper' ? `, CS${cleanSheet}` : `, G${goals}, A${assists}`);
   Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${gaPart}`);
   Game.save(); renderAll();
   setTimeout(()=>{ nextDay(); },300);

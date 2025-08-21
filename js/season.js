@@ -109,27 +109,46 @@ function openSeasonEnd(){
 
   const c=q('#match-content'); c.innerHTML='';
   const box=document.createElement('div'); box.className='glass';
+  const seasonStat = st.player.pos==='Goalkeeper'
+    ? `Season: ${st.seasonMinutes} min, CS ${st.seasonCleanSheets}`
+    : `Season: ${st.seasonMinutes} min, G ${st.seasonGoals}, A ${st.seasonAssists}`;
+  const careerStat = st.player.pos==='Goalkeeper'
+    ? `Career: ${st.minutesPlayed} min, CS ${st.cleanSheets}`
+    : `Career: ${st.minutesPlayed} min, G ${st.goals}, A ${st.assists}`;
   box.innerHTML = `<div class="h">Season ${st.season} summary</div>
     <div>League position: ${pos}/20 ${won?' - <span class="badge">CHAMPIONS</span>':''}</div>
-    <div class="muted" style="margin-top:8px">Season: ${st.seasonMinutes} min, G ${st.seasonGoals}, A ${st.seasonAssists}</div>
-    <div class="muted" style="margin-top:4px">Career: ${st.minutesPlayed} min, G ${st.goals}, A ${st.assists}</div>
+    <div class="muted" style="margin-top:8px">${seasonStat}</div>
+    <div class="muted" style="margin-top:4px">${careerStat}</div>
     ${tableHtml}
     <div style="margin-top:10px"><button class="btn primary" id="btn-next-season">Start next season</button>${offerRenew?' <button class="btn" id="btn-renew-contract">Renew contract</button>':''}</div>`;
   c.append(box); q('#match-modal').setAttribute('open','');
 
   q('#btn-next-season').onclick=()=>{
     q('#match-modal').removeAttribute('open');
-    const lastSeason = {min:st.seasonMinutes, goals:st.seasonGoals, assists:st.seasonAssists};
+    const lastSeason = st.player.pos==='Goalkeeper'
+      ? {min:st.seasonMinutes, cleanSheets:st.seasonCleanSheets}
+      : {min:st.seasonMinutes, goals:st.seasonGoals, assists:st.seasonAssists};
     if(st.player.club!=='Free Agent'){
       // manager feedback
       let msg;
-      if(lastSeason.goals>=10 || lastSeason.min>=1800){
-        st.player.salary=Math.round(st.player.salary*1.1);
-        msg=`Great season! Salary increased to ${Game.money(weeklySalary(st.player))}/w.`;
-      } else if(lastSeason.min<600){
-        msg=`Tough season. Salary stays the same at ${Game.money(weeklySalary(st.player))}/w.`;
+      if(st.player.pos==='Goalkeeper'){
+        if(lastSeason.cleanSheets>=10 || lastSeason.min>=1800){
+          st.player.salary=Math.round(st.player.salary*1.1);
+          msg=`Great season! Salary increased to ${Game.money(weeklySalary(st.player))}/w.`;
+        } else if(lastSeason.min<600){
+          msg=`Tough season. Salary stays the same at ${Game.money(weeklySalary(st.player))}/w.`;
+        } else {
+          msg=`Well kid decent season, salary stays at ${Game.money(weeklySalary(st.player))}/w.`;
+        }
       } else {
-        msg=`Well kid decent season, salary stays at ${Game.money(weeklySalary(st.player))}/w.`;
+        if(lastSeason.goals>=10 || lastSeason.min>=1800){
+          st.player.salary=Math.round(st.player.salary*1.1);
+          msg=`Great season! Salary increased to ${Game.money(weeklySalary(st.player))}/w.`;
+        } else if(lastSeason.min<600){
+          msg=`Tough season. Salary stays the same at ${Game.money(weeklySalary(st.player))}/w.`;
+        } else {
+          msg=`Well kid decent season, salary stays at ${Game.money(weeklySalary(st.player))}/w.`;
+        }
       }
       showPopup('Manager', msg);
       Game.log(`Manager: ${msg}`);
@@ -148,7 +167,9 @@ function openSeasonEnd(){
       } else {
         st.player.marketBlocked = Math.max(0,(st.player.marketBlocked||0)-1);
       }
-      const poorSeason = lastSeason.min>900 && (lastSeason.goals+lastSeason.assists)<2;
+      const poorSeason = st.player.pos==='Goalkeeper'
+        ? lastSeason.min>900 && lastSeason.cleanSheets<4
+        : lastSeason.min>900 && (lastSeason.goals+lastSeason.assists)<2;
       if(poorSeason && Math.random()<0.5){
         const lower=makeOpponents().filter(t=>getTeamLevel(t)<getTeamLevel(st.player.club));
         if(lower.length){
@@ -166,7 +187,7 @@ function openSeasonEnd(){
     const first = randomWedToSatOfWeek(lastSaturdayOfAugust(baseYear));
     st.schedule = buildSchedule(first, 38, st.player.club);
     st.currentDate = st.schedule[0].date; // on season start marker
-    st.seasonMinutes=0; st.seasonGoals=0; st.seasonAssists=0;
+    st.seasonMinutes=0; st.seasonGoals=0; st.seasonAssists=0; st.seasonCleanSheets=0;
     Object.keys(st.shopPurchases||{}).forEach(id=>{ const it=SHOP_ITEMS.find(i=>i.id===id); if(it && it.perSeason) delete st.shopPurchases[id]; });
     st.player.salaryMultiplier=1;
     st.seasonProcessed = false;
