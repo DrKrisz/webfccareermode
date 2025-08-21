@@ -29,6 +29,8 @@ const Game = {
     minutesPlayed: 0,
     goals: 0,
     assists: 0,
+    cleanSheets: 0,
+    seasonCleanSheets: 0,
     seasonMinutes: 0,
     seasonGoals: 0,
     seasonAssists: 0,
@@ -87,8 +89,8 @@ const Game = {
       contractReworkYear: 0,
     };
     this.state.season = 1; this.state.week = 1;
-    this.state.minutesPlayed = 0; this.state.goals = 0; this.state.assists = 0;
-    this.state.seasonMinutes = 0; this.state.seasonGoals = 0; this.state.seasonAssists = 0;
+    this.state.minutesPlayed = 0; this.state.goals = 0; this.state.assists = 0; this.state.cleanSheets = 0;
+    this.state.seasonMinutes = 0; this.state.seasonGoals = 0; this.state.seasonAssists = 0; this.state.seasonCleanSheets = 0;
     this.state.lastOffers = []; this.state.playedMatchDates = []; this.state.eventLog = [];
     this.state.shopPurchases = {};
     this.state.auto = false;
@@ -120,6 +122,8 @@ function migrateState(st){
   st.leagueSnapshot = st.leagueSnapshot || [];
   st.leagueSnapshotWeek = st.leagueSnapshotWeek || 0;
   st.seasonSummary = st.seasonSummary || null;
+  st.cleanSheets = st.cleanSheets || 0;
+  st.seasonCleanSheets = st.seasonCleanSheets || 0;
   if(st.player){
     st.player.salaryMultiplier = st.player.salaryMultiplier || 1;
     st.player.passiveIncome = st.player.passiveIncome || 0;

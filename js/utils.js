@@ -85,13 +85,18 @@ function computeValue(overall,league,weeklySalary){
 function weeklySalary(p){
   return Math.round((p.salary||0)*(p.salaryMultiplier||1));
 }
-function applyPostMatchGrowth(st, minutes, rating, goals, assists, played){
+function applyPostMatchGrowth(st, minutes, rating, goals, assists, played, conceded=0){
   const targetMap={'second bench':10,'bench':20,'rotater':45,'match player':70,'match starter':90};
   const target=targetMap[st.player.timeBand]||30; let delta=0;
   if(minutes>=target) delta+=0.2; if(rating>=7) delta+=0.2; if(rating>=8) delta+=0.2;
-  if(st.player.pos==='Attacker') delta+=goals*.25+assists*.15;
-  if(st.player.pos==='Midfield') delta+=goals*.18+assists*.20;
-  if(st.player.pos==='Defender') delta+=goals*.12+assists*.08;
+  if(st.player.pos==='Goalkeeper'){
+    if(conceded===0) delta+=0.25;
+    else delta-=0.05*conceded;
+  } else {
+    if(st.player.pos==='Attacker') delta+=goals*.25+assists*.15;
+    if(st.player.pos==='Midfield') delta+=goals*.18+assists*.20;
+    if(st.player.pos==='Defender') delta+=goals*.12+assists*.08;
+  }
   if(minutes<target*.4) delta-=0.15; if(st.player.age>=31) delta-=0.05;
   const clubLvl=getTeamLevel(st.player.club);
   if(clubLvl<75) delta+=0.1; // lower level clubs boost growth
