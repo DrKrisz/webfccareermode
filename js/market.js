@@ -116,12 +116,28 @@ function acceptOffer(i){
   st.player.releaseClause=Math.round((o.releaseClauseFee?o.releaseClauseFee:o.value)*1.5);
   st.player.marketBlocked=0; st.player.contractReworkYear=0;
   if(o.releaseClauseFee) Game.log(`Release clause of ${Game.money(o.releaseClauseFee)} activated by ${o.club}`);
+
+  // Check if player should be loaned to a lower league
+  const clubLevel=getTeamLevel(o.club);
+  const needsLoan = clubLevel>85 && st.player.overall+10<clubLevel;
+  if(needsLoan){
+    const loanClub = pick(LEAGUES['EFL Championship']);
+    const loanYears = randInt(1,2);
+    st.player.loan = {parentClub:o.club, parentLeague:o.league, seasonsLeft:loanYears};
+    st.player.club = loanClub;
+    st.player.league = 'EFL Championship';
+    Game.log(`${o.club} loaned you to ${loanClub} for ${loanYears} season${loanYears>1?'s':''}`);
+    showPopup('Loan move', `${o.club} loaned you to ${loanClub} for ${loanYears} season${loanYears>1?'s':''}.`);
+  } else {
+    st.player.loan = null;
+  }
+
   const year=new Date().getFullYear();
   const first=realisticMatchDate(lastSaturdayOfAugust(year));
-  st.schedule=buildSchedule(first,38,o.club,o.league);
+  st.schedule=buildSchedule(first,38,st.player.club,st.player.league);
   st.currentDate=st.schedule[0].date;
   st.week=1;
-  Game.log(`Signed for ${o.club}, ${o.years}y, ${o.status}, ${o.timeBand}, ${Game.money(o.salary)}/w`);
+  Game.log(`Signed for ${o.club}${st.player.loan?` (loaned to ${st.player.club})`:''}, ${o.years}y, ${o.status}, ${o.timeBand}, ${Game.money(o.salary)}/w`);
   Game.save(); renderAll(); q('#market-modal').removeAttribute('open');
 }
 

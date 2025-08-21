@@ -60,7 +60,7 @@ const TEAM_BASE_LEVELS = {
 const Game = {
   state: {
     // player fields get filled on newGame
-    player: null, // {name, age, origin, pos, overall, club, league, status, timeBand, salary, value, balance, yearsLeft, transferListed, alwaysPlay, goldenClub, releaseClause, marketBlocked, contractReworkYear}
+    player: null, // {name, age, origin, pos, overall, club, league, status, timeBand, salary, value, balance, yearsLeft, transferListed, alwaysPlay, goldenClub, releaseClause, marketBlocked, contractReworkYear, loan}
     season: 1,
     week: 1,
     currentDate: null,
@@ -126,6 +126,7 @@ const Game = {
       releaseClause: 0,
       marketBlocked: 0,
       contractReworkYear: 0,
+      loan: null,
     };
     this.state.season = 1; this.state.week = 1;
     this.state.minutesPlayed = 0; this.state.goals = 0; this.state.assists = 0; this.state.cleanSheets = 0;
@@ -172,6 +173,7 @@ function migrateState(st){
     st.player.releaseClause = st.player.releaseClause || 0;
     st.player.marketBlocked = st.player.marketBlocked || 0;
     st.player.contractReworkYear = st.player.contractReworkYear || 0;
+    st.player.loan = st.player.loan || null;
   }
   if(typeof st.currentDate !== 'number'){
     const firstSched = Array.isArray(st.schedule) && st.schedule.length ? st.schedule[0] : null;

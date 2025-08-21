@@ -183,6 +183,16 @@ function openSeasonEnd(){
 
     st.season += 1; st.week = 1;
     st.player.age += 1;
+    if(st.player.loan){
+      st.player.loan.seasonsLeft -= 1;
+      if(st.player.loan.seasonsLeft<=0){
+        st.player.club = st.player.loan.parentClub;
+        st.player.league = st.player.loan.parentLeague;
+        Game.log(`Loan ended. Returned to ${st.player.club}.`);
+        showPopup('Loan ended', `Returned to ${st.player.club}.`);
+        st.player.loan = null;
+      }
+    }
     const baseYear = new Date(new Date(st.schedule[0].date).getFullYear()+1,7,31).getFullYear();
     const first = realisticMatchDate(lastSaturdayOfAugust(baseYear));
     st.schedule = buildSchedule(first, 38, st.player.club, st.player.league||'Premier League');
