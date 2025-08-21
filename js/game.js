@@ -20,16 +20,41 @@ const TEAM_BASE_LEVELS = {
   'Crystal Palace': 72,
   'Everton': 72,
   'Fulham': 73,
-  'Leeds United': 74,
   'Liverpool': 88,
   'Man City': 90,
   'Man Utd': 84,
   'Newcastle': 80,
   'Nottm Forest': 70,
-  'Sunderland': 69,
+  'Sheffield Utd': 70,
   'Tottenham': 80,
   'West Ham': 75,
-  'Wolves': 71
+  'Wolves': 71,
+  'Luton Town': 68,
+  // EFL Championship
+  'Birmingham City': 65,
+  'Blackburn Rovers': 68,
+  'Bristol City': 66,
+  'Cardiff City': 66,
+  'Coventry City': 72,
+  'Huddersfield Town': 64,
+  'Hull City': 67,
+  'Ipswich Town': 65,
+  'Leeds United': 74,
+  'Leicester City': 82,
+  'Middlesbrough': 72,
+  'Millwall': 67,
+  'Norwich City': 72,
+  'Plymouth Argyle': 63,
+  'Preston North End': 67,
+  'Queens Park Rangers': 63,
+  'Rotherham United': 60,
+  'Sheffield Wednesday': 64,
+  'Southampton': 80,
+  'Stoke City': 68,
+  'Sunderland': 69,
+  'Swansea City': 67,
+  'Watford': 70,
+  'West Brom': 71
 };
 
 const Game = {
@@ -116,7 +141,7 @@ const Game = {
     this.state.seasonSummary = null;
     const year = new Date().getFullYear();
     const first = realisticMatchDate(lastSaturdayOfAugust(year));
-    this.state.schedule = buildSchedule(first, 38);
+    this.state.schedule = buildSchedule(first, 38, null, 'Premier League');
     // start at season start marker day for clarity
     this.state.currentDate = this.state.schedule[0].date;
     this.log(`Career started: ${this.state.player.name}, ${this.state.player.age}, ${this.state.player.pos}, ${this.state.player.origin}`);

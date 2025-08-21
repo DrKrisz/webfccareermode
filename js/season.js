@@ -7,7 +7,7 @@ function updateLeagueSnapshot(){
   const played = st.schedule.filter(e=>e.isMatch && e.played).length;
   if(st.leagueSnapshotWeek===played) return;
   const club=st.player.club;
-  const teams=makeOpponents().map(t=>({team:t}));
+  const teams=makeOpponents(st.player.league||'Premier League').map(t=>({team:t}));
   const stats={w:0,d:0,l:0,gf:0,ga:0};
   st.schedule.filter(e=>e.isMatch && e.played).forEach(e=>{
     if(e.result==='W') stats.w++;
@@ -54,7 +54,7 @@ function openSeasonEnd(){
     stats.pts=stats.w*3+stats.d;
 
     const club=st.player.club;
-    const teams=makeOpponents().map(t=>({team:t}));
+    const teams=makeOpponents(st.player.league||'Premier League').map(t=>({team:t}));
     if(!teams.find(t=>t.team===club)){ teams.pop(); teams.push({team:club}); }
     teams.forEach(t=>{
       if(t.team===club){ Object.assign(t,stats); }
@@ -171,10 +171,10 @@ function openSeasonEnd(){
         ? lastSeason.min>900 && lastSeason.cleanSheets<4
         : lastSeason.min>900 && (lastSeason.goals+lastSeason.assists)<2;
       if(poorSeason && Math.random()<0.5){
-        const lower=makeOpponents().filter(t=>getTeamLevel(t)<getTeamLevel(st.player.club));
+        const lower=makeOpponents(st.player.league||'Premier League').filter(t=>getTeamLevel(t)<getTeamLevel(st.player.club));
         if(lower.length){
           const club=pick(lower);
-          st.lastOffers=[makeOfferForVaried(st.player,club,getTeamLevel(club))];
+          st.lastOffers=[makeOfferForVaried(st.player,club,getTeamLevel(club),CLUB_TO_LEAGUE[club])];
           st.player.transferListed=true;
           Game.log('Club considers selling you after poor season.');
         }
@@ -185,7 +185,7 @@ function openSeasonEnd(){
     st.player.age += 1;
     const baseYear = new Date(new Date(st.schedule[0].date).getFullYear()+1,7,31).getFullYear();
     const first = realisticMatchDate(lastSaturdayOfAugust(baseYear));
-    st.schedule = buildSchedule(first, 38, st.player.club);
+    st.schedule = buildSchedule(first, 38, st.player.club, st.player.league||'Premier League');
     st.currentDate = st.schedule[0].date; // on season start marker
     st.seasonMinutes=0; st.seasonGoals=0; st.seasonAssists=0; st.seasonCleanSheets=0;
     Object.keys(st.shopPurchases||{}).forEach(id=>{ const it=SHOP_ITEMS.find(i=>i.id===id); if(it && it.perSeason) delete st.shopPurchases[id]; });
