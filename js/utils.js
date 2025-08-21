@@ -1,4 +1,4 @@
-/* WebCareerGame • Pre-Alpha v0.0.9
+/* WebCareerGame • Pre-Alpha v0.1.0
    Shared helper functions for simulation and economy.
 */
 
@@ -66,7 +66,10 @@ function computeSalary(age,overall,league,status,timeBand){
   const overSq = overall*overall;
   const coef = 15;
   const leagueFactor = league==='Premier League'?1.5:1;
-  const statusFactor = {'rookie':0.10,'decent':0.18,'key player':0.35,'important':0.60,'star player':1.00}[status]||0.2;
+  const statusFactor = {
+    'rookie':0.10,'decent':0.18,'key player':0.35,'important':0.60,'star player':1.00,
+    'Backup keeper':0.05,'Reserve keeper':0.15,'First-choice':0.40,'World-class':1.00
+  }[status]||0.2;
   const timeFactor = {'second bench':0.30,'bench':0.50,'rotater':0.80,'match player':1.00,'match starter':1.20}[timeBand]||0.6;
   const ageFactor = age<=18?0.75: age<=23?0.95: age<=28?1.10: age<=31?1.00: 0.85;
   const weekly = overSq*coef*timeFactor*leagueFactor*statusFactor*ageFactor;

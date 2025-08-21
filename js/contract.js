@@ -1,7 +1,19 @@
 // ===== Contract rework =====
-function statusRank(s){ return ['rookie','decent','key player','important','star player'].indexOf(s); }
+function statusRank(s){
+  const map={'rookie':0,'decent':1,'key player':2,'important':3,'star player':4,
+    'Backup keeper':0,'Reserve keeper':1,'First-choice':2,'World-class':3};
+  return map[s]??0;
+}
 function timeRank(t){ return ['second bench','bench','rotater','match player','match starter'].indexOf(t); }
-function allowedStatuses(age,overall,current){
+function allowedStatuses(age,overall,current,pos){
+  if(pos==='Goalkeeper'){
+    const list=['Backup keeper'];
+    if(overall>=60) list.push('Reserve keeper');
+    if(overall>=70) list.push('First-choice');
+    if(overall>=80) list.push('World-class');
+    if(current && !list.includes(current)) list.push(current);
+    return list;
+  }
   const list=['rookie'];
   if(overall>=60) list.push('decent');
   if(overall>=70) list.push('key player');
@@ -67,7 +79,7 @@ function openContractRework(){
   });
 
   statusDiv.innerHTML='';
-  allowedStatuses(st.player.age, st.player.overall, st.player.status).forEach(s=>{
+  allowedStatuses(st.player.age, st.player.overall, st.player.status, st.player.pos).forEach(s=>{
     const b=document.createElement('button');
     b.textContent=s;
     b.dataset.value=s;

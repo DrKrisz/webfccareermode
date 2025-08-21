@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WebCareerGame • Pre-Alpha v0.0.9</title>
+  <title>WebCareerGame • Pre-Alpha v0.1.0</title>
   <!-- Split build: external CSS & JS -->
   <link rel="stylesheet" href="style.css">
   <script src="js/game.js" defer></script>
@@ -12,6 +12,7 @@
   <script src="js/market.js" defer></script>
   <script src="js/contract.js" defer></script>
   <script src="js/shop.js" defer></script>
+  <script src="js/goalkeeper.js" defer></script>
   <script src="js/match.js" defer></script>
   <script src="js/season.js" defer></script>
   <script src="js/time.js" defer></script>
@@ -46,12 +47,12 @@
         <div class="glass">
           <div class="h">What's new <span class="app-version"></span></div>
           <ul class="updates">
-            <li>Play Match button lives beside Next day for stable layout.</li>
-            <li>Action buttons sport emojis with training cooldown and countdowns.</li>
-            <li>Calendar cells enlarged and centered for easier viewing.</li>
+            <li>Goalkeeper position playable with dedicated training and match minigames.</li>
+            <li>Goalkeeper contracts feature four tiers from backup to world-class.</li>
           </ul>
           <div class="h before">Before</div>
           <ul class="updates muted before-list">
+            <li>v0.0.9: Play Match beside Next day, action emojis with cooldowns, larger calendar cells.</li>
             <li>v0.0.7: calendar result colors, event log highlights, expanded shop.</li>
             <li>v0.0.6: refactored game scripts for modularity.</li>
             <li>v0.0.5: auto-advance days, season summary, event log.</li>
@@ -78,7 +79,7 @@
               <label class="pill radio"><input type="radio" name="pos" value="Attacker" checked> Attacker</label>
               <label class="pill radio"><input type="radio" name="pos" value="Midfield"> Midfield</label>
               <label class="pill radio"><input type="radio" name="pos" value="Defender"> Defender</label>
-              <label class="pill radio muted" title="Goalkeeper disabled" style="text-decoration: line-through;"><input type="radio" name="pos" value="Goalkeeper" disabled> Goalkeeper</label>
+              <label class="pill radio"><input type="radio" name="pos" value="Goalkeeper"> Goalkeeper <span class="badge new">NEW</span></label>
             </div>
           </div>
           <label class="pill checkbox"><input type="checkbox" id="always-play"> Always play</label>

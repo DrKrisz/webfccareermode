@@ -1,4 +1,4 @@
-/* WebCareerGame • Pre-Alpha v0.0.5
+/* WebCareerGame • Pre-Alpha v0.1.0
    External stylesheet (dark, minimalist, iOS‑ish)
    Mobile-first, responsive up to desktop
 */
@@ -86,6 +86,11 @@ body{
   font-size: 12px;
   border: 1px solid var(--border);
   background: #101821;
+}
+
+.badge.new {
+  background: var(--success);
+  color: #000;
 }
 
 
@@ -236,6 +241,10 @@ a{ color:var(--primary) }
 /* Minigame */
 .minigame{position:relative;width:100%;height:260px;border-radius:12px;background:#0e1620;border:1px dashed var(--border);overflow:hidden}
 .bubble{position:absolute;width:34px;height:34px;border-radius:999px;background:linear-gradient(180deg,#2a6df1,#204fb3);display:grid;place-items:center;font-weight:900;user-select:none;cursor:pointer}
+
+.gk-guess{display:flex;height:260px}
+.gk-guess button{flex:1;font-size:24px;border:0;background:#13202d;color:var(--text);cursor:pointer}
+.gk-guess button:hover{background:#173347}
 
 .shop-item{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .shop-item .desc{font-size:12px;margin-top:4px}
