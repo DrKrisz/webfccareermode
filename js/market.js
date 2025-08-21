@@ -1,28 +1,28 @@
 // ===== Market generation =====
 function rollMarketOffers(p){
   const count=1+Math.floor(Math.random()*5);
-  const clubs=makeOpponents().sort(()=>Math.random()-0.5);
+  const clubs=[...ALL_CLUBS].sort(()=>Math.random()-0.5);
   const offers=[];
-  for(const club of clubs){
+  for(const {club,league} of clubs){
     if(offers.length>=count) break;
     const lvl=getTeamLevel(club);
     const diff=lvl - p.overall;
     const chance = diff<=0?0.8: diff<5?0.6: diff<10?0.3: 0.05; // big clubs rarely approach weak players
-    if(Math.random()<chance) offers.push(makeOfferForVaried(p,club,lvl));
+    if(Math.random()<chance) offers.push(makeOfferForVaried(p,club,lvl,league));
   }
   if(p.releaseClause && p.overall>=75 && Math.random()<0.15){
-    const big=makeOpponents().filter(c=>getTeamLevel(c)>85 && c!==p.club);
+    const big=ALL_CLUBS.filter(c=>getTeamLevel(c.club)>85 && c.club!==p.club);
     if(big.length){
-      const club=pick(big);
-      const o=makeOfferForVaried(p,club,getTeamLevel(club));
+      const {club,league}=pick(big);
+      const o=makeOfferForVaried(p,club,getTeamLevel(club),league);
       o.releaseClauseFee=p.releaseClause;
       offers.push(o);
     }
   }
   return offers;
 }
-function makeOfferFor(player, club){ return makeOfferForVaried(player, club); }
-function makeOfferForVaried(player, club, level){
+function makeOfferFor(player, club){ return makeOfferForVaried(player, club, null, CLUB_TO_LEAGUE[club]); }
+function makeOfferForVaried(player, club, level, league){
   const o=player.overall;
   let status,timeBand;
   if(player.pos==='Goalkeeper'){
@@ -44,7 +44,7 @@ function makeOfferForVaried(player, club, level){
   const clubFactor = 0.8 + Math.random()*0.6; // 0.8..1.4
   const posBonus = player.pos==='Attacker'?1.15: player.pos==='Midfield'?1.05: 1.0;
   const years=Math.min(5, Math.max(1, Math.round(randNorm(2.2,1.2))));
-  const league='Premier League';
+  league = league || CLUB_TO_LEAGUE[club] || 'Premier League';
   let salary=computeSalary(player.age,player.overall,league,status,timeBand)*clubFactor*posBonus;
   const lengthFactor = years>=4?0.9: years===3?1.0: years===2?1.08:1.15; // shorter pays more
   salary*=lengthFactor;
@@ -110,7 +110,11 @@ function acceptOffer(i){
   st.player.releaseClause=Math.round((o.releaseClauseFee?o.releaseClauseFee:o.value)*1.5);
   st.player.marketBlocked=0; st.player.contractReworkYear=0;
   if(o.releaseClauseFee) Game.log(`Release clause of ${Game.money(o.releaseClauseFee)} activated by ${o.club}`);
-  ensureNoSelfMatches(o.club);
+  const year=new Date().getFullYear();
+  const first=realisticMatchDate(lastSaturdayOfAugust(year));
+  st.schedule=buildSchedule(first,38,o.club,o.league);
+  st.currentDate=st.schedule[0].date;
+  st.week=1;
   Game.log(`Signed for ${o.club}, ${o.years}y, ${o.status}, ${o.timeBand}, ${Game.money(o.salary)}/w`);
   Game.save(); renderAll(); q('#market-modal').removeAttribute('open');
 }

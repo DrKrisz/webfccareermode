@@ -2,6 +2,26 @@
    Shared helper functions for simulation and economy.
 */
 
+// ===== League data =====
+const LEAGUES = {
+  'Premier League': [
+    'Arsenal', 'Aston Villa', 'Bournemouth', 'Brentford', 'Brighton',
+    'Burnley', 'Chelsea', 'Crystal Palace', 'Everton', 'Fulham',
+    'Liverpool', 'Man City', 'Man Utd', 'Newcastle', 'Nottm Forest',
+    'Sheffield Utd', 'Tottenham', 'West Ham', 'Wolves', 'Luton Town'
+  ],
+  'EFL Championship': [
+    'Birmingham City','Blackburn Rovers','Bristol City','Cardiff City','Coventry City',
+    'Huddersfield Town','Hull City','Ipswich Town','Leeds United','Leicester City',
+    'Middlesbrough','Millwall','Norwich City','Plymouth Argyle','Preston North End',
+    'Queens Park Rangers','Rotherham United','Sheffield Wednesday','Southampton',
+    'Stoke City','Sunderland','Swansea City','Watford','West Brom'
+  ]
+};
+const CLUB_TO_LEAGUE = {};
+Object.entries(LEAGUES).forEach(([lg,teams])=>teams.forEach(t=>{CLUB_TO_LEAGUE[t]=lg;}));
+const ALL_CLUBS = Object.entries(LEAGUES).flatMap(([lg,teams])=>teams.map(t=>({club:t,league:lg})));
+
 function getTeamLevel(club){
   return (Game.state.teamLevels && Game.state.teamLevels[club]) || TEAM_BASE_LEVELS[club] || 60;
 }
@@ -22,8 +42,8 @@ function realisticMatchDate(anchor){ // returns a plausible Premier League match
 }
 function weekAfter(d){ const n=new Date(d.getTime()); n.setDate(n.getDate()+7); return n; }
 
-function buildSchedule(firstMatchDate, weeks, excludeClub){
-  const opponents = makeOpponents().filter(t=>t!==excludeClub);
+function buildSchedule(firstMatchDate, weeks, excludeClub, league=Game.state.player?.league||'Premier League'){
+  const opponents = makeOpponents(league).filter(t=>t!==excludeClub);
   const out = [];
   // season start marker one day before first kickoff
   const seasonStart = new Date(firstMatchDate.getTime()); seasonStart.setDate(seasonStart.getDate()-1);
@@ -43,23 +63,17 @@ function buildSchedule(firstMatchDate, weeks, excludeClub){
   return out;
 }
 
-function ensureNoSelfMatches(club){
+function ensureNoSelfMatches(club, league=Game.state.player?.league||'Premier League'){
   if(!club) return;
-  const others = makeOpponents().filter(t=>t!==club);
+  const others = makeOpponents(league).filter(t=>t!==club);
   Game.state.schedule.forEach(e=>{
     if(e.isMatch && e.opponent===club){ e.opponent = pick(others); }
   });
 }
 
 // ===== Data / RNG helpers =====
-function makeOpponents(){
-  // 20 Premier League teams (2023/24 season)
-  return [
-    'Arsenal', 'Aston Villa', 'Bournemouth', 'Brentford', 'Brighton',
-    'Burnley', 'Chelsea', 'Crystal Palace', 'Everton', 'Fulham',
-    'Leeds United', 'Liverpool', 'Man City', 'Man Utd', 'Newcastle',
-    'Nottm Forest', 'Sunderland', 'Tottenham', 'West Ham', 'Wolves'
-  ];
+function makeOpponents(league=Game.state.player?.league||'Premier League'){
+  return LEAGUES[league] || LEAGUES['Premier League'];
 }
 function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
 function randNorm(mu=0, sigma=1){ const u=1-Math.random(); const v=1-Math.random(); return mu+sigma*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
