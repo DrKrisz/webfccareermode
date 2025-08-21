@@ -115,7 +115,7 @@ const Game = {
     this.state.leagueSnapshotWeek = 0;
     this.state.seasonSummary = null;
     const year = new Date().getFullYear();
-    const first = randomWedToSatOfWeek(lastSaturdayOfAugust(year));
+    const first = realisticMatchDate(lastSaturdayOfAugust(year));
     this.state.schedule = buildSchedule(first, 38);
     // start at season start marker day for clarity
     this.state.currentDate = this.state.schedule[0].date;

@@ -184,7 +184,7 @@ function openSeasonEnd(){
     st.season += 1; st.week = 1;
     st.player.age += 1;
     const baseYear = new Date(new Date(st.schedule[0].date).getFullYear()+1,7,31).getFullYear();
-    const first = randomWedToSatOfWeek(lastSaturdayOfAugust(baseYear));
+    const first = realisticMatchDate(lastSaturdayOfAugust(baseYear));
     st.schedule = buildSchedule(first, 38, st.player.club);
     st.currentDate = st.schedule[0].date; // on season start marker
     st.seasonMinutes=0; st.seasonGoals=0; st.seasonAssists=0; st.seasonCleanSheets=0;
