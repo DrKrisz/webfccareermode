@@ -20,6 +20,7 @@ function goalkeeperTrainingView(onDone){
     field.className='minigame gk-guess';
     field.innerHTML='';
     const target=Math.random()<0.5?'left':'right';
+    const ball=document.createElement('div'); ball.className='gk-ball'; field.append(ball);
     const left=document.createElement('button'); left.textContent='\u2B05\uFE0F';
     const right=document.createElement('button'); right.textContent='\u27A1\uFE0F';
     field.append(left,right);
@@ -27,8 +28,9 @@ function goalkeeperTrainingView(onDone){
     function choose(side){
       if(picked) return; picked=true;
       if(side===target) correct++;
+      ball.style.left = target==='left' ? '20%' : '80%';
       round++;
-      timers.push(setTimeout(()=>{ round<rounds?guessPhase():pushPhase(); },300));
+      timers.push(setTimeout(()=>{ round<rounds?guessPhase():pushPhase(); },500));
     }
     left.onclick=()=>choose('left');
     right.onclick=()=>choose('right');
