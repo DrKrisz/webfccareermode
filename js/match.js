@@ -77,11 +77,11 @@ function openTraining(){
   const daysSince = st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
   if(todayEntry && todayEntry.isMatch){ showPopup('Training', 'Match scheduled today. Focus on the game.'); return; }
   if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
-  if(st.player.pos==='Goalkeeper' && daysSince < 1){
+  if(daysSince < 1){
     Game.log('Tried to train twice today. Come back tomorrow.');
     Game.save();
     renderAll();
-    showPopup('Training', 'Trained today. Come back tomorrow.');
+    showPopup('Training', 'You have trained today, come back tomorrow.');
     return;
   }
   if(daysSince < 2 && st.player.pos!=='Goalkeeper'){
