@@ -25,7 +25,8 @@ function wireEvents(){
       const name=q('#name').value||'Player';
       const age=q('#age').value||16;
       const origin=q('#origin').value;
-      const pos=[...document.querySelectorAll('input[name=pos]')].find(x=>x.checked)?.value||'Attacker';
+      const posEl=[...document.querySelectorAll('input[name=pos]')].find(x=>x.checked);
+      const pos=posEl ? posEl.value : 'Attacker';
       const alwaysPlay=q('#always-play').checked;
       Game.newGame({name,age,origin,pos,alwaysPlay});
       renderAll();

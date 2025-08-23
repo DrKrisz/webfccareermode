@@ -2,7 +2,7 @@
 function statusRank(s){
   const map={'rookie':0,'decent':1,'key player':2,'important':3,'star player':4,
     'Backup keeper':0,'Reserve keeper':1,'First-choice':2,'World-class':3};
-  return map[s]??0;
+  return Object.prototype.hasOwnProperty.call(map, s) ? map[s] : 0;
 }
 function timeRank(t){ return ['second bench','bench','rotater','match player','match starter'].indexOf(t); }
 function allowedStatuses(age,overall,current,pos){
