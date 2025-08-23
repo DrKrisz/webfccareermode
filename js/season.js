@@ -119,8 +119,12 @@ function openSeasonEnd(){
     <div>League position: ${pos}/20 ${won?' - <span class="badge">CHAMPIONS</span>':''}</div>
     <div class="muted" style="margin-top:8px">${seasonStat}</div>
     <div class="muted" style="margin-top:4px">${careerStat}</div>
-    ${tableHtml}
-    <div style="margin-top:10px"><button class="btn primary" id="btn-next-season">Start next season</button>${offerRenew?' <button class="btn" id="btn-renew-contract">Renew contract</button>':''}</div>`;
+    <div id="season-actions" style="text-align:center;margin:10px 0">
+      <button class="btn primary" id="btn-next-season">Start next season</button>
+      <button class="btn" id="btn-contract-rework">Contract</button>
+      ${offerRenew?'<button class="btn" id="btn-renew-contract">Renew contract</button>':''}
+    </div>
+    ${tableHtml}`;
   c.append(box); q('#match-modal').setAttribute('open','');
 
   q('#btn-next-season').onclick=()=>{
@@ -210,7 +214,9 @@ function openSeasonEnd(){
     Game.log(`Season ${st.season} begins. Age ${st.player.age}. ${contractInfo}`);
     Game.state.auto=false; updateAutoBtn();
     Game.save(); renderAll();
+    showPopup('Season start', `Season ${st.season} has started.`);
   };
+  q('#btn-contract-rework').onclick=()=>{ q('#match-modal').removeAttribute('open'); openContractRework(); };
   if(offerRenew){ q('#btn-renew-contract').onclick=()=>renewContractOffer(); }
 }
 

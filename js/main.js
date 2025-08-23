@@ -52,6 +52,7 @@ function wireEvents(){
       Game.newGame({name,age,origin,pos,alwaysPlay});
       renderAll();
       openMarket();
+      showPopup('Season start', `Season ${Game.state.season} has started.`);
     });
   }
   const click = (id, fn)=>{ const el=q(id); if(el) el.onclick=fn; };
@@ -105,6 +106,7 @@ function wireEvents(){
     Game.newGame(setup);
     renderAll();
     openMarket();
+    showPopup('Season start', `Season ${Game.state.season} has started.`);
     history.replaceState(null, '', location.pathname);
     return true;
   }
