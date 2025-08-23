@@ -41,4 +41,3 @@ function buyItem(item){
   showPopup('Shop', `Bought ${item.name}!`);
   Game.save(); renderAll(); openShop();
 }
-
