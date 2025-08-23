@@ -283,6 +283,16 @@ a{ color:var(--primary) }
   .card{padding:12px}
   .btn{padding:8px 12px;font-size:14px}
 }
+/* Extra small screen tweaks */
+@media(max-width:480px){
+  .calendar{grid-template-columns:repeat(3, minmax(0, 1fr))}
+  .day{height:100px;padding:6px}
+  .brand{flex-wrap:wrap}
+  .brand h1{font-size:16px}
+  .version{font-size:12px}
+  .btn{padding:6px 10px;font-size:13px}
+}
+
 
 /* Contract modal */
 .option{cursor:pointer}
