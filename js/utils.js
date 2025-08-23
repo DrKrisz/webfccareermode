@@ -6,19 +6,20 @@
 const LEAGUES = {
   // 2025/26 season line-ups
   'Premier League': [
-    'Arsenal', 'Aston Villa', 'Bournemouth', 'Brentford', 'Brighton',
-    'Chelsea', 'Crystal Palace', 'Everton', 'Fulham', 'Ipswich Town',
-    'Leicester City', 'Liverpool', 'Man City', 'Man Utd', 'Newcastle',
-    'Nottm Forest', 'Southampton', 'Tottenham', 'West Ham', 'Wolves'
+    'Arsenal','Aston Villa','Bournemouth','Brentford','Brighton',
+    'Burnley','Chelsea','Crystal Palace','Everton','Fulham',
+    'Leeds United','Liverpool','Man City','Man Utd','Newcastle',
+    'Nottm Forest','Sunderland','Tottenham','West Ham','Wolves'
   ],
   'EFL Championship': [
-    'Birmingham City','Blackburn Rovers','Bristol City','Cardiff City','Coventry City',
-    'Huddersfield Town','Hull City','Leeds United','Middlesbrough','Millwall',
-    'Norwich City','Plymouth Argyle','Preston North End','Queens Park Rangers','Rotherham United',
-    'Sheffield Wednesday','Stoke City','Sunderland','Swansea City','Watford',
-    'West Brom','Burnley','Luton Town','Sheffield Utd'
+    'Birmingham City','Blackburn Rovers','Bristol City','Charlton Athletic','Coventry City',
+    'Derby County','Hull City','Ipswich Town','Leicester City','Middlesbrough',
+    'Millwall','Norwich City','Oxford United','Portsmouth','Preston North End',
+    'Queens Park Rangers','Sheffield Utd','Sheffield Wednesday','Southampton','Stoke City',
+    'Swansea City','Watford','West Brom','Wrexham'
   ]
 };
+
 const CLUB_TO_LEAGUE = {};
 Object.entries(LEAGUES).forEach(([lg,teams])=>teams.forEach(t=>{CLUB_TO_LEAGUE[t]=lg;}));
 const ALL_CLUBS = Object.entries(LEAGUES).flatMap(([lg,teams])=>teams.map(t=>({club:t,league:lg})));

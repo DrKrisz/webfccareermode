@@ -8,53 +8,53 @@ const APP_VERSION = 'v0.1.0';
 // ===== Storage / Globals =====
 const LS_KEY = 'webcareergame.save.v010';
 
-// Base strength levels for each club (0-100 scale roughly reflecting squad quality)
-const TEAM_BASE_LEVELS = {
-  'Arsenal': 85,
-  'Aston Villa': 78,
-  'Bournemouth': 70,
-  'Brentford': 74,
-  'Brighton': 78,
-  'Burnley': 68,
-  'Chelsea': 82,
-  'Crystal Palace': 72,
+const TEAM_BASE_LEVELS_25_26 = {
+  // Premier League
+  'Liverpool': 90,       // Defending champions, major summer spending :contentReference[oaicite:2]{index=2}
+  'Arsenal': 89,        // Significant squad upgrades—depth across all positions :contentReference[oaicite:3]{index=3}
+  'Manchester City': 88, // Youth reinforcements and return of Rodri, bouncing back :contentReference[oaicite:4]{index=4}
+  'Chelsea': 85,         // Strong summer signings and clinical recent performance :contentReference[oaicite:5]{index=5}
+  'Manchester United': 82, // Rebuilding under Amorim, smart signings like Cunha & Mbeumo :contentReference[oaicite:6]{index=6}
+  'Newcastle United': 80, // Solid squad, consistent mid-table—and still in the chase :contentReference[oaicite:7]{index=7}
+  'Tottenham': 78,       // Europa League winners, but still adapting sans Son :contentReference[oaicite:8]{index=8}
+  'Brighton': 76,        // Youth-driven, solid finishers from last season :contentReference[oaicite:9]{index=9}
+  'West Ham': 74,
+  'Aston Villa': 74,
   'Everton': 72,
-  'Fulham': 73,
-  'Liverpool': 88,
-  'Man City': 90,
-  'Man Utd': 84,
-  'Newcastle': 80,
-  'Nottm Forest': 70,
-  'Sheffield Utd': 70,
-  'Tottenham': 80,
-  'West Ham': 75,
-  'Wolves': 71,
+  'Leeds United': 72,    // Promoted, likely to hover mid- to lower-table :contentReference[oaicite:10]{index=10}
+  'Fulham': 71,
+  'Nottingham Forest': 70, // Promoted, comparable to Bournemouth/Forest :contentReference[oaicite:11]{index=11}
+  'Bournemouth': 70,
   'Luton Town': 68,
-  // EFL Championship
+  'Burnley': 68,
+  'Wolves': 67,
+  'Crystal Palace': 66,
+  'West Ham': 74,         // Mid-table expected :contentReference[oaicite:12]{index=12}
+
+  // Championship (2025–26 season adjustments—not updated with promotions)
   'Birmingham City': 65,
-  'Blackburn Rovers': 68,
+  'Blackburn Rovers': 67,
   'Bristol City': 66,
   'Cardiff City': 66,
-  'Coventry City': 72,
+  'Coventry City': 68,
   'Huddersfield Town': 64,
-  'Hull City': 67,
-  'Ipswich Town': 65,
-  'Leeds United': 74,
-  'Leicester City': 82,
-  'Middlesbrough': 72,
+  'Hull City': 66,
+  'Ipswich Town': 66,
+  'Leicester City': 70,    // Relegated—still stronger quality than most in Championship
+  'Middlesbrough': 70,
   'Millwall': 67,
-  'Norwich City': 72,
+  'Norwich City': 69,
   'Plymouth Argyle': 63,
-  'Preston North End': 67,
-  'Queens Park Rangers': 63,
+  'Preston North End': 66,
+  'Queens Park Rangers': 64,
   'Rotherham United': 60,
   'Sheffield Wednesday': 64,
-  'Southampton': 80,
-  'Stoke City': 68,
-  'Sunderland': 69,
+  'Southampton': 72,      // Just came down—Champs-level strength remains
+  'Stoke City': 67,
+  'Sunderland': 70,
   'Swansea City': 67,
-  'Watford': 70,
-  'West Brom': 71
+  'Watford': 68,
+  'West Brom': 69
 };
 
 const Game = {
