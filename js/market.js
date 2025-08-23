@@ -64,11 +64,14 @@ function openMarket(){
   const st=Game.state; const info=q('#market-info'); const list=q('#market-list'); const empty=q('#market-empty');
   list.innerHTML=''; empty.classList.add('hidden');
   if(st.player.club!=='Free Agent'){
-    if(st.player.marketBlocked>0){
+    if(st.player.loan){
+      info.textContent = `You are on loan from ${st.player.loan.parentClub}.`;
+    } else if(st.player.marketBlocked>0){
       info.textContent = `Contract locked for ${st.player.marketBlocked} more season${st.player.marketBlocked>1?'s':''}.`;
     } else {
       info.textContent = st.player.transferListed? 'You are listed for transfer. Teams may approach soon.' : 'You are under contract. Request a transfer listing if you want to move.';
-      const action = btn(st.player.transferListed?'Refresh offers':'Request transfer listing', ()=>{
+      const row=document.createElement('div'); row.className='row wrap';
+      const transferBtn = btn(st.player.transferListed?'Refresh offers':'Request transfer listing', ()=>{
         if(st.player.transferListed){ st.lastOffers = Math.random()<0.6 ? rollMarketOffers(st.player) : []; }
         else {
           const approve = Math.random()<0.6; // 60% approve
@@ -77,7 +80,14 @@ function openMarket(){
         }
         Game.save(); renderAll(); openMarket();
       }, 'btn primary');
-      list.append(action);
+      row.append(transferBtn);
+      if(!st.player.loan){
+        const loanBtn = btn('Request loan', ()=>{
+          requestLoan();
+        }, 'btn');
+        row.append(loanBtn);
+      }
+      list.append(row);
     }
   } else {
     info.textContent = 'You are a free agent. Choose a club to sign for.';
@@ -139,5 +149,31 @@ function acceptOffer(i){
   st.week=1;
   Game.log(`Signed for ${o.club}${st.player.loan?` (loaned to ${st.player.club})`:''}, ${o.years}y, ${o.status}, ${o.timeBand}, ${Game.money(o.salary)}/w`);
   Game.save(); renderAll(); q('#market-modal').removeAttribute('open');
+}
+
+function requestLoan(){
+  const st=Game.state;
+  if(st.player.loan) return;
+  const approve = Math.random()<0.6;
+  if(approve){
+    const loanClub = pick(LEAGUES['EFL Championship'].filter(c=>c!==st.player.club));
+    const loanYears = randInt(1,2);
+    st.player.loan = {parentClub:st.player.club, parentLeague:st.player.league, seasonsLeft:loanYears};
+    st.player.club = loanClub;
+    st.player.league = 'EFL Championship';
+    st.player.transferListed = false;
+    st.lastOffers = [];
+    const year=new Date().getFullYear();
+    const first=realisticMatchDate(lastSaturdayOfAugust(year));
+    st.schedule=buildSchedule(first,38,st.player.club,st.player.league);
+    st.currentDate=st.schedule[0].date;
+    st.week=1;
+    Game.log(`Loaned to ${loanClub} for ${loanYears} season${loanYears>1?'s':''}.`);
+    showPopup('Loan move', `Loaned to ${loanClub} for ${loanYears} season${loanYears>1?'s':''}.`);
+  } else {
+    Game.log('Club denied loan request');
+    showPopup('Loan request', 'Club denied your loan request right now. Perform well and ask again.');
+  }
+  Game.save(); renderAll(); openMarket();
 }
 
