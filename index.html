@@ -12,7 +12,7 @@
       <div class="logo" aria-hidden="true">⚽</div>
       <nav class="nav">
         <a href="#features">Features</a>
-        <a href="old-index.html" class="btn primary">Play now</a>
+        <a href="#setup" class="btn primary">Play now</a>
       </nav>
     </div>
   </header>
@@ -22,7 +22,7 @@
       <div class="container">
         <h1>Craft Your Football Legacy</h1>
         <p>Start as a free agent, train hard, and climb to the top leagues.</p>
-        <a href="old-index.html" class="btn primary big">Start Playing</a>
+        <a href="#setup" class="btn primary big">Start Playing</a>
       </div>
     </section>
 
@@ -46,6 +46,32 @@
         </div>
       </div>
     </section>
+
+    <section id="setup" class="setup container">
+      <h2>Player setup</h2>
+      <form id="setup-form">
+        <div class="field"><label for="name">Player name</label><input id="name" class="input" required placeholder="Your name" maxlength="24" /></div>
+        <div class="field"><label for="age">Age</label><input id="age" class="input" type="number" min="16" max="40" value="16" /><div class="muted hint">start at 16 for free agent intro</div></div>
+        <div class="field"><label for="origin">Origin continent</label>
+          <select id="origin">
+            <option>Europe</option><option>South America</option><option>North America</option><option>Africa</option><option>Asia</option><option>Oceania</option>
+          </select>
+        </div>
+        <div class="field"><label>Position</label>
+          <div class="row wrap">
+            <label class="pill radio"><input type="radio" name="pos" value="Attacker" checked> Attacker</label>
+            <label class="pill radio"><input type="radio" name="pos" value="Midfield"> Midfield</label>
+            <label class="pill radio"><input type="radio" name="pos" value="Defender"> Defender</label>
+            <label class="pill radio"><input type="radio" name="pos" value="Goalkeeper"> Goalkeeper</label>
+          </div>
+        </div>
+        <label class="pill checkbox"><input type="checkbox" id="always-play"> Always play</label>
+        <div class="row end mt">
+          <button class="btn ghost" type="button" id="reset-save">Reset save</button>
+          <button class="btn primary" type="submit">Start career</button>
+        </div>
+      </form>
+    </section>
   </main>
 
   <footer class="site-footer">
@@ -53,5 +79,30 @@
       © 2025 WebCareerGame
     </div>
   </footer>
+
+  <script>
+    const LS_KEY = 'webcareergame.save.v010';
+    const form = document.getElementById('setup-form');
+    if(form){
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const params = new URLSearchParams({
+          name: document.getElementById('name').value,
+          age: document.getElementById('age').value,
+          origin: document.getElementById('origin').value,
+          pos: document.querySelector('input[name=pos]:checked').value,
+          alwaysPlay: document.getElementById('always-play').checked ? '1' : '0'
+        });
+        location.href = 'old-index.html?' + params.toString();
+      });
+    }
+    const resetBtn = document.getElementById('reset-save');
+    if(resetBtn){
+      resetBtn.addEventListener('click', () => {
+        localStorage.removeItem(LS_KEY);
+        alert('Local save cleared');
+      });
+    }
+  </script>
 </body>
 </html>

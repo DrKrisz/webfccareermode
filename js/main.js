@@ -80,11 +80,31 @@ function wireEvents(){
   click('#close-alert-log', ()=>q('#alert-log-modal').removeAttribute('open'));
 }
 
-(function boot(){
-  wireEvents();
-  injectVersion();
-  if(!Game.load()){
-    console.warn('Failed to load save state; starting fresh');
+  (function boot(){
+    wireEvents();
+    injectVersion();
+    const loaded = Game.load();
+    if(!loaded){
+      if(!setupFromUrl()){
+        console.warn('Failed to load save state; starting fresh');
+      }
+    }
+    renderAll();
+  })();
+
+  function setupFromUrl(){
+    const params = new URLSearchParams(location.search);
+    if(!params.has('name')) return false;
+    const setup = {
+      name: params.get('name') || 'Player',
+      age: params.get('age') || 16,
+      origin: params.get('origin') || 'Europe',
+      pos: params.get('pos') || 'Attacker',
+      alwaysPlay: params.get('alwaysPlay') === '1'
+    };
+    Game.newGame(setup);
+    renderAll();
+    openMarket();
+    history.replaceState(null, '', location.pathname);
+    return true;
   }
-  renderAll();
-})();
