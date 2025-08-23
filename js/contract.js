@@ -57,7 +57,13 @@ function openContractRework(){
 
   slider.min=st.player.salary;
   const maxSal=computeSalary(st.player.age, st.player.overall, st.player.league||'Premier League', selStatus, selTime);
-  slider.max=Math.round(Math.max(maxSal, st.player.salary));
+  const currentRoleMax=computeSalary(st.player.age, st.player.overall, st.player.league||'Premier League', st.player.status, st.player.timeBand);
+  let capMultiplier=1.4;
+  const starUndervalued = st.player.overall>=85 && st.player.salary < currentRoleMax*0.6;
+  const rivalInterest = (st.lastOffers||[]).some(o=>o.league===st.player.league && o.club!==st.player.club);
+  if(rivalInterest) capMultiplier=Math.max(capMultiplier,1.8);
+  if(starUndervalued) capMultiplier=Math.max(capMultiplier,2.0);
+  slider.max=Math.round(Math.max(st.player.salary, Math.min(maxSal, st.player.salary*capMultiplier)));
   slider.value=st.player.salary;
   slider.step=Math.max(1, Math.round(st.player.salary*0.01));
 
