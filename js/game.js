@@ -8,7 +8,7 @@ const APP_VERSION = 'v0.1.0';
 // ===== Storage / Globals =====
 const LS_KEY = 'webcareergame.save.v010';
 
-const TEAM_BASE_LEVELS_25_26 = {
+const TEAM_BASE_LEVELS = {
   // Premier League
   'Liverpool': 90,       // Defending champions, major summer spending :contentReference[oaicite:2]{index=2}
   'Arsenal': 89,        // Significant squad upgrades—depth across all positions :contentReference[oaicite:3]{index=3}

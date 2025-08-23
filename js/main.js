@@ -1,3 +1,24 @@
+// ===== Alert Log =====
+const alertLog=[];
+function renderAlertLog(){
+  const el=q('#alert-log');
+  if(!el) return;
+  el.innerHTML='';
+  alertLog.forEach(line=>{
+    const div=document.createElement('div');
+    div.textContent=line;
+    el.append(div);
+  });
+}
+window.onerror=(msg,src,line,col,err)=>{
+  alertLog.push(`${msg} (${src}:${line})`);
+  renderAlertLog();
+};
+window.onunhandledrejection=e=>{
+  alertLog.push(`Unhandled: ${e.reason}`);
+  renderAlertLog();
+};
+
 // ===== Download / Retire =====
 function downloadLog(){ const st=Game.state; const text=(st.eventLog||[]).join('\n'); const blob=new Blob([text],{type:'text/plain'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='webcareergame-log.txt'; a.click(); URL.revokeObjectURL(url); }
 function retirePrompt(){ const st=Game.state; const c=q('#retire-content'); c.innerHTML=''; const box=document.createElement('div'); box.className='glass';
@@ -55,6 +76,8 @@ function wireEvents(){
   click('#btn-log', ()=>downloadLog());
   click('#close-match', ()=>q('#match-modal').removeAttribute('open'));
   click('#close-message', ()=>q('#message-modal').removeAttribute('open'));
+  click('#btn-alert-log', ()=>{ renderAlertLog(); q('#alert-log-modal').setAttribute('open',''); });
+  click('#close-alert-log', ()=>q('#alert-log-modal').removeAttribute('open'));
 }
 
 (function boot(){
