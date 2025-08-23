@@ -102,15 +102,15 @@ function openTraining(){
   q('#training-modal').setAttribute('open','');
   trainingSession={cancelled:false};
   const startMini=()=>{
-    if(trainingSession?.cancelled) return;
+    if(trainingSession && trainingSession.cancelled) return;
     const mini = st.player.pos==='Goalkeeper'
       ? goalkeeperTrainingView(res=>{
-          if(trainingSession?.cancelled) return;
+          if(trainingSession && trainingSession.cancelled) return;
           finishTraining(res);
           trainingSession=null;
         })
       : minigameView('Finish the drill to improve!', res=>{
-          if(trainingSession?.cancelled) return;
+          if(trainingSession && trainingSession.cancelled) return;
           finishTraining(res);
           trainingSession=null;
         });
@@ -229,7 +229,7 @@ function finishMatch(entry, minutes, mini){
   const c=q('#match-content'); const box=document.createElement('div'); box.className='glass';
   const stats=[
     `<div class="kv"><div class="k">Minutes</div><div class="v">${minutes}</div></div>`,
-    `<div class="kv"><div class="k">Rating</div><div class="v">${rating?.toFixed?rating.toFixed(1):rating}</div></div>`,
+    `<div class="kv"><div class="k">Rating</div><div class="v">${rating && rating.toFixed ? rating.toFixed(1) : rating}</div></div>`,
   ];
   if(rating!=='DNP'){
     if(st.player.pos==='Goalkeeper'){

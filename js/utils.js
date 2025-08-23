@@ -44,8 +44,9 @@ function realisticMatchDate(anchor){ // returns a plausible Premier League match
 }
 function weekAfter(d){ const n=new Date(d.getTime()); n.setDate(n.getDate()+7); return n; }
 
-function buildSchedule(firstMatchDate, weeks, excludeClub, league=Game.state.player?.league||'Premier League'){
-  const opponents = makeOpponents(league).filter(t=>t!==excludeClub);
+function buildSchedule(firstMatchDate, weeks, excludeClub, league){
+  const lg = league || (Game.state.player && Game.state.player.league) || 'Premier League';
+  const opponents = makeOpponents(lg).filter(t=>t!==excludeClub);
   const out = [];
   // season start marker one day before first kickoff
   const seasonStart = new Date(firstMatchDate.getTime()); seasonStart.setDate(seasonStart.getDate()-1);
@@ -65,17 +66,19 @@ function buildSchedule(firstMatchDate, weeks, excludeClub, league=Game.state.pla
   return out;
 }
 
-function ensureNoSelfMatches(club, league=Game.state.player?.league||'Premier League'){
+function ensureNoSelfMatches(club, league){
+  const lg = league || (Game.state.player && Game.state.player.league) || 'Premier League';
   if(!club) return;
-  const others = makeOpponents(league).filter(t=>t!==club);
+  const others = makeOpponents(lg).filter(t=>t!==club);
   Game.state.schedule.forEach(e=>{
     if(e.isMatch && e.opponent===club){ e.opponent = pick(others); }
   });
 }
 
 // ===== Data / RNG helpers =====
-function makeOpponents(league=Game.state.player?.league||'Premier League'){
-  return LEAGUES[league] || LEAGUES['Premier League'];
+function makeOpponents(league){
+  const lg = league || (Game.state.player && Game.state.player.league) || 'Premier League';
+  return LEAGUES[lg] || LEAGUES['Premier League'];
 }
 function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
 function randNorm(mu=0, sigma=1){ const u=1-Math.random(); const v=1-Math.random(); return mu+sigma*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
