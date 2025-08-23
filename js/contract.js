@@ -7,18 +7,12 @@ function statusRank(s){
 function timeRank(t){ return ['second bench','bench','rotater','match player','match starter'].indexOf(t); }
 function allowedStatuses(age,overall,current,pos){
   if(pos==='Goalkeeper'){
-    const list=['Backup keeper'];
-    if(overall>=60) list.push('Reserve keeper');
-    if(overall>=70) list.push('First-choice');
-    if(overall>=80) list.push('World-class');
+    const list=['Backup keeper','Reserve keeper','First-choice','World-class'];
     if(current && !list.includes(current)) list.push(current);
     return list;
   }
-  const list=['rookie'];
-  if(overall>=60) list.push('decent');
-  if(overall>=70) list.push('key player');
-  if(overall>=80) list.push('important');
-  if(overall>=88 && age>=21) list.push('star player');
+  const list=['rookie','decent','key player','important'];
+  if(age>=21) list.push('star player');
   if(current && !list.includes(current)) list.push(current);
   return list;
 }
