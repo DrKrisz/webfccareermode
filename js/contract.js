@@ -18,7 +18,7 @@ function allowedStatuses(age,overall,current,pos){
 }
 function contractChance(st,salary,years,status,time){
   const maxSalary=computeSalary(st.player.age, st.player.overall, st.player.league||'Premier League', status, time);
-  if(salary>maxSalary*1.2) return 0;
+  if(salary>maxSalary) return 0;
   let chance=0.6;
   if(salary>st.player.salary*1.1) chance-=0.2;
   if(years>st.player.yearsLeft) chance-=0.1*(years-st.player.yearsLeft);
@@ -57,9 +57,9 @@ function openContractRework(){
 
   slider.min=st.player.salary;
   const maxSal=computeSalary(st.player.age, st.player.overall, st.player.league||'Premier League', selStatus, selTime);
-  slider.max=Math.round(Math.max(maxSal, st.player.salary)*1.2);
+  slider.max=Math.round(Math.max(maxSal, st.player.salary));
   slider.value=st.player.salary;
-  slider.step=100;
+  slider.step=Math.max(1, Math.round(st.player.salary*0.01));
 
   yearsDiv.innerHTML='';
   [0,1,2,3].forEach(n=>{
@@ -127,7 +127,7 @@ function openContractRework(){
     const status=selStatus;
     const time=selTime;
     const maxSalary=computeSalary(st.player.age, st.player.overall, st.player.league||'Premier League', status, time);
-    if(salary>maxSalary*1.2){
+    if(salary>maxSalary){
       showPopup('Contract', 'Club rejects your unrealistic salary demand.');
       st.player.contractReworkYear=st.season; Game.log('Contract rework rejected: salary too high.'); Game.save(); modal.removeAttribute('open');
       return;
