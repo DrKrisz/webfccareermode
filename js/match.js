@@ -203,6 +203,7 @@ function maybeInjure(source, minutes=0){
   else if(roll<0.9){ type='sprain'; days=randInt(7,21); }
   else { type='fracture'; days=randInt(30,90); }
   st.player.injury={type, days};
+  st.player.preInjuryStatus=st.player.status;
   st.player.status=`Injured (${type}, ${days}d)`;
   Game.log(`Injury: ${type}, out ${days} days`);
   return {type,days};
