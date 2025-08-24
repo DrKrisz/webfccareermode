@@ -128,6 +128,7 @@
               <button class="btn primary" id="btn-shop">🏪 Shop</button>
               <button class="btn primary" id="btn-train">🏋️‍♂️ Train</button>
               <button class="btn primary" id="btn-contract">📝 Contract</button>
+              <button class="btn primary" id="btn-league">📊 Table</button>
             </div>
             <div class="row wrap mt">
               <button class="btn ghost" id="btn-save">💾 Save</button>
@@ -267,6 +268,17 @@
         <button class="btn ghost" id="contract-cancel">Cancel</button>
         <button class="btn primary" id="contract-confirm">Submit</button>
       </div>
+    </div>
+  </dialog>
+
+  <!-- League table modal -->
+  <dialog id="league-modal" class="modal">
+    <div class="sheet">
+      <header class="brand sheet-head">
+        <div class="logo"></div><h1 class="sheet-title">League table</h1>
+        <button class="btn ghost" id="close-league">Close</button>
+      </header>
+      <div class="content" id="league-content"></div>
     </div>
   </dialog>
 
