@@ -249,13 +249,13 @@ function openSeasonEnd(){
     }).join('');
     const tableHtml=`<table class="league-table"><thead><tr><th>Pos</th><th>Team</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table>`;
 
-    st.seasonSummary = {teams,pos,won,tableHtml};
+    st.seasonSummary = {teams,pos,totalTeams,won,tableHtml};
     st.seasonProcessed=true;
     Game.save();
     renderAll();
   }
 
-  const {pos,won,tableHtml} = st.seasonSummary;
+  const {pos,won,totalTeams,tableHtml} = st.seasonSummary;
   const offerRenew = st.player.club!=='Free Agent' && st.player.yearsLeft<=1;
 
   const c=q('#match-content'); c.innerHTML='';
