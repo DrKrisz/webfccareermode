@@ -79,8 +79,6 @@ function wireEvents(){
       startNextSeason();
     }
   });
-  click('#btn-save', ()=>{ Game.save(); showPopup('Save', 'Game saved'); });
-  click('#btn-reset', ()=>{ showPopup('Reset save', 'Delete your local save and restart?', ()=>Game.reset()); });
   click('#btn-retire', ()=>retirePrompt());
   click('#retire-cancel', ()=>q('#retire-modal').removeAttribute('open'));
   click('#retire-confirm', ()=>{ q('#retire-modal').removeAttribute('open'); Game.reset(); });

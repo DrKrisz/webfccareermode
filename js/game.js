@@ -6,7 +6,6 @@
 const APP_VERSION = 'v0.1.0';
 
 // ===== Storage / Globals =====
-const LS_KEY = 'webcareergame.save.v010';
 
 const TEAM_BASE_LEVELS = {
   // Premier League 2025/26
@@ -131,19 +130,9 @@ const Game = {
     seasonSummary: null,
   },
   money(n){ try { return '£' + Math.round(n).toLocaleString('en-GB'); } catch { return '£' + Math.round(n); } },
-  save(){ localStorage.setItem(LS_KEY, JSON.stringify(this.state)); },
-  load(){
-    const raw = localStorage.getItem(LS_KEY);
-    if(!raw) return false;
-    try{
-      this.state = JSON.parse(raw);
-      migrateState(this.state);
-      return true;
-    }catch{
-      return false;
-    }
-  },
-  reset(){ localStorage.removeItem(LS_KEY); location.reload(); },
+  save(){ /* saving disabled */ },
+  load(){ return false; },
+  reset(){ location.reload(); },
   log(msg){ const stamp = new Date(this.state.currentDate || Date.now()).toDateString(); this.state.eventLog.push(`[${stamp}] ${msg}`); },
   newGame(setup){
     const base = 55 + Math.floor(Math.random()*6);
