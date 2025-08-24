@@ -50,7 +50,12 @@ function nextDay(token, fast=false){
     st.player.injury.days -= 1;
     if(st.player.injury.days<=0){
       st.player.injury=null;
-      st.player.status='-';
+      if(st.player.preInjuryStatus){
+        st.player.status=st.player.preInjuryStatus;
+        delete st.player.preInjuryStatus;
+      } else {
+        st.player.status='-';
+      }
       Game.log('Recovered from injury.');
       showPopup('Recovery', 'You are fit to play again.');
     } else {
