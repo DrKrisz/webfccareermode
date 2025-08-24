@@ -29,7 +29,7 @@ function autoTick(){
     }
   }, 800+Math.floor(Math.random()*600));
 }
-function nextDay(token){
+function nextDay(token, fast=false){
   if(token!==undefined){
     if(token!==autoEpoch || !Game.state.auto || modalOpen()) return;
   }
@@ -40,10 +40,10 @@ function nextDay(token){
       showPopup('Match day', 'You need a club to play matches.');
       const maxWeeks = leagueWeeks(st.player.league||'Premier League');
       st.week = Math.min(maxWeeks, st.week+1);
-      st.currentDate+=24*3600*1000; Game.save(); renderAll(); if(Game.state.auto) autoTick();
+      st.currentDate+=24*3600*1000; Game.save(); if(!fast) renderAll(); if(!fast && Game.state.auto) autoTick();
       return;
     }
-    simulateMatch(entry); return;
+    simulateMatch(entry, fast); return;
   }
   if(entry && entry.type==='seasonEnd'){ Game.state.auto=false; updateAutoBtn(); openSeasonEnd(); return; }
   if(st.player.injury){
@@ -57,6 +57,31 @@ function nextDay(token){
       st.player.status=`Injured (${st.player.injury.type}, ${st.player.injury.days}d)`;
     }
   }
-  st.currentDate+=24*3600*1000; Game.save(); renderAll(); if(Game.state.auto) autoTick();
+  st.currentDate+=24*3600*1000; Game.save(); if(!fast) { renderAll(); if(Game.state.auto) autoTick(); }
+}
+
+function skipMonth(){
+  const startMonth = new Date(Game.state.currentDate).getMonth();
+  let guard=0;
+  while(new Date(Game.state.currentDate).getMonth()===startMonth && guard<60){
+    nextDay(undefined, true);
+    guard++;
+  }
+  renderAll();
+}
+
+function skipSeason(){
+  let guard=0;
+  while(guard<400){
+    const st=Game.state;
+    const entry=st.schedule.find(d=>sameDay(d.date, st.currentDate));
+    if(entry && entry.type==='seasonEnd'){
+      nextDay(undefined, true);
+      break;
+    }
+    nextDay(undefined, true);
+    guard++;
+  }
+  renderAll();
 }
 

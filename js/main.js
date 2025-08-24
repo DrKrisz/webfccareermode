@@ -119,6 +119,16 @@ function wireEvents(){
       openMarket();
     }
   });
+  click('#dev-skip-month', ()=>{
+    skipMonth();
+    Game.log('Dev: skipped month');
+    showPopup('Dev tools','Skipped one month.');
+  });
+  click('#dev-skip-season', ()=>{
+    skipSeason();
+    Game.log('Dev: skipped season');
+    showPopup('Dev tools','Skipped to season end.');
+  });
   click('#dev-set-balance', ()=>{
     const st=Game.state;
     const val=+q('#dev-balance').value;

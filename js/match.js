@@ -276,7 +276,7 @@ function finishMatch(entry, minutes, mini){
   if(injury) showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`);
 }
 
-function simulateMatch(entry){
+function simulateMatch(entry, fast=false){
   const st=Game.state;
   if(st.player.club==='Free Agent'){ showPopup('Match day', 'You need a club to play matches.'); return; }
   if(entry.played || !sameDay(entry.date, st.currentDate)) return;
@@ -321,7 +321,11 @@ function simulateMatch(entry){
   const injury = maybeInjure('match', minutes);
   Game.save(); renderAll();
   if(injury) showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`);
-  setTimeout(()=>{ nextDay(); },300);
+  if(fast){
+    nextDay(undefined, true);
+  } else {
+    setTimeout(()=>{ nextDay(); },300);
+  }
 }
 
 function viewMatchSummary(entry){
