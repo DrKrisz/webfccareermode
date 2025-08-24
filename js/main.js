@@ -70,7 +70,15 @@ function wireEvents(){
   click('#close-training', ()=>cancelTraining());
   click('#close-cooldown', ()=>q('#cooldown-modal').removeAttribute('open'));
   click('#cooldown-ok', ()=>q('#cooldown-modal').removeAttribute('open'));
-  click('#btn-play', ()=>{ const entry=Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate)); if(entry && entry.isMatch && !entry.played) openMatch(entry); });
+  click('#btn-play', ()=>{
+    const entry=Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate));
+    if(!entry) return;
+    if(entry.isMatch && !entry.played){
+      openMatch(entry);
+    } else if(entry.type==='seasonEnd'){
+      startNextSeason();
+    }
+  });
   click('#btn-save', ()=>{ Game.save(); showPopup('Save', 'Game saved'); });
   click('#btn-reset', ()=>{ showPopup('Reset save', 'Delete your local save and restart?', ()=>Game.reset()); });
   click('#btn-retire', ()=>retirePrompt());
