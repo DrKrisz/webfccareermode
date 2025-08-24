@@ -63,7 +63,7 @@ function wireEvents(){
   click('#close-market', ()=>q('#market-modal').removeAttribute('open'));
   click('#close-shop', ()=>q('#shop-modal').removeAttribute('open'));
   click('#close-contract', ()=>q('#contract-modal').removeAttribute('open'));
-  click('#close-league', ()=>q('#league-modal').removeAttribute('open'));
+  click('#close-league', ()=>{ const dlg=q('#league-modal'); if(dlg){ if(dlg.close) dlg.close(); else dlg.removeAttribute('open'); } });
   click('#btn-next', ()=>nextDay());
   click('#btn-auto', ()=>toggleAuto());
   click('#btn-train', ()=>openTraining());
