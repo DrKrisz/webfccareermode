@@ -67,7 +67,6 @@
         </div>
         <label class="pill checkbox"><input type="checkbox" id="always-play"> Always play</label>
         <div class="row end mt">
-          <button class="btn ghost" type="button" id="reset-save">Reset save</button>
           <button class="btn primary" type="submit">Start career</button>
         </div>
       </form>
@@ -81,7 +80,6 @@
   </footer>
 
   <script>
-    const LS_KEY = 'webcareergame.save.v010';
     const form = document.getElementById('setup-form');
     if(form){
       form.addEventListener('submit', e => {
@@ -94,13 +92,6 @@
           alwaysPlay: document.getElementById('always-play').checked ? '1' : '0'
         });
         location.href = 'game.html?' + params.toString();
-      });
-    }
-    const resetBtn = document.getElementById('reset-save');
-    if(resetBtn){
-      resetBtn.addEventListener('click', () => {
-        localStorage.removeItem(LS_KEY);
-        alert('Local save cleared');
       });
     }
   </script>
