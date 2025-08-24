@@ -116,7 +116,7 @@ function renderAll(){
 
   const trainBtn=q('#btn-train');
   if(trainBtn){
-    trainBtn.disabled=false;
+    trainBtn.disabled=!!st.player.injury;
   }
 
   const nextBtn=q('#btn-next');
@@ -132,7 +132,7 @@ function renderAll(){
   const playBtn=q('#btn-play');
   if(playBtn){
     if(st.player.club==='Free Agent') playBtn.disabled=true;
-    else if(todayEntry && todayEntry.isMatch && !todayEntry.played && !st.auto && !autoTimeoutId){
+    else if(todayEntry && todayEntry.isMatch && !todayEntry.played && !st.auto && !autoTimeoutId && !st.player.injury){
       playBtn.disabled=false;
     } else {
       playBtn.disabled=true;

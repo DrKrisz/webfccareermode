@@ -45,6 +45,17 @@ function nextDay(token){
     simulateMatch(entry); return;
   }
   if(entry && entry.type==='seasonEnd'){ Game.state.auto=false; updateAutoBtn(); openSeasonEnd(); return; }
+  if(st.player.injury){
+    st.player.injury.days -= 1;
+    if(st.player.injury.days<=0){
+      st.player.injury=null;
+      st.player.status='-';
+      Game.log('Recovered from injury.');
+      showPopup('Recovery', 'You are fit to play again.');
+    } else {
+      st.player.status=`Injured (${st.player.injury.type}, ${st.player.injury.days}d)`;
+    }
+  }
   st.currentDate+=24*3600*1000; Game.save(); renderAll(); if(Game.state.auto) autoTick();
 }
 
