@@ -89,7 +89,8 @@ function openLeagueTable(){
   content.append(select);
   content.append(tableWrap);
   render();
-  modal.setAttribute('open','');
+  if(modal.showModal) modal.showModal();
+  else modal.setAttribute('open','');
 }
 
 // ===== Season end summary & rollover =====
