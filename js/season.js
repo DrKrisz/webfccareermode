@@ -132,8 +132,36 @@ function openSeasonEnd(){
       }
     });
     teams.sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga));
-    const promoted = teams.slice(0,3).map(t=>t.team);
-    const relegated = teams.slice(-3).map(t=>t.team);
+
+    // determine promotion/relegation across Premier League and Championship
+    let promoted=[], relegated=[];
+    if(st.player.league==='Premier League'){
+      relegated = teams.slice(-3).map(t=>t.team);
+      const champTable = randomLeagueTable('EFL Championship', leagueWeeks('EFL Championship'));
+      promoted = champTable.slice(0,3).map(t=>t.team);
+      // adjust levels for Championship teams generated here
+      champTable.forEach((t,i)=>{
+        const lvl=getTeamLevel(t.team);
+        if(promoted.includes(t.team)) st.teamLevels[t.team]=Math.min(99,lvl+4);
+        else if(i>=champTable.length-3) st.teamLevels[t.team]=Math.max(50,lvl-4);
+        else if(i<10) st.teamLevels[t.team]=Math.min(99,lvl+1);
+        else st.teamLevels[t.team]=Math.max(50,lvl);
+      });
+    } else if(st.player.league==='EFL Championship'){
+      promoted = teams.slice(0,3).map(t=>t.team);
+      const premTable = randomLeagueTable('Premier League', leagueWeeks('Premier League'));
+      relegated = premTable.slice(-3).map(t=>t.team);
+      // adjust levels for Premier League teams generated here
+      premTable.forEach((t,i)=>{
+        const lvl=getTeamLevel(t.team);
+        if(relegated.includes(t.team)) st.teamLevels[t.team]=Math.max(50,lvl-4);
+        else if(i<10) st.teamLevels[t.team]=Math.min(99,lvl+1);
+        else st.teamLevels[t.team]=Math.max(50,lvl);
+      });
+    } else {
+      promoted = teams.slice(0,3).map(t=>t.team);
+      relegated = teams.slice(-3).map(t=>t.team);
+    }
 
     // snapshot final table for consistency in week summary
     st.leagueSnapshot = teams.map(t=>({...t}));
@@ -147,6 +175,20 @@ function openSeasonEnd(){
       else if(relegated.includes(t.team)) st.teamLevels[t.team]=Math.max(50,lvl-4);
       else if(i>=17) st.teamLevels[t.team]=Math.max(50,lvl-2);
       else st.teamLevels[t.team]=Math.max(50,lvl);
+    });
+
+    // adjust levels for teams not in the player's league list
+    promoted.forEach(t=>{
+      if(!teams.find(tm=>tm.team===t)){
+        const lvl=getTeamLevel(t);
+        st.teamLevels[t]=Math.min(99,lvl+4);
+      }
+    });
+    relegated.forEach(t=>{
+      if(!teams.find(tm=>tm.team===t)){
+        const lvl=getTeamLevel(t);
+        st.teamLevels[t]=Math.max(50,lvl-4);
+      }
     });
     st.relegated=relegated;
     st.promoted=promoted;
