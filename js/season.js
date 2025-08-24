@@ -164,6 +164,16 @@ function startNextSeason(){
       st.player.loan = null;
     }
   }
+  const relegated = st.relegated||[];
+  const promoted = st.promoted||[];
+  if(relegated.length || promoted.length){
+    applyPromotionRelegation(promoted,relegated);
+    if(relegated.includes(st.player.club)) st.player.league='EFL Championship';
+    else if(promoted.includes(st.player.club)) st.player.league='Premier League';
+    relegated.forEach(c=>{ Game.log(`${c} relegated to EFL Championship.`); showPopup('Relegated', `${c} move to Championship.`); });
+    promoted.forEach(c=>{ Game.log(`${c} promoted to Premier League.`); showPopup('Promoted', `${c} move to Premier League.`); });
+    st.relegated=[]; st.promoted=[];
+  }
   const baseYear = new Date(new Date(st.schedule[0].date).getFullYear()+1,7,31).getFullYear();
   const first = realisticMatchDate(lastSaturdayOfAugust(baseYear));
   const league = st.player.league || 'Premier League';
@@ -217,6 +227,8 @@ function openSeasonEnd(){
       }
     });
     teams.sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga));
+    const promoted = teams.slice(0,3).map(t=>t.team);
+    const relegated = teams.slice(-3).map(t=>t.team);
 
     // snapshot final table for consistency in week summary
     st.leagueSnapshot = teams.map(t=>({...t}));
@@ -225,11 +237,14 @@ function openSeasonEnd(){
     // adjust team levels based on final positions
     teams.forEach((t,i)=>{
       const lvl=getTeamLevel(t.team);
-      if(i<3) st.teamLevels[t.team]=Math.min(99,lvl+2);
+      if(promoted.includes(t.team)) st.teamLevels[t.team]=Math.min(99,lvl+4);
       else if(i<10) st.teamLevels[t.team]=Math.min(99,lvl+1);
+      else if(relegated.includes(t.team)) st.teamLevels[t.team]=Math.max(50,lvl-4);
       else if(i>=17) st.teamLevels[t.team]=Math.max(50,lvl-2);
       else st.teamLevels[t.team]=Math.max(50,lvl);
     });
+    st.relegated=relegated;
+    st.promoted=promoted;
 
     const pos=teams.findIndex(t=>t.team===club)+1;
     const totalTeams=teams.length;

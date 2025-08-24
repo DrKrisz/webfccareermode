@@ -92,6 +92,27 @@ function ensureNoSelfMatches(club, league){
   });
 }
 
+function applyPromotionRelegation(promoted,relegated){
+  const prem=LEAGUES['Premier League'];
+  const champ=LEAGUES['EFL Championship'];
+  relegated.forEach(club=>{
+    const i=prem.indexOf(club); if(i>-1) prem.splice(i,1);
+    if(!champ.includes(club)) champ.push(club);
+    CLUB_TO_LEAGUE[club]='EFL Championship';
+    const obj=ALL_CLUBS.find(c=>c.club===club);
+    if(obj) obj.league='EFL Championship';
+    else ALL_CLUBS.push({club,league:'EFL Championship'});
+  });
+  promoted.forEach(club=>{
+    const i=champ.indexOf(club); if(i>-1) champ.splice(i,1);
+    if(!prem.includes(club)) prem.push(club);
+    CLUB_TO_LEAGUE[club]='Premier League';
+    const obj=ALL_CLUBS.find(c=>c.club===club);
+    if(obj) obj.league='Premier League';
+    else ALL_CLUBS.push({club,league:'Premier League'});
+  });
+}
+
 // ===== Data / RNG helpers =====
 function makeOpponents(league){
   const lg = league || (Game.state.player && Game.state.player.league) || 'Premier League';
