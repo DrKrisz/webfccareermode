@@ -93,8 +93,10 @@ function wireEvents(){
   click('#close-dev', ()=>q('#dev-modal').removeAttribute('open'));
   click('#dev-injure', ()=>{
     const st=Game.state;
-    if(st.player){
+    if(st.player && !st.player.injury){
+      st.player.preInjuryStatus = st.player.status;
       st.player.injury={type:'dev injury', days:7};
+      st.player.status=`Injured (dev injury, 7d)`;
       Game.log('Dev: forced injury');
       Game.save();
       renderAll();
@@ -105,6 +107,12 @@ function wireEvents(){
     const st=Game.state;
     if(st.player){
       st.player.injury=null;
+      if(st.player.preInjuryStatus){
+        st.player.status=st.player.preInjuryStatus;
+        delete st.player.preInjuryStatus;
+      } else {
+        st.player.status='-';
+      }
       Game.log('Dev: healed injury');
       Game.save();
       renderAll();
