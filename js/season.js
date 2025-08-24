@@ -113,6 +113,7 @@ function openSeasonEnd(){
 
     const club=st.player.club;
     const teams=makeOpponents(st.player.league||'Premier League').map(t=>({team:t}));
+    const games = leagueWeeks(st.player.league||'Premier League');
     if(!teams.find(t=>t.team===club)){ teams.pop(); teams.push({team:club}); }
     teams.forEach(t=>{
       if(t.team===club){ Object.assign(t,stats); }
