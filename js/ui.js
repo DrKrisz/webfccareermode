@@ -134,11 +134,20 @@ function renderAll(){
 
   const playBtn=q('#btn-play');
   if(playBtn){
-    if(st.player.club==='Free Agent') playBtn.disabled=true;
+    if(todayEntry && todayEntry.type==='seasonEnd'){
+      playBtn.disabled=false;
+      playBtn.textContent='Next season';
+    }
+    else if(st.player.club==='Free Agent'){
+      playBtn.disabled=true;
+      playBtn.textContent='Play match';
+    }
     else if(todayEntry && todayEntry.isMatch && !todayEntry.played && !st.auto && !autoTimeoutId && !st.player.injury){
       playBtn.disabled=false;
+      playBtn.textContent='Play match';
     } else {
       playBtn.disabled=true;
+      playBtn.textContent='Play match';
     }
   }
 
