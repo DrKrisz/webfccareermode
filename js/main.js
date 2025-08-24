@@ -59,9 +59,11 @@ function wireEvents(){
   click('#btn-market', ()=>openMarket());
   click('#btn-shop', ()=>openShop());
   click('#btn-contract', ()=>openContractRework());
+  click('#btn-league', ()=>openLeagueTable());
   click('#close-market', ()=>q('#market-modal').removeAttribute('open'));
   click('#close-shop', ()=>q('#shop-modal').removeAttribute('open'));
   click('#close-contract', ()=>q('#contract-modal').removeAttribute('open'));
+  click('#close-league', ()=>q('#league-modal').removeAttribute('open'));
   click('#btn-next', ()=>nextDay());
   click('#btn-auto', ()=>toggleAuto());
   click('#btn-train', ()=>openTraining());
