@@ -25,6 +25,12 @@ function openMatch(entry){
   if(st.player.club==='Free Agent'){ showPopup('Match', 'You need a club to play matches.'); return; }
   if(!sameDay(entry.date, st.currentDate)) return; // only today
 
+  if(st.player.injury){
+    showPopup('Match', `You are injured and miss the game.`);
+    finishMatch(entry, 0, {clicks:0,success:false,score:0});
+    return;
+  }
+
   const youStart = st.player.alwaysPlay ? true : decideStarting(st.player.timeBand);
   const willSubIn = youStart?false:Math.random()<subChance(st.player.timeBand);
 
@@ -73,7 +79,7 @@ function openTraining(){
   clearAutoTick();
   const st=Game.state;
   const todayEntry = st.schedule.find(d=>sameDay(d.date, st.currentDate));
-  const injured = st.player.status && st.player.status.toLowerCase().includes('injur');
+  const injured = !!st.player.injury;
   const daysSince = st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
   if(todayEntry && todayEntry.isMatch){ showPopup('Training', 'Match scheduled today. Focus on the game.'); return; }
   if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
@@ -142,9 +148,14 @@ function finishTraining(mini){
   Game.log(`Training session: overall +${gain.toFixed(2)}`);
   const notes=q('#notes'); if(notes) notes.textContent=`Trained today. Overall +${gain.toFixed(2)}.`;
   st.lastTrainingDate = st.currentDate;
+  const injury = maybeInjure('training');
   Game.save();
   renderAll();
-  setTimeout(()=>{ q('#training-modal').removeAttribute('open'); showPopup('Training complete', `Overall +${gain.toFixed(2)} (now ${st.player.overall.toFixed(2)})`); }, 600);
+  setTimeout(()=>{ 
+    q('#training-modal').removeAttribute('open'); 
+    showPopup('Training complete', `Overall +${gain.toFixed(2)} (now ${st.player.overall.toFixed(2)})`);
+    if(injury) setTimeout(()=>showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`), 600);
+  }, 600);
 }
 
 function minigameView(title, onDone){
@@ -178,6 +189,24 @@ function cancelTraining(){
   q('#training-modal').removeAttribute('open');
 }
 function placeBubble(el, field){ const w=field.clientWidth||300; const h=field.clientHeight||220; const x=Math.random()*(w-34); const y=Math.random()*(h-34); el.style.left=x+'px'; el.style.top=y+'px'; }
+
+function maybeInjure(source, minutes=0){
+  const st=Game.state;
+  if(!st.player || st.player.injury) return null;
+  let chance=0;
+  if(source==='training') chance=0.05;
+  else if(source==='match' && minutes>0) chance=0.08;
+  if(Math.random()>=chance) return null;
+  const roll=Math.random();
+  let type,days;
+  if(roll<0.6){ type='knock'; days=randInt(2,5); }
+  else if(roll<0.9){ type='sprain'; days=randInt(7,21); }
+  else { type='fracture'; days=randInt(30,90); }
+  st.player.injury={type, days};
+  st.player.status=`Injured (${type}, ${days}d)`;
+  Game.log(`Injury: ${type}, out ${days} days`);
+  return {type,days};
+}
 
 function payWeekly(st){
   if(st.player.club==='Free Agent') return;
@@ -223,6 +252,7 @@ function finishMatch(entry, minutes, mini){
   st.week = Math.min(38, st.week+1);
   const gaPart = rating==='DNP' ? '' : (st.player.pos==='Goalkeeper' ? `, CS${cleanSheet}` : `, G${goals}, A${assists}`);
   Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${gaPart}`);
+  const injury = maybeInjure('match', minutes);
 
   // Move day and show summary
   setTimeout(()=>{ nextDay(); }, 300);
@@ -243,14 +273,16 @@ function finishMatch(entry, minutes, mini){
   box.innerHTML = `<div class="h">Full time</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">${stats.join('')}</div>`;
   c.append(box);
   Game.save(); renderAll();
+  if(injury) showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`);
 }
 
 function simulateMatch(entry){
   const st=Game.state;
   if(st.player.club==='Free Agent'){ showPopup('Match day', 'You need a club to play matches.'); return; }
   if(entry.played || !sameDay(entry.date, st.currentDate)) return;
-  const youStart = st.player.alwaysPlay ? true : decideStarting(st.player.timeBand);
-  const willSubIn = youStart?false:Math.random()<subChance(st.player.timeBand);
+  const injured = !!st.player.injury;
+  const youStart = injured ? false : (st.player.alwaysPlay ? true : decideStarting(st.player.timeBand));
+  const willSubIn = youStart?false:(injured?false:Math.random()<subChance(st.player.timeBand));
   let minutes=0;
   if(youStart) minutes=90;
   else if(willSubIn) minutes=randInt(12,28);
@@ -286,7 +318,9 @@ function simulateMatch(entry){
   st.week=Math.min(38, st.week+1);
   const gaPart = rating==='DNP' ? '' : (st.player.pos==='Goalkeeper' ? `, CS${cleanSheet}` : `, G${goals}, A${assists}`);
   Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${gaPart}`);
+  const injury = maybeInjure('match', minutes);
   Game.save(); renderAll();
+  if(injury) showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`);
   setTimeout(()=>{ nextDay(); },300);
 }
 

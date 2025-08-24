@@ -127,6 +127,7 @@ const Game = {
       marketBlocked: 0,
       contractReworkYear: 0,
       loan: null,
+      injury: null,
     };
     this.state.season = 1; this.state.week = 1;
     this.state.minutesPlayed = 0; this.state.goals = 0; this.state.assists = 0; this.state.cleanSheets = 0;
@@ -174,6 +175,7 @@ function migrateState(st){
     st.player.marketBlocked = st.player.marketBlocked || 0;
     st.player.contractReworkYear = st.player.contractReworkYear || 0;
     st.player.loan = st.player.loan || null;
+    st.player.injury = st.player.injury || null;
   }
   if(typeof st.currentDate !== 'number'){
     const firstSched = Array.isArray(st.schedule) && st.schedule.length ? st.schedule[0] : null;
