@@ -144,7 +144,7 @@ function acceptOffer(i){
 
   const year=new Date().getFullYear();
   const first=realisticMatchDate(lastSaturdayOfAugust(year));
-  st.schedule=buildSchedule(first,38,st.player.club,st.player.league);
+  st.schedule=buildSchedule(first,leagueWeeks(st.player.league),st.player.club,st.player.league);
   st.currentDate=st.schedule[0].date;
   st.week=1;
   Game.log(`Signed for ${o.club}${st.player.loan?` (loaned to ${st.player.club})`:''}, ${o.years}y, ${o.status}, ${o.timeBand}, ${Game.money(o.salary)}/w`);
@@ -165,7 +165,7 @@ function requestLoan(){
     st.lastOffers = [];
     const year=new Date().getFullYear();
     const first=realisticMatchDate(lastSaturdayOfAugust(year));
-    st.schedule=buildSchedule(first,38,st.player.club,st.player.league);
+    st.schedule=buildSchedule(first,leagueWeeks(st.player.league),st.player.club,st.player.league);
     st.currentDate=st.schedule[0].date;
     st.week=1;
     Game.log(`Loaned to ${loanClub} for ${loanYears} season${loanYears>1?'s':''}.`);
