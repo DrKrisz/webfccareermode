@@ -17,12 +17,29 @@ const LEAGUES = {
     'Millwall','Norwich City','Oxford United','Portsmouth','Preston North End',
     'Queens Park Rangers','Sheffield Utd','Sheffield Wednesday','Southampton','Stoke City',
     'Swansea City','Watford','West Brom','Wrexham'
+  ],
+  'La Liga': [
+    'Alaves','Athletic Club','Atletico Madrid','Barcelona','Celta Vigo',
+    'Cadiz','Espanyol','Getafe','Girona','Granada',
+    'Las Palmas','Mallorca','Osasuna','Rayo Vallecano','Real Betis',
+    'Real Madrid','Real Sociedad','Sevilla','Valencia','Villarreal'
+  ],
+  'Serie A': [
+    'Atalanta','Bologna','Cagliari','Empoli','Fiorentina',
+    'Genoa','Hellas Verona','Inter','Juventus','Lazio',
+    'Lecce','Milan','Monza','Napoli','Parma',
+    'Roma','Salernitana','Sassuolo','Torino','Udinese'
   ]
 };
 
 const CLUB_TO_LEAGUE = {};
 Object.entries(LEAGUES).forEach(([lg,teams])=>teams.forEach(t=>{CLUB_TO_LEAGUE[t]=lg;}));
 const ALL_CLUBS = Object.entries(LEAGUES).flatMap(([lg,teams])=>teams.map(t=>({club:t,league:lg})));
+
+function leagueWeeks(league){
+  const teams = LEAGUES[league] || LEAGUES['Premier League'];
+  return (teams.length - 1) * 2;
+}
 
 function getTeamLevel(club){
   return (Game.state.teamLevels && Game.state.teamLevels[club]) || TEAM_BASE_LEVELS[club] || 60;

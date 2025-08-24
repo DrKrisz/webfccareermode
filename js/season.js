@@ -3,12 +3,14 @@ function updateLeagueSnapshot(){
   const st=Game.state;
   if(!st.player || st.player.club==='Free Agent') return;
   // Don't overwrite the final league table once the season is processed
-  if(st.seasonProcessed && st.leagueSnapshotWeek===38) return;
+  const gamesTotal = leagueWeeks(st.player.league||'Premier League');
+  if(st.seasonProcessed && st.leagueSnapshotWeek===gamesTotal) return;
   const played = st.schedule.filter(e=>e.isMatch && e.played).length;
   if(st.leagueSnapshotWeek===played) return;
-  const club=st.player.club;
-  const teams=makeOpponents(st.player.league||'Premier League').map(t=>({team:t}));
-  const stats={w:0,d:0,l:0,gf:0,ga:0};
+    const club=st.player.club;
+    const teams=makeOpponents(st.player.league||'Premier League').map(t=>({team:t}));
+    const games = leagueWeeks(st.player.league||'Premier League');
+    const stats={w:0,d:0,l:0,gf:0,ga:0};
   st.schedule.filter(e=>e.isMatch && e.played).forEach(e=>{
     if(e.result==='W') stats.w++;
     else if(e.result==='D') stats.d++;
@@ -59,7 +61,8 @@ function openSeasonEnd(){
     teams.forEach(t=>{
       if(t.team===club){ Object.assign(t,stats); }
       else {
-        const w=randInt(5,25); const d=randInt(0,38-w); const l=38-w-d;
+        const w=randInt(Math.floor(games*0.13), Math.floor(games*0.66));
+        const d=randInt(0,games-w); const l=games-w-d;
         const gf=w*randInt(1,3)+d*randInt(0,2)+randInt(0,10);
         const ga=l*randInt(1,3)+d*randInt(0,2)+randInt(0,10);
         const pts=w*3+d;
@@ -70,7 +73,7 @@ function openSeasonEnd(){
 
     // snapshot final table for consistency in week summary
     st.leagueSnapshot = teams.map(t=>({...t}));
-    st.leagueSnapshotWeek = 38;
+    st.leagueSnapshotWeek = games;
 
     // adjust team levels based on final positions
     teams.forEach((t,i)=>{
@@ -82,6 +85,7 @@ function openSeasonEnd(){
     });
 
     const pos=teams.findIndex(t=>t.team===club)+1;
+    const totalTeams=teams.length;
     const won=pos===1;
     if(won){ st.player.goldenClub=true; Game.log('🏆 League won! Club marked gold.'); }
     else { st.player.goldenClub=false; }
@@ -116,7 +120,7 @@ function openSeasonEnd(){
     ? `Career: ${st.minutesPlayed} min, CS ${st.cleanSheets}`
     : `Career: ${st.minutesPlayed} min, G ${st.goals}, A ${st.assists}`;
   box.innerHTML = `<div class="h">Season ${st.season} summary</div>
-    <div>League position: ${pos}/20 ${won?' - <span class="badge">CHAMPIONS</span>':''}</div>
+    <div>League position: ${pos}/${totalTeams} ${won?' - <span class="badge">CHAMPIONS</span>':''}</div>
     <div class="muted" style="margin-top:8px">${seasonStat}</div>
     <div class="muted" style="margin-top:4px">${careerStat}</div>
     <div id="season-actions" style="text-align:center;margin:10px 0">
@@ -199,7 +203,8 @@ function openSeasonEnd(){
     }
     const baseYear = new Date(new Date(st.schedule[0].date).getFullYear()+1,7,31).getFullYear();
     const first = realisticMatchDate(lastSaturdayOfAugust(baseYear));
-    st.schedule = buildSchedule(first, 38, st.player.club, st.player.league||'Premier League');
+    const league = st.player.league || 'Premier League';
+    st.schedule = buildSchedule(first, leagueWeeks(league), st.player.club, league);
     st.currentDate = st.schedule[0].date; // on season start marker
     st.seasonMinutes=0; st.seasonGoals=0; st.seasonAssists=0; st.seasonCleanSheets=0;
     Object.keys(st.shopPurchases||{}).forEach(id=>{ const it=SHOP_ITEMS.find(i=>i.id===id); if(it && it.perSeason) delete st.shopPurchases[id]; });

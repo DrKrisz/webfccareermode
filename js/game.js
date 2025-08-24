@@ -56,6 +56,50 @@ const TEAM_BASE_LEVELS = {
   'Watford': 68,
   'West Brom': 69,
   'Wrexham': 65
+,
+  // La Liga 2025/26
+  'Alaves': 69,
+  'Athletic Club': 77,
+  'Atletico Madrid': 85,
+  'Barcelona': 88,
+  'Celta Vigo': 72,
+  'Cadiz': 68,
+  'Espanyol': 69,
+  'Getafe': 70,
+  'Girona': 72,
+  'Granada': 68,
+  'Las Palmas': 68,
+  'Mallorca': 70,
+  'Osasuna': 71,
+  'Rayo Vallecano': 70,
+  'Real Betis': 76,
+  'Real Madrid': 90,
+  'Real Sociedad': 80,
+  'Sevilla': 78,
+  'Valencia': 74,
+  'Villarreal': 78,
+
+  // Serie A 2025/26
+  'Atalanta': 84,
+  'Bologna': 78,
+  'Cagliari': 69,
+  'Empoli': 68,
+  'Fiorentina': 79,
+  'Genoa': 73,
+  'Hellas Verona': 71,
+  'Inter': 89,
+  'Juventus': 87,
+  'Lazio': 82,
+  'Lecce': 67,
+  'Milan': 86,
+  'Monza': 72,
+  'Napoli': 85,
+  'Parma': 70,
+  'Roma': 83,
+  'Salernitana': 68,
+  'Sassuolo': 74,
+  'Torino': 75,
+  'Udinese': 72
 };
 
 const Game = {
@@ -143,8 +187,9 @@ const Game = {
     this.state.leagueSnapshotWeek = 0;
     this.state.seasonSummary = null;
     const year = new Date().getFullYear();
+    const league = 'Premier League';
     const first = realisticMatchDate(lastSaturdayOfAugust(year));
-    this.state.schedule = buildSchedule(first, 38, null, 'Premier League');
+    this.state.schedule = buildSchedule(first, leagueWeeks(league), null, league);
     // start at season start marker day for clarity
     this.state.currentDate = this.state.schedule[0].date;
     this.log(`Career started: ${this.state.player.name}, ${this.state.player.age}, ${this.state.player.pos}, ${this.state.player.origin}`);

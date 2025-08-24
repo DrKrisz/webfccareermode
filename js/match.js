@@ -249,7 +249,7 @@ function finishMatch(entry, minutes, mini){
   applyPostMatchGrowth(st, minutes, rating, goals, assists, true, oppGoals);
   st.player.value = Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   payWeekly(st);
-  st.week = Math.min(38, st.week+1);
+  st.week = Math.min(leagueWeeks(st.player.league||'Premier League'), st.week+1);
   const gaPart = rating==='DNP' ? '' : (st.player.pos==='Goalkeeper' ? `, CS${cleanSheet}` : `, G${goals}, A${assists}`);
   Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${gaPart}`);
   const injury = maybeInjure('match', minutes);
@@ -315,7 +315,7 @@ function simulateMatch(entry){
   applyPostMatchGrowth(st, minutes, rating, goals, assists, false, oppGoals);
   st.player.value=Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   payWeekly(st);
-  st.week=Math.min(38, st.week+1);
+  st.week=Math.min(leagueWeeks(st.player.league||'Premier League'), st.week+1);
   const gaPart = rating==='DNP' ? '' : (st.player.pos==='Goalkeeper' ? `, CS${cleanSheet}` : `, G${goals}, A${assists}`);
   Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${gaPart}`);
   const injury = maybeInjure('match', minutes);

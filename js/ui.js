@@ -41,7 +41,9 @@ function renderAll(){
   q('#landing').style.display = onLanding ? 'grid' : 'none';
   q('#manager').style.display = onLanding ? 'none' : 'block';
   if(onLanding) return;
-  if(!(st.seasonProcessed && st.leagueSnapshotWeek===38)) updateLeagueSnapshot();
+  const league = st.player.league || 'Premier League';
+  const weeksTotal = leagueWeeks(league);
+  if(!(st.seasonProcessed && st.leagueSnapshotWeek===weeksTotal)) updateLeagueSnapshot();
 
   // Left info
   q('#v-name').textContent = st.player.name;
@@ -65,7 +67,7 @@ function renderAll(){
   }
 
   q('#v-season').textContent = st.season;
-  q('#v-week').textContent = `${Math.min(st.week,38)} / 38`;
+  q('#v-week').textContent = `${Math.min(st.week,weeksTotal)} / ${weeksTotal}`;
   q('#v-overall').textContent = st.player.overall;
   q('#v-playtime').textContent = `${st.minutesPlayed} min`;
   const weeklyIncome = weeklySalary(st.player)+(st.player.passiveIncome||0);
@@ -109,8 +111,9 @@ function renderAll(){
     const info = document.createElement('div');
     info.className='muted';
     info.style.fontSize='12px';
-    const finalFlag = st.seasonProcessed && st.leagueSnapshotWeek===38 ? ' (final)' : '';
-    info.textContent = `Table: ${pos}/20${finalFlag} • Leader ${leader.team} ${leader.pts} pts`;
+    const finalFlag = st.seasonProcessed && st.leagueSnapshotWeek===weeksTotal ? ' (final)' : '';
+    const teamCount = makeOpponents(league).length;
+    info.textContent = `Table: ${pos}/${teamCount}${finalFlag} • Leader ${leader.team} ${leader.pts} pts`;
     q('#week-summary').append(info);
   }
 

@@ -38,7 +38,8 @@ function nextDay(token){
   if(entry && entry.isMatch && !entry.played){
     if(st.player.club==='Free Agent'){
       showPopup('Match day', 'You need a club to play matches.');
-      st.week = Math.min(38, st.week+1);
+      const maxWeeks = leagueWeeks(st.player.league||'Premier League');
+      st.week = Math.min(maxWeeks, st.week+1);
       st.currentDate+=24*3600*1000; Game.save(); renderAll(); if(Game.state.auto) autoTick();
       return;
     }
