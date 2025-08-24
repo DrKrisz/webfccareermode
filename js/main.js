@@ -130,6 +130,12 @@ function wireEvents(){
     Game.log('Dev: skipped season');
     showPopup('Dev tools','Skipped to season end.');
   });
+  click('#dev-force-season', ()=>{
+    startNextSeason();
+    q('#dev-modal').removeAttribute('open');
+    Game.log('Dev: forced new season');
+    showPopup('Dev tools','Started next season.');
+  });
   click('#dev-set-balance', ()=>{
     const st=Game.state;
     const val=+q('#dev-balance').value;
