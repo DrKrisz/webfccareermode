@@ -79,47 +79,7 @@ function wireEvents(){
   click('#close-message', ()=>q('#message-modal').removeAttribute('open'));
   click('#btn-alert-log', ()=>{ renderAlertLog(); q('#alert-log-modal').setAttribute('open',''); });
   click('#close-alert-log', ()=>q('#alert-log-modal').removeAttribute('open'));
-  click('#btn-dev', ()=>q('#dev-modal').setAttribute('open',''));
-  click('#close-dev', ()=>q('#dev-modal').removeAttribute('open'));
-  click('#dev-injure', ()=>{
-    const st=Game.state;
-    if(st.player){
-      st.player.injury={type:'dev injury',days:7};
-      Game.log('Dev: forced injury');
-      Game.save();
-      renderAll();
-      showPopup('Dev tools','Player injured for 7 days.');
-    }
-    q('#dev-modal').removeAttribute('open');
-  });
-  click('#dev-heal', ()=>{
-    const st=Game.state;
-    if(st.player){
-      st.player.injury=null;
-      Game.log('Dev: healed injury');
-      Game.save();
-      renderAll();
-      showPopup('Dev tools','Player healed.');
-    }
-    q('#dev-modal').removeAttribute('open');
-  });
-  click('#dev-loan', ()=>{
-    if(Game.state.player){
-      requestLoan();
-    }
-    q('#dev-modal').removeAttribute('open');
-  });
-  click('#dev-offers', ()=>{
-    const st=Game.state;
-    if(st.player){
-      st.player.transferListed=true;
-      st.lastOffers=rollMarketOffers(st.player);
-      Game.save();
-      renderAll();
-      openMarket();
-    }
-    q('#dev-modal').removeAttribute('open');
-  });
+  click('#btn-dev', ()=>window.open('dev.html','devtools','width=400,height=420'));
 }
 
   (function boot(){
