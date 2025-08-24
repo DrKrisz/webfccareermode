@@ -48,6 +48,12 @@
     </section>
 
     <section id="setup" class="setup container">
+      <h2>Choose game mode</h2>
+      <div class="row wrap field">
+        <label class="pill radio"><input type="radio" name="mode" value="player" checked> Player</label>
+        <label class="pill radio"><input type="radio" name="mode" value="manager"> Team Manager</label>
+      </div>
+
       <h2>Player setup</h2>
       <form id="setup-form">
         <div class="field"><label for="name">Player name</label><input id="name" class="input" required placeholder="Your name" maxlength="24" /></div>
@@ -80,20 +86,25 @@
   </footer>
 
   <script>
-    const form = document.getElementById('setup-form');
-    if(form){
-      form.addEventListener('submit', e => {
-        e.preventDefault();
-        const params = new URLSearchParams({
-          name: document.getElementById('name').value,
-          age: document.getElementById('age').value,
-          origin: document.getElementById('origin').value,
-          pos: document.querySelector('input[name=pos]:checked').value,
-          alwaysPlay: document.getElementById('always-play').checked ? '1' : '0'
+      const form = document.getElementById('setup-form');
+      if(form){
+        form.addEventListener('submit', e => {
+          e.preventDefault();
+          const mode = document.querySelector('input[name=mode]:checked').value;
+          if (mode === 'manager') {
+            location.href = 'managergame.html';
+            return;
+          }
+          const params = new URLSearchParams({
+            name: document.getElementById('name').value,
+            age: document.getElementById('age').value,
+            origin: document.getElementById('origin').value,
+            pos: document.querySelector('input[name=pos]:checked').value,
+            alwaysPlay: document.getElementById('always-play').checked ? '1' : '0'
+          });
+          location.href = 'game.html?' + params.toString();
         });
-        location.href = 'game.html?' + params.toString();
-      });
-    }
+      }
   </script>
 </body>
 </html>
