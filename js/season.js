@@ -94,6 +94,96 @@ function openLeagueTable(){
 }
 
 // ===== Season end summary & rollover =====
+function startNextSeason(){
+  const st=Game.state;
+  const lastSeason = st.player.pos==='Goalkeeper'
+    ? {min:st.seasonMinutes, cleanSheets:st.seasonCleanSheets}
+    : {min:st.seasonMinutes, goals:st.seasonGoals, assists:st.seasonAssists};
+  if(st.player.club!=='Free Agent'){
+    // manager feedback
+    let msg;
+    if(st.player.pos==='Goalkeeper'){
+      if(lastSeason.cleanSheets>=10 || lastSeason.min>=1800){
+        st.player.salary=Math.round(st.player.salary*1.1);
+        msg=`Great season! Salary increased to ${Game.money(weeklySalary(st.player))}/w.`;
+      } else if(lastSeason.min<600){
+        msg=`Tough season. Salary stays the same at ${Game.money(weeklySalary(st.player))}/w.`;
+      } else {
+        msg=`Well kid decent season, salary stays at ${Game.money(weeklySalary(st.player))}/w.`;
+      }
+    } else {
+      if(lastSeason.goals>=10 || lastSeason.min>=1800){
+        st.player.salary=Math.round(st.player.salary*1.1);
+        msg=`Great season! Salary increased to ${Game.money(weeklySalary(st.player))}/w.`;
+      } else if(lastSeason.min<600){
+        msg=`Tough season. Salary stays the same at ${Game.money(weeklySalary(st.player))}/w.`;
+      } else {
+        msg=`Well kid decent season, salary stays at ${Game.money(weeklySalary(st.player))}/w.`;
+      }
+    }
+    showPopup('Manager', msg);
+    Game.log(`Manager: ${msg}`);
+
+    st.player.yearsLeft = Math.max(0, st.player.yearsLeft-1);
+    if(st.player.yearsLeft<=0){
+      st.player.club='Free Agent';
+      st.player.league='';
+      st.player.status='-';
+      st.player.timeBand='-';
+      st.player.salary=0;
+      st.player.yearsLeft=0;
+      st.player.releaseClause=0;
+      st.player.marketBlocked=0;
+      Game.log('Contract ended. You are a Free Agent.');
+    } else {
+      st.player.marketBlocked = Math.max(0,(st.player.marketBlocked||0)-1);
+    }
+    const poorSeason = st.player.pos==='Goalkeeper'
+      ? lastSeason.min>900 && lastSeason.cleanSheets<4
+      : lastSeason.min>900 && (lastSeason.goals+lastSeason.assists)<2;
+    if(poorSeason && Math.random()<0.5){
+      const lower=makeOpponents(st.player.league||'Premier League').filter(t=>getTeamLevel(t)<getTeamLevel(st.player.club));
+      if(lower.length){
+        const club=pick(lower);
+        st.lastOffers=[makeOfferForVaried(st.player,club,getTeamLevel(club),CLUB_TO_LEAGUE[club])];
+        st.player.transferListed=true;
+        Game.log('Club considers selling you after poor season.');
+      }
+    }
+  }
+
+  st.season += 1; st.week = 1;
+  st.player.age += 1;
+  if(st.player.loan){
+    st.player.loan.seasonsLeft -= 1;
+    if(st.player.loan.seasonsLeft<=0){
+      st.player.club = st.player.loan.parentClub;
+      st.player.league = st.player.loan.parentLeague;
+      Game.log(`Loan ended. Returned to ${st.player.club}.`);
+      showPopup('Loan ended', `Returned to ${st.player.club}.`);
+      st.player.loan = null;
+    }
+  }
+  const baseYear = new Date(new Date(st.schedule[0].date).getFullYear()+1,7,31).getFullYear();
+  const first = realisticMatchDate(lastSaturdayOfAugust(baseYear));
+  const league = st.player.league || 'Premier League';
+  st.schedule = buildSchedule(first, leagueWeeks(league), st.player.club, league);
+  st.currentDate = st.schedule[0].date; // on season start marker
+  st.seasonMinutes=0; st.seasonGoals=0; st.seasonAssists=0; st.seasonCleanSheets=0;
+  Object.keys(st.shopPurchases||{}).forEach(id=>{ const it=SHOP_ITEMS.find(i=>i.id===id); if(it && it.perSeason) delete st.shopPurchases[id]; });
+  st.player.salaryMultiplier=1;
+  st.seasonProcessed = false;
+  st.seasonSummary = null;
+  st.leagueSnapshot = [];
+  st.leagueSnapshotWeek = 0;
+  const contractInfo = st.player.club==='Free Agent'
+    ? 'Free Agent.'
+    : `Contract ${st.player.yearsLeft} season${st.player.yearsLeft!==1?'s':''} left.`;
+  Game.log(`Season ${st.season} begins. Age ${st.player.age}. ${contractInfo}`);
+  Game.state.auto=false; updateAutoBtn();
+  Game.save(); renderAll();
+  showPopup('Season start', `Season ${st.season} has started.`);
+}
 function openSeasonEnd(){
   const st=Game.state;
   if(!st.seasonSummary){
@@ -190,93 +280,7 @@ function openSeasonEnd(){
 
   q('#btn-next-season').onclick=()=>{
     q('#match-modal').removeAttribute('open');
-    const lastSeason = st.player.pos==='Goalkeeper'
-      ? {min:st.seasonMinutes, cleanSheets:st.seasonCleanSheets}
-      : {min:st.seasonMinutes, goals:st.seasonGoals, assists:st.seasonAssists};
-    if(st.player.club!=='Free Agent'){
-      // manager feedback
-      let msg;
-      if(st.player.pos==='Goalkeeper'){
-        if(lastSeason.cleanSheets>=10 || lastSeason.min>=1800){
-          st.player.salary=Math.round(st.player.salary*1.1);
-          msg=`Great season! Salary increased to ${Game.money(weeklySalary(st.player))}/w.`;
-        } else if(lastSeason.min<600){
-          msg=`Tough season. Salary stays the same at ${Game.money(weeklySalary(st.player))}/w.`;
-        } else {
-          msg=`Well kid decent season, salary stays at ${Game.money(weeklySalary(st.player))}/w.`;
-        }
-      } else {
-        if(lastSeason.goals>=10 || lastSeason.min>=1800){
-          st.player.salary=Math.round(st.player.salary*1.1);
-          msg=`Great season! Salary increased to ${Game.money(weeklySalary(st.player))}/w.`;
-        } else if(lastSeason.min<600){
-          msg=`Tough season. Salary stays the same at ${Game.money(weeklySalary(st.player))}/w.`;
-        } else {
-          msg=`Well kid decent season, salary stays at ${Game.money(weeklySalary(st.player))}/w.`;
-        }
-      }
-      showPopup('Manager', msg);
-      Game.log(`Manager: ${msg}`);
-
-      st.player.yearsLeft = Math.max(0, st.player.yearsLeft-1);
-      if(st.player.yearsLeft<=0){
-        st.player.club='Free Agent';
-        st.player.league='';
-        st.player.status='-';
-        st.player.timeBand='-';
-        st.player.salary=0;
-        st.player.yearsLeft=0;
-        st.player.releaseClause=0;
-        st.player.marketBlocked=0;
-        Game.log('Contract ended. You are a Free Agent.');
-      } else {
-        st.player.marketBlocked = Math.max(0,(st.player.marketBlocked||0)-1);
-      }
-      const poorSeason = st.player.pos==='Goalkeeper'
-        ? lastSeason.min>900 && lastSeason.cleanSheets<4
-        : lastSeason.min>900 && (lastSeason.goals+lastSeason.assists)<2;
-      if(poorSeason && Math.random()<0.5){
-        const lower=makeOpponents(st.player.league||'Premier League').filter(t=>getTeamLevel(t)<getTeamLevel(st.player.club));
-        if(lower.length){
-          const club=pick(lower);
-          st.lastOffers=[makeOfferForVaried(st.player,club,getTeamLevel(club),CLUB_TO_LEAGUE[club])];
-          st.player.transferListed=true;
-          Game.log('Club considers selling you after poor season.');
-        }
-      }
-    }
-
-    st.season += 1; st.week = 1;
-    st.player.age += 1;
-    if(st.player.loan){
-      st.player.loan.seasonsLeft -= 1;
-      if(st.player.loan.seasonsLeft<=0){
-        st.player.club = st.player.loan.parentClub;
-        st.player.league = st.player.loan.parentLeague;
-        Game.log(`Loan ended. Returned to ${st.player.club}.`);
-        showPopup('Loan ended', `Returned to ${st.player.club}.`);
-        st.player.loan = null;
-      }
-    }
-    const baseYear = new Date(new Date(st.schedule[0].date).getFullYear()+1,7,31).getFullYear();
-    const first = realisticMatchDate(lastSaturdayOfAugust(baseYear));
-    const league = st.player.league || 'Premier League';
-    st.schedule = buildSchedule(first, leagueWeeks(league), st.player.club, league);
-    st.currentDate = st.schedule[0].date; // on season start marker
-    st.seasonMinutes=0; st.seasonGoals=0; st.seasonAssists=0; st.seasonCleanSheets=0;
-    Object.keys(st.shopPurchases||{}).forEach(id=>{ const it=SHOP_ITEMS.find(i=>i.id===id); if(it && it.perSeason) delete st.shopPurchases[id]; });
-    st.player.salaryMultiplier=1;
-    st.seasonProcessed = false;
-    st.seasonSummary = null;
-    st.leagueSnapshot = [];
-    st.leagueSnapshotWeek = 0;
-    const contractInfo = st.player.club==='Free Agent'
-      ? 'Free Agent.'
-      : `Contract ${st.player.yearsLeft} season${st.player.yearsLeft!==1?'s':''} left.`;
-    Game.log(`Season ${st.season} begins. Age ${st.player.age}. ${contractInfo}`);
-    Game.state.auto=false; updateAutoBtn();
-    Game.save(); renderAll();
-    showPopup('Season start', `Season ${st.season} has started.`);
+    startNextSeason();
   };
   q('#btn-contract-rework').onclick=()=>{ q('#match-modal').removeAttribute('open'); openContractRework(); };
   if(offerRenew){ q('#btn-renew-contract').onclick=()=>renewContractOffer(); }
