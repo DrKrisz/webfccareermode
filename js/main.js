@@ -126,6 +126,7 @@ function wireEvents(){
   });
   click('#dev-skip-season', ()=>{
     skipSeason();
+    q('#dev-modal').removeAttribute('open');
     Game.log('Dev: skipped season');
     showPopup('Dev tools','Skipped to season end.');
   });
