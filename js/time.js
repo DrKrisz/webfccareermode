@@ -72,16 +72,18 @@ function skipMonth(){
 
 function skipSeason(){
   let guard=0;
+  let seasonEnded=false;
   while(guard<400){
     const st=Game.state;
     const entry=st.schedule.find(d=>sameDay(d.date, st.currentDate));
     if(entry && entry.type==='seasonEnd'){
       nextDay(undefined, true);
+      seasonEnded=true;
       break;
     }
     nextDay(undefined, true);
     guard++;
   }
-  renderAll();
+  if(!seasonEnded) renderAll();
 }
 
