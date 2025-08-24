@@ -39,6 +39,16 @@ body {
   margin:0 0 32px;
 }
 
+.cta-buttons {
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  align-items:center;
+}
+@media (min-width:600px) {
+  .cta-buttons { flex-direction:row; }
+}
+
 .btn {
   display:inline-block;
   padding:12px 24px;
@@ -54,6 +64,11 @@ body {
 .btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,.3); }
 .btn.primary { background:linear-gradient(135deg,var(--primary),#2050b3); }
 .btn.big { font-size:20px; padding:16px 32px; }
+
+.manager-btn {
+  font-size:24px;
+  padding:20px 40px;
+}
 
 .features { padding:80px 0; text-align:center; }
 .features h2 { font-size:32px; margin:0 0 40px; }
