@@ -117,6 +117,28 @@ function wireEvents(){
       openMarket();
     }
   });
+  click('#dev-set-balance', ()=>{
+    const st=Game.state;
+    const val=+q('#dev-balance').value;
+    if(st.player && !isNaN(val)){
+      st.player.balance=val;
+      Game.log('Dev: balance set');
+      Game.save();
+      renderAll();
+      showPopup('Dev tools', `Balance set to ${Game.money(val)}.`);
+    }
+  });
+  click('#dev-set-overall', ()=>{
+    const st=Game.state;
+    const val=+q('#dev-overall').value;
+    if(st.player && !isNaN(val)){
+      st.player.overall=val;
+      Game.log('Dev: overall set');
+      Game.save();
+      renderAll();
+      showPopup('Dev tools', `Overall set to ${val}.`);
+    }
+  });
 }
 
   (function boot(){
