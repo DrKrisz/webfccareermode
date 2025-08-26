@@ -22,10 +22,4 @@
     });
   }
 
-  // Allow quick theme colour switching on the landing page.
-  document.querySelectorAll('.color-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.documentElement.style.setProperty('--primary', btn.style.backgroundColor);
-    });
-  });
 })();
