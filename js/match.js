@@ -245,9 +245,10 @@ function finishMatch(entry, minutes, mini){
   // Commit outcome
   entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
   const cleanSheet = st.player.pos==='Goalkeeper' && oppGoals===0 ? 1 : 0;
-  st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists; if(st.player.pos==='Goalkeeper') st.cleanSheets+=cleanSheet;
-  st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists; if(st.player.pos==='Goalkeeper') st.seasonCleanSheets+=cleanSheet;
-  applyPostMatchGrowth(st, minutes, rating, goals, assists, true, oppGoals);
+    st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists; if(st.player.pos==='Goalkeeper') st.cleanSheets+=cleanSheet;
+    st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists; if(st.player.pos==='Goalkeeper') st.seasonCleanSheets+=cleanSheet;
+    if(minutes>0){ st.matchesPlayed++; st.seasonMatches++; }
+    applyPostMatchGrowth(st, minutes, rating, goals, assists, true, oppGoals);
   st.player.value = Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   payWeekly(st);
   st.week = Math.min(leagueWeeks(st.player.league||'Premier League'), st.week+1);
@@ -318,9 +319,10 @@ function simulateMatch(entry, fast=false){
   const scoreline=`${teamGoals}-${oppGoals}`;
   entry.played=true; entry.result=result; entry.scoreline=scoreline; Game.state.playedMatchDates.push(entry.date);
   const cleanSheet = st.player.pos==='Goalkeeper' && oppGoals===0 ? 1 : 0;
-  st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists; if(st.player.pos==='Goalkeeper') st.cleanSheets+=cleanSheet;
-  st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists; if(st.player.pos==='Goalkeeper') st.seasonCleanSheets+=cleanSheet;
-  applyPostMatchGrowth(st, minutes, rating, goals, assists, false, oppGoals);
+    st.minutesPlayed+=minutes; st.goals+=goals; st.assists+=assists; if(st.player.pos==='Goalkeeper') st.cleanSheets+=cleanSheet;
+    st.seasonMinutes+=minutes; st.seasonGoals+=goals; st.seasonAssists+=assists; if(st.player.pos==='Goalkeeper') st.seasonCleanSheets+=cleanSheet;
+    if(minutes>0){ st.matchesPlayed++; st.seasonMatches++; }
+    applyPostMatchGrowth(st, minutes, rating, goals, assists, false, oppGoals);
   st.player.value=Math.round(computeValue(st.player.overall, st.player.league||'Premier League', st.player.salary||1000));
   payWeekly(st);
   st.week=Math.min(leagueWeeks(st.player.league||'Premier League'), st.week+1);

@@ -69,7 +69,7 @@ function renderAll(){
   q('#v-season').textContent = st.season;
   q('#v-week').textContent = `${Math.min(st.week,weeksTotal)} / ${weeksTotal}`;
   q('#v-overall').textContent = st.player.overall;
-  q('#v-playtime').textContent = `${st.minutesPlayed} min`;
+  q('#v-playtime').textContent = `${st.seasonMinutes} min / ${st.seasonMatches} matches (${st.minutesPlayed} min / ${st.matchesPlayed} matches)`;
   const weeklyIncome = weeklySalary(st.player)+(st.player.passiveIncome||0);
   q('#v-salary').textContent = Game.money(weeklyIncome) + ' /week';
   q('#v-value').textContent = fmtValue(st.player.value);
