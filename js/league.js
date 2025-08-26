@@ -74,11 +74,7 @@ function openLeagueTable(){
     let teams;
     if(lg==='Carabao Cup'){
       const cup=(st.schedule||[]).filter(e=>e.competition==='Carabao Cup');
-      const rows=cup.map(e=>{
-        const res=e.played?`${e.result}${e.scoreline?` ${e.scoreline}`:''}`:'TBD';
-        return `<tr><td>${e.round||''}</td><td>${e.opponent}</td><td>${res}</td></tr>`;
-      }).join('');
-      tableWrap.innerHTML=`<table class="league-table"><thead><tr><th>Round</th><th>Opponent</th><th>Result</th></tr></thead><tbody>${rows}</tbody></table>`;
+      tableWrap.innerHTML=renderCarabaoCupTable(cup);
       return;
     } else if(st.player && st.player.league===lg){
       updateLeagueSnapshot();
