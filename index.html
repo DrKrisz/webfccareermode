@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WebCareerGame – Build Your Football Story</title>
   <link rel="stylesheet" href="landing.css" />
+  <script src="js/landing.js" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -103,26 +104,6 @@
     </div>
   </footer>
 
-  <script>
-      const form = document.getElementById('setup-form');
-      if(form){
-        form.addEventListener('submit', e => {
-          e.preventDefault();
-          const mode = document.querySelector('input[name=mode]:checked').value;
-          if (mode === 'manager') {
-            location.href = 'managergame.html';
-            return;
-          }
-          const params = new URLSearchParams({
-            name: document.getElementById('name').value,
-            age: document.getElementById('age').value,
-            origin: document.getElementById('origin').value,
-            pos: document.querySelector('input[name=pos]:checked').value,
-            alwaysPlay: document.getElementById('always-play').checked ? '1' : '0'
-          });
-          location.href = 'game.html?' + params.toString();
-        });
-      }
-  </script>
+
 </body>
 </html>
