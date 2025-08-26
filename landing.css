@@ -65,10 +65,6 @@ body {
 .btn.primary { background:linear-gradient(135deg,var(--primary),#2050b3); }
 .btn.big { font-size:20px; padding:16px 32px; }
 
-.manager-btn {
-  font-size:24px;
-  padding:20px 40px;
-}
 
 .features { padding:80px 0; text-align:center; }
 .features h2 { font-size:32px; margin:0 0 40px; }

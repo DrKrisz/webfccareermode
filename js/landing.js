@@ -6,11 +6,6 @@
   if(form){
     form.addEventListener('submit', e => {
       e.preventDefault();
-      const mode = document.querySelector('input[name=mode]:checked').value;
-      if(mode === 'manager'){
-        location.href = 'managergame.html';
-        return;
-      }
       const params = new URLSearchParams({
         name: document.getElementById('name').value,
         age: document.getElementById('age').value,
