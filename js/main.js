@@ -19,6 +19,13 @@ window.onunhandledrejection=e=>{
   renderAlertLog();
 };
 
+// Small helper to bind event listeners only when the element exists.
+// Keeps the wiring code terse throughout the file.
+const bind = (selector, fn) => {
+  const el = q(selector);
+  if (el) el.onclick = fn;
+};
+
 // ===== Download / Retire =====
 function downloadLog(){ const st=Game.state; const text=(st.eventLog||[]).join('\n'); const blob=new Blob([text],{type:'text/plain'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='webcareergame-log.txt'; a.click(); URL.revokeObjectURL(url); }
 function retirePrompt(){ const st=Game.state; const c=q('#retire-content'); c.innerHTML=''; const box=document.createElement('div'); box.className='glass';
@@ -39,6 +46,12 @@ function retirePrompt(){ const st=Game.state; const c=q('#retire-content'); c.in
 
 // ===== Events / Boot =====
 function wireEvents(){
+  wireCoreEvents();
+  wireDevTools();
+}
+
+// Attach core gameplay and UI events.
+function wireCoreEvents(){
   const form = document.getElementById('setup-form');
   if(form){
     form.addEventListener('submit', e=>{
@@ -55,22 +68,22 @@ function wireEvents(){
       showPopup('Season start', `Season ${Game.state.season} has started.`);
     });
   }
-  const click = (id, fn)=>{ const el=q(id); if(el) el.onclick=fn; };
-  click('#btn-market', ()=>openMarket());
-  click('#btn-shop', ()=>openShop());
-  click('#btn-contract', ()=>openContractRework());
-  click('#btn-league', ()=>openLeagueTable());
-  click('#close-market', ()=>q('#market-modal').removeAttribute('open'));
-  click('#close-shop', ()=>q('#shop-modal').removeAttribute('open'));
-  click('#close-contract', ()=>q('#contract-modal').removeAttribute('open'));
-  click('#close-league', ()=>{ const dlg=q('#league-modal'); if(dlg){ if(dlg.close) dlg.close(); else dlg.removeAttribute('open'); } });
-  click('#btn-next', ()=>nextDay());
-  click('#btn-auto', ()=>toggleAuto());
-  click('#btn-train', ()=>openTraining());
-  click('#close-training', ()=>cancelTraining());
-  click('#close-cooldown', ()=>q('#cooldown-modal').removeAttribute('open'));
-  click('#cooldown-ok', ()=>q('#cooldown-modal').removeAttribute('open'));
-  click('#btn-play', ()=>{
+
+  bind('#btn-market', ()=>openMarket());
+  bind('#btn-shop', ()=>openShop());
+  bind('#btn-contract', ()=>openContractRework());
+  bind('#btn-league', ()=>openLeagueTable());
+  bind('#close-market', ()=>q('#market-modal').removeAttribute('open'));
+  bind('#close-shop', ()=>q('#shop-modal').removeAttribute('open'));
+  bind('#close-contract', ()=>q('#contract-modal').removeAttribute('open'));
+  bind('#close-league', ()=>{ const dlg=q('#league-modal'); if(dlg){ if(dlg.close) dlg.close(); else dlg.removeAttribute('open'); } });
+  bind('#btn-next', ()=>nextDay());
+  bind('#btn-auto', ()=>toggleAuto());
+  bind('#btn-train', ()=>openTraining());
+  bind('#close-training', ()=>cancelTraining());
+  bind('#close-cooldown', ()=>q('#cooldown-modal').removeAttribute('open'));
+  bind('#cooldown-ok', ()=>q('#cooldown-modal').removeAttribute('open'));
+  bind('#btn-play', ()=>{
     const entry=Game.state.schedule.find(d=>sameDay(d.date, Game.state.currentDate));
     if(!entry) return;
     if(entry.isMatch && !entry.played){
@@ -79,99 +92,106 @@ function wireEvents(){
       startNextSeason();
     }
   });
-  click('#btn-retire', ()=>retirePrompt());
-  click('#retire-cancel', ()=>q('#retire-modal').removeAttribute('open'));
-  click('#retire-confirm', ()=>{ q('#retire-modal').removeAttribute('open'); Game.reset(); });
-  click('#btn-log', ()=>downloadLog());
-  click('#close-match', ()=>q('#match-modal').removeAttribute('open'));
-  click('#close-message', ()=>q('#message-modal').removeAttribute('open'));
-  click('#btn-alert-log', ()=>{ renderAlertLog(); q('#alert-log-modal').setAttribute('open',''); });
-  click('#close-alert-log', ()=>q('#alert-log-modal').removeAttribute('open'));
-  click('#btn-dev', ()=>q('#dev-modal').setAttribute('open',''));
-  click('#close-dev', ()=>q('#dev-modal').removeAttribute('open'));
-  click('#dev-injure', ()=>{
-    const st=Game.state;
-    if(st.player && !st.player.injury){
-      st.player.preInjuryStatus = st.player.status;
-      st.player.injury={type:'dev injury', days:7};
-      st.player.status=`Injured (dev injury, 7d)`;
-      Game.log('Dev: forced injury');
-      Game.save();
-      renderAll();
-      showPopup('Dev tools','Player injured for 7 days.');
-    }
-  });
-  click('#dev-heal', ()=>{
-    const st=Game.state;
-    if(st.player){
-      st.player.injury=null;
-      if(st.player.preInjuryStatus){
-        st.player.status=st.player.preInjuryStatus;
-        delete st.player.preInjuryStatus;
-      } else {
-        st.player.status='-';
+  bind('#btn-retire', ()=>retirePrompt());
+  bind('#retire-cancel', ()=>q('#retire-modal').removeAttribute('open'));
+  bind('#retire-confirm', ()=>{ q('#retire-modal').removeAttribute('open'); Game.reset(); });
+  bind('#btn-log', ()=>downloadLog());
+  bind('#close-match', ()=>q('#match-modal').removeAttribute('open'));
+  bind('#close-message', ()=>q('#message-modal').removeAttribute('open'));
+  bind('#btn-alert-log', ()=>{ renderAlertLog(); q('#alert-log-modal').setAttribute('open',''); });
+  bind('#close-alert-log', ()=>q('#alert-log-modal').removeAttribute('open'));
+  bind('#btn-dev', ()=>q('#dev-modal').setAttribute('open',''));
+  bind('#close-dev', ()=>q('#dev-modal').removeAttribute('open'));
+}
+
+// Attach developer / debug actions.
+function wireDevTools(){
+  const actions = {
+    '#dev-injure': ()=>{
+      const st=Game.state;
+      if(st.player && !st.player.injury){
+        st.player.preInjuryStatus = st.player.status;
+        st.player.injury={type:'dev injury', days:7};
+        st.player.status=`Injured (dev injury, 7d)`;
+        Game.log('Dev: forced injury');
+        Game.save();
+        renderAll();
+        showPopup('Dev tools','Player injured for 7 days.');
       }
-      Game.log('Dev: healed injury');
-      Game.save();
-      renderAll();
-      showPopup('Dev tools','Player healed.');
-    }
-  });
-  click('#dev-loan', ()=>{
-    if(Game.state.player){
-      requestLoan();
-    }
-  });
-  click('#dev-offers', ()=>{
-    const st=Game.state;
-    if(st.player){
-      st.player.transferListed=true;
-      st.lastOffers=rollMarketOffers(st.player);
-      Game.save();
-      renderAll();
+    },
+    '#dev-heal': ()=>{
+      const st=Game.state;
+      if(st.player){
+        st.player.injury=null;
+        if(st.player.preInjuryStatus){
+          st.player.status=st.player.preInjuryStatus;
+          delete st.player.preInjuryStatus;
+        } else {
+          st.player.status='-';
+        }
+        Game.log('Dev: healed injury');
+        Game.save();
+        renderAll();
+        showPopup('Dev tools','Player healed.');
+      }
+    },
+    '#dev-loan': ()=>{
+      if(Game.state.player){
+        requestLoan();
+      }
+    },
+    '#dev-offers': ()=>{
+      const st=Game.state;
+      if(st.player){
+        st.player.transferListed=true;
+        st.lastOffers=rollMarketOffers(st.player);
+        Game.save();
+        renderAll();
+        q('#dev-modal').removeAttribute('open');
+        openMarket();
+      }
+    },
+    '#dev-skip-month': ()=>{
+      skipMonth();
+      Game.log('Dev: skipped month');
+      showPopup('Dev tools','Skipped one month.');
+    },
+    '#dev-skip-season': ()=>{
+      skipSeason();
       q('#dev-modal').removeAttribute('open');
-      openMarket();
+      Game.log('Dev: skipped season');
+      showPopup('Dev tools','Skipped to season end.');
+    },
+    '#dev-force-season': ()=>{
+      startNextSeason();
+      q('#dev-modal').removeAttribute('open');
+      Game.log('Dev: forced new season');
+      showPopup('Dev tools','Started next season.');
+    },
+    '#dev-set-balance': ()=>{
+      const st=Game.state;
+      const val=+q('#dev-balance').value;
+      if(st.player && !isNaN(val)){
+        st.player.balance=val;
+        Game.log('Dev: balance set');
+        Game.save();
+        renderAll();
+        showPopup('Dev tools', `Balance set to ${Game.money(val)}.`);
+      }
+    },
+    '#dev-set-overall': ()=>{
+      const st=Game.state;
+      const val=+q('#dev-overall').value;
+      if(st.player && !isNaN(val)){
+        st.player.overall=val;
+        Game.log('Dev: overall set');
+        Game.save();
+        renderAll();
+        showPopup('Dev tools', `Overall set to ${val}.`);
+      }
     }
-  });
-  click('#dev-skip-month', ()=>{
-    skipMonth();
-    Game.log('Dev: skipped month');
-    showPopup('Dev tools','Skipped one month.');
-  });
-  click('#dev-skip-season', ()=>{
-    skipSeason();
-    q('#dev-modal').removeAttribute('open');
-    Game.log('Dev: skipped season');
-    showPopup('Dev tools','Skipped to season end.');
-  });
-  click('#dev-force-season', ()=>{
-    startNextSeason();
-    q('#dev-modal').removeAttribute('open');
-    Game.log('Dev: forced new season');
-    showPopup('Dev tools','Started next season.');
-  });
-  click('#dev-set-balance', ()=>{
-    const st=Game.state;
-    const val=+q('#dev-balance').value;
-    if(st.player && !isNaN(val)){
-      st.player.balance=val;
-      Game.log('Dev: balance set');
-      Game.save();
-      renderAll();
-      showPopup('Dev tools', `Balance set to ${Game.money(val)}.`);
-    }
-  });
-  click('#dev-set-overall', ()=>{
-    const st=Game.state;
-    const val=+q('#dev-overall').value;
-    if(st.player && !isNaN(val)){
-      st.player.overall=val;
-      Game.log('Dev: overall set');
-      Game.save();
-      renderAll();
-      showPopup('Dev tools', `Overall set to ${val}.`);
-    }
-  });
+  };
+  Object.entries(actions).forEach(([id, fn]) => bind(id, fn));
 }
 
   (function boot(){
