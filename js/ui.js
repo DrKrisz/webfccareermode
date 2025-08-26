@@ -174,7 +174,11 @@ function renderCalendar(){
     if(entry){
       if(entry.type==='seasonStart') label='<div style="font-size:11px">Season start</div>';
       else if(entry.type==='seasonEnd') label='<div style="font-size:11px">Season end</div>';
-      else if(entry.isMatch) label=`<div style="font-size:11px;">vs ${entry.opponent}</div><div style="font-size:10px">${entry.competition||'League'} game</div>`;
+      else if(entry.isMatch){
+        let comp=entry.competition||'League';
+        if(entry.competition==='Carabao Cup' && entry.round) comp+=` ${entry.round}`;
+        label=`<div style="font-size:11px;">vs ${entry.opponent}</div><div style="font-size:10px">${comp} game</div>`;
+      }
     }
     item.innerHTML=`<div class="muted">${dateStr}</div><div class="dot"></div>${label}${extra||''}`;
 

@@ -77,10 +77,35 @@ function buildSchedule(firstMatchDate, weeks, excludeClub, league){
     out.push({date:d.getTime(), opponent:opponents[i%opponents.length], isMatch:true, played:false, result:null, scoreline:null, type:'match', competition:'League'});
     current = weekAfter(current);
   }
+  if(lg==='Premier League' || lg==='EFL Championship'){
+    insertCarabaoCup(out, firstMatchDate, excludeClub);
+  }
   // season end marker two days after final match
-  const end=new Date(last.getTime()); end.setDate(end.getDate()+2);
-  out.push({date:end.getTime(), type:'seasonEnd', isMatch:false, played:true});
-  return out;
+  out.sort((a,b)=>a.date-b.date);
+  const lastMatch = out.filter(e=>e.isMatch).slice(-1)[0];
+  if(lastMatch){
+    const end=new Date(lastMatch.date); end.setDate(end.getDate()+2);
+    out.push({date:end.getTime(), type:'seasonEnd', isMatch:false, played:true});
+  }
+  return out.sort((a,b)=>a.date-b.date);
+}
+
+function insertCarabaoCup(schedule, firstMatchDate, excludeClub){
+  const rounds=['Round 1','Round 2','Quarterfinal','Semifinal','Final'];
+  let date=new Date(firstMatchDate.getTime());
+  date.setDate(date.getDate()+28); // start about a month into season
+  const teams=[...LEAGUES['Premier League'], ...LEAGUES['EFL Championship']];
+  const others=teams.filter(t=>t!==excludeClub);
+  rounds.forEach(r=>{
+    const d=realisticMatchDate(date);
+    schedule.push({date:d.getTime(), opponent:pick(others), isMatch:true, played:false, result:null, scoreline:null, type:'match', competition:'Carabao Cup', round:r});
+    date.setDate(date.getDate()+28);
+  });
+}
+
+function eliminateCup(name){
+  const st=Game.state;
+  st.schedule=st.schedule.filter(e=>!(e.competition===name && !e.played && e.date>st.currentDate));
 }
 
 function ensureNoSelfMatches(club, league){

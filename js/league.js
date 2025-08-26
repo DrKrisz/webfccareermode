@@ -59,6 +59,7 @@ function openLeagueTable(){
   const content=q('#league-content');
   if(!modal || !content) return;
   const leagues=Object.keys(LEAGUES);
+  leagues.push('Carabao Cup');
   const select=document.createElement('select');
   leagues.forEach(lg=>{
     const opt=document.createElement('option');
@@ -71,7 +72,15 @@ function openLeagueTable(){
   function render(){
     const lg=select.value;
     let teams;
-    if(st.player && st.player.league===lg){
+    if(lg==='Carabao Cup'){
+      const cup=(st.schedule||[]).filter(e=>e.competition==='Carabao Cup');
+      const rows=cup.map(e=>{
+        const res=e.played?`${e.result}${e.scoreline?` ${e.scoreline}`:''}`:'TBD';
+        return `<tr><td>${e.round||''}</td><td>${e.opponent}</td><td>${res}</td></tr>`;
+      }).join('');
+      tableWrap.innerHTML=`<table class="league-table"><thead><tr><th>Round</th><th>Opponent</th><th>Result</th></tr></thead><tbody>${rows}</tbody></table>`;
+      return;
+    } else if(st.player && st.player.league===lg){
       updateLeagueSnapshot();
       teams=(st.leagueSnapshot||[]).slice();
     } else {

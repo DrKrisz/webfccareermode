@@ -253,6 +253,13 @@ function finishMatch(entry, minutes, mini){
   st.week = Math.min(leagueWeeks(st.player.league||'Premier League'), st.week+1);
   const gaPart = rating==='DNP' ? '' : (st.player.pos==='Goalkeeper' ? `, CS${cleanSheet}` : `, G${goals}, A${assists}`);
   Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${gaPart}`);
+  if(entry.competition==='Carabao Cup'){
+    if(entry.round==='Final' && result==='W'){
+      Game.log('🏆 Carabao Cup won!');
+      showPopup('Trophy', 'You won the Carabao Cup!');
+    }
+    if(result!=='W') eliminateCup('Carabao Cup');
+  }
   const injury = maybeInjure('match', minutes);
 
   // Move day and show summary
@@ -319,6 +326,13 @@ function simulateMatch(entry, fast=false){
   st.week=Math.min(leagueWeeks(st.player.league||'Premier League'), st.week+1);
   const gaPart = rating==='DNP' ? '' : (st.player.pos==='Goalkeeper' ? `, CS${cleanSheet}` : `, G${goals}, A${assists}`);
   Game.log(`Match vs ${entry.opponent}: ${result} ${scoreline}, min ${minutes}, rat ${rating}${gaPart}`);
+  if(entry.competition==='Carabao Cup'){
+    if(entry.round==='Final' && result==='W'){
+      Game.log('🏆 Carabao Cup won!');
+      showPopup('Trophy', 'You won the Carabao Cup!');
+    }
+    if(result!=='W') eliminateCup('Carabao Cup');
+  }
   const injury = maybeInjure('match', minutes);
   Game.save(); renderAll();
   if(injury) showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`);
