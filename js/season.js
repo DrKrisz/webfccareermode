@@ -84,7 +84,7 @@ function startNextSeason(){
   const league = st.player.league || 'Premier League';
   st.schedule = buildSchedule(first, leagueWeeks(league), st.player.club, league);
   st.currentDate = st.schedule[0].date; // on season start marker
-  st.seasonMinutes=0; st.seasonGoals=0; st.seasonAssists=0; st.seasonCleanSheets=0;
+  st.seasonMinutes=0; st.seasonMatches=0; st.seasonGoals=0; st.seasonAssists=0; st.seasonCleanSheets=0;
   Object.keys(st.shopPurchases||{}).forEach(id=>{ const it=SHOP_ITEMS.find(i=>i.id===id); if(it && it.perSeason) delete st.shopPurchases[id]; });
   st.player.salaryMultiplier=1;
   st.seasonProcessed = false;

@@ -110,11 +110,13 @@ const Game = {
     currentDate: null,
     schedule: [],
     minutesPlayed: 0,
+    matchesPlayed: 0,
     goals: 0,
     assists: 0,
     cleanSheets: 0,
     seasonCleanSheets: 0,
     seasonMinutes: 0,
+    seasonMatches: 0,
     seasonGoals: 0,
     seasonAssists: 0,
     lastOffers: [],
@@ -164,8 +166,8 @@ const Game = {
       injury: null,
     };
     this.state.season = 1; this.state.week = 1;
-    this.state.minutesPlayed = 0; this.state.goals = 0; this.state.assists = 0; this.state.cleanSheets = 0;
-    this.state.seasonMinutes = 0; this.state.seasonGoals = 0; this.state.seasonAssists = 0; this.state.seasonCleanSheets = 0;
+    this.state.minutesPlayed = 0; this.state.matchesPlayed = 0; this.state.goals = 0; this.state.assists = 0; this.state.cleanSheets = 0;
+    this.state.seasonMinutes = 0; this.state.seasonMatches = 0; this.state.seasonGoals = 0; this.state.seasonAssists = 0; this.state.seasonCleanSheets = 0;
     this.state.lastOffers = []; this.state.playedMatchDates = []; this.state.eventLog = [];
     this.state.shopPurchases = {};
     this.state.auto = false;
