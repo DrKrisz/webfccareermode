@@ -71,14 +71,16 @@ function startNextSeason(){
   }
   const relegated = st.relegated||[];
   const promoted = st.promoted||[];
-  if(relegated.length || promoted.length){
-    applyPromotionRelegation(promoted,relegated);
-    if(relegated.includes(st.player.club)) st.player.league='EFL Championship';
-    else if(promoted.includes(st.player.club)) st.player.league='Premier League';
-    relegated.forEach(c=>{ Game.log(`${c} relegated to EFL Championship.`); showPopup('Relegated', `${c} move to Championship.`); });
-    promoted.forEach(c=>{ Game.log(`${c} promoted to Premier League.`); showPopup('Promoted', `${c} move to Premier League.`); });
-    st.relegated=[]; st.promoted=[];
+  if(st.player.league==='Premier League' || st.player.league==='EFL Championship'){
+    if(relegated.length || promoted.length){
+      applyPromotionRelegation(promoted,relegated);
+      if(relegated.includes(st.player.club)) st.player.league='EFL Championship';
+      else if(promoted.includes(st.player.club)) st.player.league='Premier League';
+      relegated.forEach(c=>{ Game.log(`${c} relegated to EFL Championship.`); showPopup('Relegated', `${c} move to Championship.`); });
+      promoted.forEach(c=>{ Game.log(`${c} promoted to Premier League.`); showPopup('Promoted', `${c} move to Premier League.`); });
+    }
   }
+  st.relegated=[]; st.promoted=[];
   const baseYear = new Date(new Date(st.schedule[0].date).getFullYear()+1,7,31).getFullYear();
   const first = realisticMatchDate(lastSaturdayOfAugust(baseYear));
   const league = st.player.league || 'Premier League';
