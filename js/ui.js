@@ -73,7 +73,8 @@ function renderAll(){
   } else {
     if(yearsEl){
       yearsEl.style.display='';
-      yearsEl.textContent = st.player.yearsLeft ? `${st.player.yearsLeft} season${st.player.yearsLeft>1?'s':''}` : '-';
+      const vYears = visibleYearsLeft();
+      yearsEl.textContent = vYears ? `${vYears} season${vYears>1?'s':''}` : '-';
     }
     if(yearsKey) yearsKey.style.display='';
   }

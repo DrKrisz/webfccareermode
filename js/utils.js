@@ -36,6 +36,11 @@ const CLUB_TO_LEAGUE = {};
 Object.entries(LEAGUES).forEach(([lg,teams])=>teams.forEach(t=>{CLUB_TO_LEAGUE[t]=lg;}));
 const ALL_CLUBS = Object.entries(LEAGUES).flatMap(([lg,teams])=>teams.map(t=>({club:t,league:lg})));
 
+function visibleYearsLeft(p){
+  p = p || Game.state.player;
+  return Math.max(0, (p.yearsLeft || 0) - 1);
+}
+
 function leagueWeeks(league){
   const teams = LEAGUES[league] || LEAGUES['Premier League'];
   return (teams.length - 1) * 2;
