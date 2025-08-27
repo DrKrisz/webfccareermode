@@ -151,33 +151,37 @@ function sameDay(a,b){ const da=new Date(a), db=new Date(b); return da.getFullYe
 // Generate skill ratings for a new player based on position.
 function generateSkills(pos){
   const rand=(min,max)=>Math.round(Math.random()*(max-min)+min);
+  let skills;
   switch(pos){
     case 'Goalkeeper':
-      return {
+      skills = {
         shooting: rand(10,30),
         passing: rand(40,60),
         dribbling: rand(30,50),
         defending: rand(40,60),
         goalkeeping: rand(65,75)
       };
+      break;
     case 'Defender':
-      return {
+      skills = {
         shooting: rand(40,55),
         passing: rand(45,60),
         dribbling: rand(40,55),
         defending: rand(60,70),
         goalkeeping: rand(5,15)
       };
+      break;
     case 'Midfield':
-      return {
+      skills = {
         shooting: rand(50,60),
         passing: rand(60,70),
         dribbling: rand(55,65),
         defending: rand(40,50),
         goalkeeping: rand(5,15)
       };
+      break;
     default: // Attacker
-      return {
+      skills = {
         shooting: rand(60,70),
         passing: rand(50,60),
         dribbling: rand(55,65),
@@ -185,6 +189,15 @@ function generateSkills(pos){
         goalkeeping: rand(5,15)
       };
   }
+
+  // Ensure the generated player starts with at least 55 overall.
+  const vals = Object.values(skills);
+  const avg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+  if(avg < 55){
+    const diff = 55 - avg;
+    Object.keys(skills).forEach(k=>{ skills[k] = Math.min(100, skills[k] + diff); });
+  }
+  return skills;
 }
 
 // Determine which skills are relevant for the player's position.

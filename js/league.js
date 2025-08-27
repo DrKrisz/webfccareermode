@@ -13,8 +13,9 @@ function poissonRandom(lambda, rand=Math.random){
   return k-1;
 }
 
+// Calculate relative team strength from dynamic team levels.
 function teamStrength(club){
-  const lvl=TEAM_BASE_LEVELS[club] || 70;
+  const lvl = getTeamLevel(club); // use current level instead of static baseline
   return (lvl-70)/60; // roughly -0.16..0.33
 }
 
