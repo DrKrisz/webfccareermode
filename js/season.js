@@ -95,9 +95,10 @@ function startNextSeason(){
   st.leagueSnapshotWeek = 0;
   st.leagueFixtures = {};
   st.leagueSeeds = {};
+  const vYears = visibleYearsLeft();
   const contractInfo = st.player.club==='Free Agent'
     ? 'Free Agent.'
-    : `Contract ${st.player.yearsLeft} season${st.player.yearsLeft!==1?'s':''} left.`;
+    : `Contract ${vYears} season${vYears!==1?'s':''} left.`;
   Game.log(`Season ${st.season} begins. Age ${st.player.age}. ${contractInfo}`);
   Game.state.auto=false; updateAutoBtn();
   Game.save(); renderAll();
@@ -222,7 +223,7 @@ function openSeasonEnd(){
   }
 
   const {pos,won,totalTeams,tableHtml} = st.seasonSummary;
-  const offerRenew = st.player.club!=='Free Agent' && st.player.yearsLeft<=1;
+  const offerRenew = st.player.club!=='Free Agent' && st.player.yearsLeft<=2;
 
   const c=q('#match-content'); c.innerHTML='';
   const box=document.createElement('div'); box.className='glass';
@@ -249,33 +250,49 @@ function openSeasonEnd(){
     startNextSeason();
   };
   q('#btn-contract-rework').onclick=()=>{ q('#match-modal').removeAttribute('open'); openContractRework(); };
-  if(offerRenew){ q('#btn-renew-contract').onclick=()=>renewContractOffer(); }
+  if(offerRenew){ q('#btn-renew-contract').onclick=()=>{ q('#match-modal').removeAttribute('open'); renewContractOffer(); }; }
 }
 
 function renewContractOffer(){
   const st=Game.state; if(st.player.club==='Free Agent') return;
-  const choice=prompt('Renew contract:\n1) Better role\n2) Long term deal');
-  if(choice==='1'){
-    const statusOrder=['rookie','decent','key player','important','star player'];
-    const timeOrder=['second bench','bench','rotater','match player','match starter'];
-    const sIdx=Math.min(statusOrder.length-1,statusOrder.indexOf(st.player.status)+1);
-    const tIdx=Math.min(timeOrder.length-1,timeOrder.indexOf(st.player.timeBand)+1);
-    st.player.status=statusOrder[sIdx];
-    st.player.timeBand=timeOrder[tIdx];
-    st.player.salary=Math.round(st.player.salary*1.05);
-    st.player.yearsLeft=2;
-    st.player.marketBlocked=1;
-    st.player.releaseClause=Math.round(st.player.value*1.2);
-    Game.log('Contract renewed with improved role');
-  } else if(choice==='2'){
-    st.player.salary=Math.round(st.player.salary*1.02);
-    st.player.yearsLeft=4;
-    st.player.marketBlocked=2;
-    st.player.releaseClause=Math.round(st.player.value*2);
-    Game.log('Contract renewed with long term deal');
-  } else { return; }
-  Game.save(); renderAll();
-  q('#match-modal').removeAttribute('open');
-  openSeasonEnd();
+  const modal=q('#renew-contract-modal');
+  const list=q('#renew-contract-options');
+  list.innerHTML='';
+
+  const statusOrder=['rookie','decent','key player','important','star player'];
+  const timeOrder=['second bench','bench','rotater','match player','match starter'];
+  const sIdx=Math.min(statusOrder.length-1,statusOrder.indexOf(st.player.status)+1);
+  const tIdx=Math.min(timeOrder.length-1,timeOrder.indexOf(st.player.timeBand)+1);
+
+  const options=[
+    {label:'Better role', status:statusOrder[sIdx], time:timeOrder[tIdx], salary:Math.round(st.player.salary*1.05), years:2, marketBlocked:1, releaseClause:Math.round(st.player.value*1.2), log:'Contract renewed with improved role'},
+    {label:'Long term deal', status:st.player.status, time:st.player.timeBand, salary:Math.round(st.player.salary*1.02), years:4, marketBlocked:2, releaseClause:Math.round(st.player.value*2), log:'Contract renewed with long term deal'}
+  ];
+
+  options.forEach((o,i)=>{
+    const row=document.createElement('div'); row.className='glass';
+    row.innerHTML=`<div class="h">${o.label}</div>
+      <div>Status: ${o.status}</div>
+      <div>Time band: ${o.time}</div>
+      <div>Salary: ${Game.money(o.salary)}/w</div>
+      <div>Length: ${o.years} season${o.years>1?'s':''}</div>
+      <div style="text-align:right;margin-top:8px"><button class="btn" data-i="${i}">Choose</button></div>`;
+    row.querySelector('button').onclick=()=>{
+      st.player.status=o.status;
+      st.player.timeBand=o.time;
+      st.player.salary=o.salary;
+      st.player.yearsLeft=o.years+1;
+      st.player.marketBlocked=o.marketBlocked;
+      st.player.releaseClause=o.releaseClause;
+      Game.log(o.log);
+      Game.save(); renderAll();
+      modal.removeAttribute('open');
+      openSeasonEnd();
+    };
+    list.append(row);
+  });
+
+  q('#close-renew-contract').onclick=()=>{ modal.removeAttribute('open'); openSeasonEnd(); };
+  modal.setAttribute('open','');
 }
 

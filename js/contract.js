@@ -21,7 +21,8 @@ function contractChance(st,salary,years,status,time){
   if(salary>maxSalary) return 0;
   let chance=0.6;
   if(salary>st.player.salary*1.1) chance-=0.2;
-  if(years>st.player.yearsLeft) chance-=0.1*(years-st.player.yearsLeft);
+  const currentYears = visibleYearsLeft(st.player);
+  if(years>currentYears) chance-=0.1*(years-currentYears);
   if(statusRank(status)>statusRank(st.player.status)) chance-=0.1;
   if(timeRank(time)>timeRank(st.player.timeBand)) chance-=0.1;
   const avgMinutes = st.week>1 ? st.seasonMinutes/(st.week-1) : st.seasonMinutes;
@@ -51,7 +52,7 @@ function openContractRework(){
   const cancel=q('#contract-cancel');
   const closeBtn=q('#close-contract');
 
-  let selYear=st.player.yearsLeft;
+  let selYear=visibleYearsLeft();
   let selStatus=st.player.status;
   let selTime=st.player.timeBand;
 
@@ -68,8 +69,9 @@ function openContractRework(){
   slider.step=Math.max(1, Math.round(st.player.salary*0.01));
 
   yearsDiv.innerHTML='';
+  const current=visibleYearsLeft();
   [0,1,2,3].forEach(n=>{
-    const val=st.player.yearsLeft+n;
+    const val=current+n;
     const b=document.createElement('button');
     b.textContent=n===0?'No extra year':`+${n}`;
     b.dataset.value=val;
@@ -141,7 +143,7 @@ function openContractRework(){
     const chance=contractChance(st,salary,years,status,time);
     if(Math.random()<chance){
       st.player.salary=Math.round(salary);
-      st.player.yearsLeft=years;
+      st.player.yearsLeft=years+1;
       st.player.status=status;
       st.player.timeBand=time;
       st.player.releaseClause=Math.round(st.player.value*(1.2+years*0.1));
