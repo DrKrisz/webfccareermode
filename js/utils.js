@@ -38,7 +38,7 @@ const ALL_CLUBS = Object.entries(LEAGUES).flatMap(([lg,teams])=>teams.map(t=>({c
 
 function visibleYearsLeft(p){
   p = p || Game.state.player;
-  return Math.max(0, (p.yearsLeft || 0) - 1);
+  return Math.max(0, p.yearsLeft || 0);
 }
 
 function leagueWeeks(league){

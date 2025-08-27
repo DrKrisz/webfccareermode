@@ -143,7 +143,7 @@ function openContractRework(){
     const chance=contractChance(st,salary,years,status,time);
     if(Math.random()<chance){
       st.player.salary=Math.round(salary);
-      st.player.yearsLeft=years+1;
+      st.player.yearsLeft=years;
       st.player.status=status;
       st.player.timeBand=time;
       st.player.releaseClause=Math.round(st.player.value*(1.2+years*0.1));

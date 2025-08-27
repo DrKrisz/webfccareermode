@@ -28,21 +28,6 @@ function startNextSeason(){
     }
     showPopup('Manager', msg);
     Game.log(`Manager: ${msg}`);
-
-    st.player.yearsLeft = Math.max(0, st.player.yearsLeft-1);
-    if(st.player.yearsLeft<=0){
-      st.player.club='Free Agent';
-      st.player.league='';
-      st.player.status='-';
-      st.player.timeBand='-';
-      st.player.salary=0;
-      st.player.yearsLeft=0;
-      st.player.releaseClause=0;
-      st.player.marketBlocked=0;
-      Game.log('Contract ended. You are a Free Agent.');
-    } else {
-      st.player.marketBlocked = Math.max(0,(st.player.marketBlocked||0)-1);
-    }
     const poorSeason = st.player.pos==='Goalkeeper'
       ? lastSeason.min>900 && lastSeason.cleanSheets<4
       : lastSeason.min>900 && (lastSeason.goals+lastSeason.assists)<2;
@@ -106,6 +91,24 @@ function startNextSeason(){
 }
 function openSeasonEnd(){
   const st=Game.state;
+  if(!st.seasonProcessed){
+    if(st.player.club!=='Free Agent'){
+      st.player.yearsLeft = Math.max(0,(st.player.yearsLeft||0)-1);
+      if(st.player.yearsLeft<=0){
+        st.player.club='Free Agent';
+        st.player.league='';
+        st.player.status='-';
+        st.player.timeBand='-';
+        st.player.salary=0;
+        st.player.yearsLeft=0;
+        st.player.releaseClause=0;
+        st.player.marketBlocked=0;
+        Game.log('Contract ended. You are a Free Agent.');
+      } else {
+        st.player.marketBlocked = Math.max(0,(st.player.marketBlocked||0)-1);
+      }
+    }
+  }
   if(!st.seasonSummary){
     // compute player's team stats from season
     const stats={w:0,d:0,l:0,gf:0,ga:0};
@@ -281,7 +284,7 @@ function renewContractOffer(){
       st.player.status=o.status;
       st.player.timeBand=o.time;
       st.player.salary=o.salary;
-      st.player.yearsLeft=o.years+1;
+      st.player.yearsLeft=o.years;
       st.player.marketBlocked=o.marketBlocked;
       st.player.releaseClause=o.releaseClause;
       Game.log(o.log);
