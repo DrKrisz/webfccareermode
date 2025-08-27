@@ -164,7 +164,9 @@ function generateSkills(pos){
         passing: rand(40,60),
         dribbling: rand(30,50),
         defending: rand(40,60),
-        goalkeeping: rand(65,75)
+        goalkeeping: rand(65,75),
+        pace: rand(30,50),
+        physical: rand(60,70)
       };
       break;
     case 'Defender':
@@ -173,7 +175,9 @@ function generateSkills(pos){
         passing: rand(45,60),
         dribbling: rand(40,55),
         defending: rand(60,70),
-        goalkeeping: rand(5,15)
+        goalkeeping: rand(5,15),
+        pace: rand(55,65),
+        physical: rand(60,70)
       };
       break;
     case 'Midfield':
@@ -182,7 +186,9 @@ function generateSkills(pos){
         passing: rand(60,70),
         dribbling: rand(55,65),
         defending: rand(40,50),
-        goalkeeping: rand(5,15)
+        goalkeeping: rand(5,15),
+        pace: rand(60,70),
+        physical: rand(50,60)
       };
       break;
     default: // Attacker
@@ -191,7 +197,9 @@ function generateSkills(pos){
         passing: rand(50,60),
         dribbling: rand(55,65),
         defending: rand(30,40),
-        goalkeeping: rand(5,15)
+        goalkeeping: rand(5,15),
+        pace: rand(65,75),
+        physical: rand(50,60)
       };
   }
 
@@ -209,13 +217,13 @@ function generateSkills(pos){
 function relevantSkills(pos){
   switch(pos){
     case 'Goalkeeper':
-      return ['goalkeeping','passing','defending'];
+      return ['goalkeeping','passing','defending','pace','physical'];
     case 'Defender':
-      return ['defending','passing','dribbling'];
+      return ['defending','passing','dribbling','pace','physical'];
     case 'Midfield':
-      return ['passing','dribbling','shooting','defending'];
+      return ['passing','dribbling','shooting','defending','pace','physical'];
     default:
-      return ['shooting','dribbling','passing'];
+      return ['shooting','dribbling','passing','pace','physical'];
   }
 }
 
