@@ -83,7 +83,7 @@ function renderAll(){
   q('#v-week').textContent = `${Math.min(st.week,weeksTotal)} / ${weeksTotal}`;
   q('#v-overall').textContent = st.player.overall;
   const skills = st.player.skills || {};
-  ['shooting','passing','dribbling','defending','goalkeeping'].forEach(s=>{
+  ['shooting','passing','dribbling','defending','pace','physical','goalkeeping'].forEach(s=>{
     const el=q('#skill-'+s);
     if(el) el.textContent = skills[s];
   });
