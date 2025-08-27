@@ -75,97 +75,163 @@ function openMatch(entry){
   q('#match-modal').setAttribute('open','');
 }
 
-function openTraining(){
-  clearAutoTick();
-  const st=Game.state;
-  const todayEntry = st.schedule.find(d=>sameDay(d.date, st.currentDate));
-  const injured = !!st.player.injury;
-  const daysSince = st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
-  if(todayEntry && todayEntry.isMatch){ showPopup('Training', 'Match scheduled today. Focus on the game.'); return; }
-  if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
-  if(daysSince < 1){
-    console.log('Tried to train twice today. Come back tomorrow.');
-    Game.log('Tried to train twice today. Come back tomorrow.');
-    Game.save();
-    renderAll();
-    showPopup('Training', 'You have trained today, come back tomorrow.');
-    return;
-  }
-  if(daysSince < 2 && st.player.pos!=='Goalkeeper'){
-    const rest = Math.ceil(2-daysSince);
-    const msg=`Tried to train but need to rest ${rest} day${rest>1?'s':''} before training again.`;
-    Game.log(msg);
-    Game.save();
-    renderAll();
-    showCooldownPopup(rest);
-    return;
-  }
-  const c=q('#training-content'); if(c) c.innerHTML='';
-  const box=document.createElement('div');
-  box.innerHTML='<div class="title">Training session</div>';
-  const phase=document.createElement('div'); box.append(phase);
-  c.append(box);
-  q('#training-modal').setAttribute('open','');
-  trainingSession={cancelled:false};
-  const startMini=()=>{
-    if(trainingSession && trainingSession.cancelled) return;
-    const mini = st.player.pos==='Goalkeeper'
-      ? goalkeeperTrainingView(res=>{
-          if(trainingSession && trainingSession.cancelled) return;
-          finishTraining(res);
-          trainingSession=null;
-        })
-      : minigameView('Finish the drill to improve!', res=>{
-          if(trainingSession && trainingSession.cancelled) return;
-          finishTraining(res);
-          trainingSession=null;
-        });
-    phase.append(mini.el);
-    trainingSession.miniCancel=mini.cancel;
-  };
+ function openTraining(){
+   clearAutoTick();
+   const st=Game.state;
+   const todayEntry = st.schedule.find(d=>sameDay(d.date, st.currentDate));
+   const injured = !!st.player.injury;
+   const daysSince = st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
+   if(todayEntry && todayEntry.isMatch){ showPopup('Training', 'Match scheduled today. Focus on the game.'); return; }
+   if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
+   if(daysSince < 1){
+     console.log('Tried to train twice today. Come back tomorrow.');
+     Game.log('Tried to train twice today. Come back tomorrow.');
+     Game.save();
+     renderAll();
+     showPopup('Training', 'You have trained today, come back tomorrow.');
+     return;
+   }
+   if(daysSince < 2 && st.player.pos!=='Goalkeeper'){
+     const rest = Math.ceil(2-daysSince);
+     const msg=`Tried to train but need to rest ${rest} day${rest>1?'s':''} before training again.`;
+     Game.log(msg);
+     Game.save();
+     renderAll();
+     showCooldownPopup(rest);
+     return;
+   }
+   const c=q('#training-content'); if(c) c.innerHTML='';
+   const box=document.createElement('div');
+   box.innerHTML='<div class="title">Training session</div>';
+   const phase=document.createElement('div'); box.append(phase);
+   c.append(box);
+   q('#training-modal').setAttribute('open','');
+   trainingSession={cancelled:false, skills:[], trainAll:false};
 
-  if(st.player.pos==='Goalkeeper'){
-    const info=document.createElement('div');
-    info.className='glass';
-    info.innerHTML='<div class="h">How to play</div><div>Guess the side of the shot then tap quickly to parry it away.</div>';
-    phase.append(info);
-    const readyBtn=btn('Ready', ()=>{
-      phase.innerHTML='';
-      const cancelCd=countdown(phase, startMini);
-      trainingSession.countCancel=cancelCd;
-    });
-    phase.append(readyBtn);
-  } else {
-    const cancelCd=countdown(phase, startMini);
-    trainingSession.countCancel=cancelCd;
-  }
-}
+   const beginDrill=()=>{
+     if(trainingSession && trainingSession.cancelled) return;
+     const mini = st.player.pos==='Goalkeeper'
+       ? goalkeeperTrainingView(res=>{
+           if(trainingSession && trainingSession.cancelled) return;
+           finishTraining(res);
+           trainingSession=null;
+         })
+       : minigameView('Finish the drill to improve!', res=>{
+           if(trainingSession && trainingSession.cancelled) return;
+           finishTraining(res);
+           trainingSession=null;
+         });
+     phase.append(mini.el);
+     trainingSession.miniCancel=mini.cancel;
+   };
+
+   const pickSkills=(skills,all=false)=>{
+     if(trainingSession && trainingSession.cancelled) return;
+     trainingSession.skills=skills;
+     trainingSession.trainAll=all;
+     phase.innerHTML='';
+     if(st.player.pos==='Goalkeeper'){
+       const info=document.createElement('div');
+       info.className='glass';
+       info.innerHTML='<div class="h">How to play</div><div>Guess the side of the shot then tap quickly to parry it away.</div>';
+       phase.append(info);
+       const readyBtn=btn('Ready', ()=>{
+         phase.innerHTML='';
+         const cancelCd=countdown(phase, beginDrill);
+         trainingSession.countCancel=cancelCd;
+       });
+       phase.append(readyBtn);
+     } else {
+       const cancelCd=countdown(phase, beginDrill);
+       trainingSession.countCancel=cancelCd;
+     }
+   };
+
+   const skillKeys = Object.keys(st.player.skills||{});
+   if(skillKeys.length===0){
+     // No detailed skills, fall back to default behaviour
+     pickSkills([], false);
+     return;
+   }
+
+   const infoSel=document.createElement('div');
+   infoSel.className='glass';
+   infoSel.innerHTML='<div class="h">Select training focus</div>';
+   const row=document.createElement('div');
+   row.className='row';
+   row.style.flexWrap='wrap';
+   row.style.gap='8px';
+   const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+   skillKeys.forEach(sk=>{
+     row.append(btn(cap(sk), ()=>pickSkills([sk])));
+   });
+   row.append(btn('All skills', ()=>pickSkills(relevantSkills(st.player.pos), true)));
+   infoSel.append(row);
+   phase.append(infoSel);
+ }
 
 function finishTraining(mini){
   const st=Game.state;
   const gain=+(mini.score*0.5).toFixed(2);
   const pre = st.player.overall;
+  const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+
   if(st.player.skills){
-    const rel=relevantSkills(st.player.pos);
-    rel.forEach(k=>{
-      st.player.skills[k]=Math.min(100, +(st.player.skills[k]+gain).toFixed(2));
+    const chosen = (trainingSession && trainingSession.skills && trainingSession.skills.length)
+      ? trainingSession.skills
+      : relevantSkills(st.player.pos);
+    const per = (trainingSession && trainingSession.trainAll) ? +(gain/Math.max(1,chosen.length)).toFixed(2) : gain;
+    const display = chosen.map(cap);
+    chosen.forEach(k=>{
+      st.player.skills[k]=Math.min(100, +(st.player.skills[k]+per).toFixed(2));
     });
     st.player.overall=computeOverallFromSkills(st.player.skills);
+    const overallDelta = st.player.overall - pre;
+    const notes=q('#notes');
+    if(notes){
+      if(chosen.length>1) notes.textContent=`Trained all skills. +${per.toFixed(2)} each.`;
+      else notes.textContent=`Trained ${display[0]}. +${per.toFixed(2)}.`;
+    }
+    let logMsg = chosen.length>1
+      ? `Training: +${per.toFixed(2)} each to ${display.join(', ')}`
+      : `Training: ${display[0]} +${per.toFixed(2)}`;
+    if(overallDelta>0) logMsg += ` (overall +${overallDelta.toFixed(2)})`;
+    Game.log(logMsg);
+    st.lastTrainingDate = st.currentDate;
+    const injury = maybeInjure('training');
+    Game.save();
+    renderAll();
+    setTimeout(()=>{
+      q('#training-modal').removeAttribute('open');
+      const skillMsg = chosen.length>1
+        ? `+${per.toFixed(2)} each to ${display.join(', ')}`
+        : `${display[0]} +${per.toFixed(2)}`;
+      const motivational = mini.score>=0.95 ? pick(['Perfect session!','Outstanding work!'])
+        : mini.score>=0.75 ? pick(['Great effort!','Nice job!'])
+        : mini.score>=0.5 ? pick(['Solid session.','Keep working!'])
+        : pick(['Tough session, but keep pushing!','Every rep counts.']);
+      const summary = overallDelta>0
+        ? `Overall +${overallDelta.toFixed(2)} (now ${st.player.overall.toFixed(2)})`
+        : `Overall ${st.player.overall.toFixed(2)}`;
+      showPopup('Training complete', `${skillMsg}. ${summary}. ${motivational}`);
+      if(injury) setTimeout(()=>showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`), 600);
+    }, 600);
   } else {
+    // Fallback for legacy saves without skills
     st.player.overall=Math.min(100, +(st.player.overall+gain).toFixed(2));
+    const delta=st.player.overall - pre;
+    Game.log(`Training session: overall +${delta.toFixed(2)}`);
+    const notes=q('#notes'); if(notes) notes.textContent=`Trained today. Overall +${delta.toFixed(2)}.`;
+    st.lastTrainingDate = st.currentDate;
+    const injury = maybeInjure('training');
+    Game.save();
+    renderAll();
+    setTimeout(()=>{
+      q('#training-modal').removeAttribute('open');
+      showPopup('Training complete', `Overall +${delta.toFixed(2)} (now ${st.player.overall.toFixed(2)})`);
+      if(injury) setTimeout(()=>showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`), 600);
+    }, 600);
   }
-  const delta=st.player.overall - pre;
-  Game.log(`Training session: overall +${delta.toFixed(2)}`);
-  const notes=q('#notes'); if(notes) notes.textContent=`Trained today. Overall +${delta.toFixed(2)}.`;
-  st.lastTrainingDate = st.currentDate;
-  const injury = maybeInjure('training');
-  Game.save();
-  renderAll();
-  setTimeout(()=>{
-    q('#training-modal').removeAttribute('open');
-    showPopup('Training complete', `Overall +${delta.toFixed(2)} (now ${st.player.overall.toFixed(2)})`);
-    if(injury) setTimeout(()=>showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`), 600);
-  }, 600);
 }
 
 function minigameView(title, onDone){
