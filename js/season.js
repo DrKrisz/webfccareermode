@@ -93,6 +93,8 @@ function startNextSeason(){
   st.seasonSummary = null;
   st.leagueSnapshot = [];
   st.leagueSnapshotWeek = 0;
+  st.leagueFixtures = {};
+  st.leagueSeeds = {};
   const contractInfo = st.player.club==='Free Agent'
     ? 'Free Agent.'
     : `Contract ${st.player.yearsLeft} season${st.player.yearsLeft!==1?'s':''} left.`;
