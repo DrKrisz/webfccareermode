@@ -93,7 +93,9 @@ function openSeasonEnd(){
   const st=Game.state;
   if(!st.seasonProcessed){
     if(st.player.club!=='Free Agent'){
-      st.player.yearsLeft = Math.max(0,(st.player.yearsLeft||0)-1);
+      if(st.season >= (st.player.contractStartSeason || 0)){
+        st.player.yearsLeft = Math.max(0,(st.player.yearsLeft||0)-1);
+      }
       if(st.player.yearsLeft<=0){
         st.player.club='Free Agent';
         st.player.league='';
@@ -103,6 +105,7 @@ function openSeasonEnd(){
         st.player.yearsLeft=0;
         st.player.releaseClause=0;
         st.player.marketBlocked=0;
+        st.player.contractStartSeason=0;
         Game.log('Contract ended. You are a Free Agent.');
       } else {
         st.player.marketBlocked = Math.max(0,(st.player.marketBlocked||0)-1);
@@ -285,6 +288,7 @@ function renewContractOffer(){
       st.player.timeBand=o.time;
       st.player.salary=o.salary;
       st.player.yearsLeft=o.years;
+      st.player.contractStartSeason=st.season+1;
       st.player.marketBlocked=o.marketBlocked;
       st.player.releaseClause=o.releaseClause;
       Game.log(o.log);

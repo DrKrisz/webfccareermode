@@ -104,7 +104,7 @@ const TEAM_BASE_LEVELS = {
 const Game = {
   state: {
     // player fields get filled on newGame
-    player: null, // {name, age, origin, pos, overall, skills, club, league, status, timeBand, salary, value, balance, yearsLeft, transferListed, alwaysPlay, goldenClub, releaseClause, marketBlocked, contractReworkYear, loan}
+    player: null, // {name, age, origin, pos, overall, skills, club, league, status, timeBand, salary, value, balance, yearsLeft, contractStartSeason, transferListed, alwaysPlay, goldenClub, releaseClause, marketBlocked, contractReworkYear, loan}
     season: 1,
     week: 1,
     currentDate: null,
@@ -157,6 +157,7 @@ const Game = {
       value: 0,
       balance: 0,
       yearsLeft: 0,
+      contractStartSeason: 0,
       transferListed: false,
       alwaysPlay: !!setup.alwaysPlay,
       goldenClub: false,

@@ -144,6 +144,7 @@ function openContractRework(){
     if(Math.random()<chance){
       st.player.salary=Math.round(salary);
       st.player.yearsLeft=years;
+      st.player.contractStartSeason=st.season+1;
       st.player.status=status;
       st.player.timeBand=time;
       st.player.releaseClause=Math.round(st.player.value*(1.2+years*0.1));
