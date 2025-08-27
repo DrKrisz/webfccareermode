@@ -122,7 +122,7 @@ function acceptOffer(i){
   const o=Game.state.lastOffers[i]; const st=Game.state;
   st.player.club=o.club; st.player.league=o.league; st.player.status=o.status; st.player.timeBand=o.timeBand;
   st.player.salary=Math.round(o.salary); st.player.value=Math.round(o.value);
-  st.player.yearsLeft=o.years; st.player.transferListed=false; st.lastOffers=[];
+  st.player.yearsLeft=o.years; st.player.contractStartSeason=st.season+1; st.player.transferListed=false; st.lastOffers=[];
   st.player.releaseClause=Math.round((o.releaseClauseFee?o.releaseClauseFee:o.value)*1.5);
   st.player.marketBlocked=0; st.player.contractReworkYear=0;
   if(o.releaseClauseFee) Game.log(`Release clause of ${Game.money(o.releaseClauseFee)} activated by ${o.club}`);
