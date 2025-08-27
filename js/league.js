@@ -63,8 +63,8 @@ function updateLeagueSnapshot(){
   if(!st.player || st.player.club==='Free Agent') return;
   const gamesTotal=leagueWeeks(st.player.league||'Premier League');
   if(st.seasonProcessed && st.leagueSnapshotWeek===gamesTotal) return;
-  const played=st.schedule.filter(e=>e.isMatch && e.played).length;
-  if(st.leagueSnapshotWeek===played) return;
+  const played=(st.schedule||[]).filter(e=>e.isMatch && e.played).length;
+  if(st.leagueSnapshot && st.leagueSnapshot.length>0 && st.leagueSnapshotWeek===played) return;
   const league=st.player.league||'Premier League';
   getFixtures(league);
   const club=st.player.club;
