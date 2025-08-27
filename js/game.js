@@ -104,7 +104,7 @@ const TEAM_BASE_LEVELS = {
 const Game = {
   state: {
     // player fields get filled on newGame
-    player: null, // {name, age, origin, pos, overall, club, league, status, timeBand, salary, value, balance, yearsLeft, transferListed, alwaysPlay, goldenClub, releaseClause, marketBlocked, contractReworkYear, loan}
+    player: null, // {name, age, origin, pos, overall, skills, club, league, status, timeBand, salary, value, balance, yearsLeft, transferListed, alwaysPlay, goldenClub, releaseClause, marketBlocked, contractReworkYear, loan}
     season: 1,
     week: 1,
     currentDate: null,
@@ -137,14 +137,15 @@ const Game = {
   reset(){ location.reload(); },
   log(msg){ const stamp = new Date(this.state.currentDate || Date.now()).toDateString(); this.state.eventLog.push(`[${stamp}] ${msg}`); },
   newGame(setup){
-    const base = 55 + Math.floor(Math.random()*6);
-    const overall = Math.min(60, base + (setup.pos==='Defender'?1:0));
+    const skills = generateSkills(setup.pos);
+    const overall = computeOverallFromSkills(skills);
     this.state.player = {
       name: setup.name.trim(),
       age: +setup.age,
       origin: setup.origin,
       pos: setup.pos,
       overall,
+      skills,
       club: 'Free Agent',
       league: '',
       status: '-',

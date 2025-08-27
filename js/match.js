@@ -144,16 +144,26 @@ function openTraining(){
 function finishTraining(mini){
   const st=Game.state;
   const gain=+(mini.score*0.5).toFixed(2);
-  st.player.overall=Math.min(100, +(st.player.overall+gain).toFixed(2));
-  Game.log(`Training session: overall +${gain.toFixed(2)}`);
-  const notes=q('#notes'); if(notes) notes.textContent=`Trained today. Overall +${gain.toFixed(2)}.`;
+  const pre = st.player.overall;
+  if(st.player.skills){
+    const rel=relevantSkills(st.player.pos);
+    rel.forEach(k=>{
+      st.player.skills[k]=Math.min(100, +(st.player.skills[k]+gain).toFixed(2));
+    });
+    st.player.overall=computeOverallFromSkills(st.player.skills);
+  } else {
+    st.player.overall=Math.min(100, +(st.player.overall+gain).toFixed(2));
+  }
+  const delta=st.player.overall - pre;
+  Game.log(`Training session: overall +${delta.toFixed(2)}`);
+  const notes=q('#notes'); if(notes) notes.textContent=`Trained today. Overall +${delta.toFixed(2)}.`;
   st.lastTrainingDate = st.currentDate;
   const injury = maybeInjure('training');
   Game.save();
   renderAll();
-  setTimeout(()=>{ 
-    q('#training-modal').removeAttribute('open'); 
-    showPopup('Training complete', `Overall +${gain.toFixed(2)} (now ${st.player.overall.toFixed(2)})`);
+  setTimeout(()=>{
+    q('#training-modal').removeAttribute('open');
+    showPopup('Training complete', `Overall +${delta.toFixed(2)} (now ${st.player.overall.toFixed(2)})`);
     if(injury) setTimeout(()=>showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`), 600);
   }, 600);
 }

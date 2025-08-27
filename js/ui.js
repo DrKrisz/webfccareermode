@@ -35,9 +35,21 @@ function showCooldownPopup(rest){
   }
 }
 
+function toggleSkills(){
+  const btn=q('#btn-skills');
+  const rows=[...document.querySelectorAll('.skill-detail')];
+  if(!rows.length) return;
+  const hidden=rows[0].classList.contains('hidden');
+  rows.forEach(r=>{ hidden ? r.classList.remove('hidden') : r.classList.add('hidden'); });
+  if(btn) btn.textContent = hidden ? 'Hide skills' : 'Skills';
+}
+
 // ===== Rendering =====
 function renderAll(){
   const st = Game.state; const onLanding = !st.player;
+  if(st.player && st.player.skills){
+    st.player.overall = computeOverallFromSkills(st.player.skills);
+  }
   q('#landing').style.display = onLanding ? 'grid' : 'none';
   q('#manager').style.display = onLanding ? 'none' : 'block';
   if(onLanding) return;
@@ -69,6 +81,11 @@ function renderAll(){
   q('#v-season').textContent = st.season;
   q('#v-week').textContent = `${Math.min(st.week,weeksTotal)} / ${weeksTotal}`;
   q('#v-overall').textContent = st.player.overall;
+  const skills = st.player.skills || {};
+  ['shooting','passing','dribbling','defending','goalkeeping'].forEach(s=>{
+    const el=q('#skill-'+s);
+    if(el) el.textContent = skills[s];
+  });
   q('#v-playtime').textContent = `${st.seasonMinutes} min / ${st.seasonMatches} matches (${st.minutesPlayed} min / ${st.matchesPlayed} matches)`;
   const weeklyIncome = weeklySalary(st.player)+(st.player.passiveIncome||0);
   q('#v-salary').textContent = Game.money(weeklyIncome) + ' /week';

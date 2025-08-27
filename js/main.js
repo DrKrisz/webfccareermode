@@ -80,6 +80,7 @@ function wireCoreEvents(){
   bind('#btn-next', ()=>nextDay());
   bind('#btn-auto', ()=>toggleAuto());
   bind('#btn-train', ()=>openTraining());
+  bind('#btn-skills', ()=>toggleSkills());
   bind('#close-training', ()=>cancelTraining());
   bind('#close-cooldown', ()=>q('#cooldown-modal').removeAttribute('open'));
   bind('#cooldown-ok', ()=>q('#cooldown-modal').removeAttribute('open'));

@@ -148,6 +148,66 @@ function randNorm(mu=0, sigma=1){ const u=1-Math.random(); const v=1-Math.random
 function randInt(a,b){ return a+Math.floor(Math.random()*(b-a+1)); }
 function sameDay(a,b){ const da=new Date(a), db=new Date(b); return da.getFullYear()===db.getFullYear() && da.getMonth()===db.getMonth() && da.getDate()===db.getDate(); }
 
+// Generate skill ratings for a new player based on position.
+function generateSkills(pos){
+  const rand=(min,max)=>Math.round(Math.random()*(max-min)+min);
+  switch(pos){
+    case 'Goalkeeper':
+      return {
+        shooting: rand(10,30),
+        passing: rand(40,60),
+        dribbling: rand(30,50),
+        defending: rand(40,60),
+        goalkeeping: rand(65,75)
+      };
+    case 'Defender':
+      return {
+        shooting: rand(40,55),
+        passing: rand(45,60),
+        dribbling: rand(40,55),
+        defending: rand(60,70),
+        goalkeeping: rand(5,15)
+      };
+    case 'Midfield':
+      return {
+        shooting: rand(50,60),
+        passing: rand(60,70),
+        dribbling: rand(55,65),
+        defending: rand(40,50),
+        goalkeeping: rand(5,15)
+      };
+    default: // Attacker
+      return {
+        shooting: rand(60,70),
+        passing: rand(50,60),
+        dribbling: rand(55,65),
+        defending: rand(30,40),
+        goalkeeping: rand(5,15)
+      };
+  }
+}
+
+// Determine which skills are relevant for the player's position.
+function relevantSkills(pos){
+  switch(pos){
+    case 'Goalkeeper':
+      return ['goalkeeping','passing','defending'];
+    case 'Defender':
+      return ['defending','passing','dribbling'];
+    case 'Midfield':
+      return ['passing','dribbling','shooting','defending'];
+    default:
+      return ['shooting','dribbling','passing'];
+  }
+}
+
+// Compute overall rating from individual skills.
+function computeOverallFromSkills(skills){
+  const vals=Object.values(skills||{});
+  if(!vals.length) return 0;
+  return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+}
+
 // ===== Economy / Growth =====
 function computeSalary(age,overall,league,status,timeBand){
   const overSq = overall*overall;
@@ -189,6 +249,15 @@ function applyPostMatchGrowth(st, minutes, rating, goals, assists, played, conce
   if(clubLvl<75) delta+=0.1; // lower level clubs boost growth
   if(st.player.league==='EFL Championship' && st.player.age<=23) delta+=0.05;
   delta += played?0.1:-0.05;
-  st.player.overall = Math.max(55, Math.min(100, +(st.player.overall+delta).toFixed(2)));
+  if(st.player.skills){
+    const rel = relevantSkills(st.player.pos);
+    const inc = delta/rel.length;
+    rel.forEach(k=>{
+      st.player.skills[k]=Math.max(1, Math.min(100, +(st.player.skills[k]+inc).toFixed(2)));
+    });
+    st.player.overall = computeOverallFromSkills(st.player.skills);
+  } else {
+    st.player.overall = Math.max(55, Math.min(100, +(st.player.overall+delta).toFixed(2)));
+  }
 }
 
