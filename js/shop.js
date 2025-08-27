@@ -1,10 +1,24 @@
 // ===== Shop =====
 const SHOP_ITEMS=[
-  {id:'trainer',name:'Personal Trainer',desc:'Gain +1 overall instantly',cost:500,limit:3,perSeason:true,apply:st=>{st.player.overall=Math.min(100,st.player.overall+1);}},
+  {id:'trainer',name:'Personal Trainer',desc:'Gain +1 to key skills',cost:500,limit:3,perSeason:true,apply:st=>{
+    if(st.player.skills){
+      relevantSkills(st.player.pos).forEach(k=>{ st.player.skills[k]=Math.min(100, st.player.skills[k]+1); });
+      st.player.overall=computeOverallFromSkills(st.player.skills);
+    } else {
+      st.player.overall=Math.min(100,st.player.overall+1);
+    }
+  }},
   {id:'boots',name:'Shiny Boots',desc:'Boost market value by £500',cost:250,limit:2,perSeason:true,apply:st=>{st.player.value+=500;}},
   {id:'sponsor',name:'Sponsorship Deal',desc:'Salary +10% for this season',cost:2000,limit:1,perSeason:true,apply:st=>{st.player.salaryMultiplier=(st.player.salaryMultiplier||1)*1.1;}},
   {id:'house',name:'Small House',desc:'Earn £100 weekly income forever',cost:10000,limit:3,perSeason:false,apply:st=>{st.player.passiveIncome=(st.player.passiveIncome||0)+100; st.player.houses=(st.player.houses||0)+1;}},
-  {id:'gym',name:'Gym Membership',desc:'Improve overall by +2 this season',cost:1500,limit:1,perSeason:true,apply:st=>{st.player.overall=Math.min(100,st.player.overall+2);}},
+  {id:'gym',name:'Gym Membership',desc:'Improve key skills by +2 this season',cost:1500,limit:1,perSeason:true,apply:st=>{
+    if(st.player.skills){
+      relevantSkills(st.player.pos).forEach(k=>{ st.player.skills[k]=Math.min(100, st.player.skills[k]+2); });
+      st.player.overall=computeOverallFromSkills(st.player.skills);
+    } else {
+      st.player.overall=Math.min(100,st.player.overall+2);
+    }
+  }},
   {id:'car',name:'Sports Car',desc:'Raise value by £2000',cost:3000,limit:1,perSeason:true,apply:st=>{st.player.value+=2000;}}
 ];
 
