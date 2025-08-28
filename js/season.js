@@ -262,8 +262,10 @@ function openSeasonEnd(){
 function renewContractOffer(){
   const st=Game.state; if(st.player.club==='Free Agent') return;
   const modal=q('#renew-contract-modal');
-  const list=q('#renew-contract-options');
-  list.innerHTML='';
+  const currentList=q('#renew-contract-current');
+  const rivalList=q('#renew-contract-rivals');
+  currentList.innerHTML='';
+  rivalList.innerHTML='';
 
   const statusOrder=['rookie','decent','key player','important','star player'];
   const timeOrder=['second bench','bench','rotater','match player','match starter'];
@@ -296,8 +298,40 @@ function renewContractOffer(){
       modal.removeAttribute('open');
       openSeasonEnd();
     };
-    list.append(row);
+    currentList.append(row);
   });
+
+  const rivalOffers=(st.lastOffers||[]).filter(o=>o.salary>st.player.salary);
+  if(rivalOffers.length){
+    const bestIdx=rivalOffers.reduce((best,o)=>{
+      const idx=st.lastOffers.indexOf(o);
+      return o.salary>st.lastOffers[best].salary?idx:best;
+    }, st.lastOffers.indexOf(rivalOffers[0]));
+    rivalList.append(btn('Recommend best offer',()=>{ acceptOffer(bestIdx); modal.removeAttribute('open'); openSeasonEnd(); },'btn'));
+    rivalOffers.forEach(o=>{
+      const idx=st.lastOffers.indexOf(o);
+      const row=document.createElement('div'); row.className='glass';
+      row.innerHTML=`<div class="h">${o.club}</div>
+      <div>Status: ${o.status}</div>
+      <div>Time band: ${o.timeBand}</div>
+      <div class="salary">Salary: ${Game.money(o.salary)}/w</div>
+      <div>Length: ${o.years} season${o.years>1?'s':''}</div>
+      <div class="row end" style="margin-top:8px"><button class="btn" data-i="${idx}">Sign</button><button class="btn ghost" data-better="${idx}">Ask better</button></div>`;
+      row.querySelector('button[data-i]').onclick=()=>{ acceptOffer(idx); modal.removeAttribute('open'); openSeasonEnd(); };
+      row.querySelector('button[data-better]').onclick=()=>{
+        if(Math.random()<0.5){
+          o.salary=Math.round(o.salary*1.1);
+          row.querySelector('.salary').textContent=`Salary: ${Game.money(o.salary)}/w`;
+        } else {
+          showPopup('Negotiation','Club refuses to improve offer');
+        }
+      };
+      rivalList.append(row);
+    });
+  } else {
+    const msg=document.createElement('div'); msg.textContent='No better offers from other clubs.';
+    rivalList.append(msg);
+  }
 
   q('#close-renew-contract').onclick=()=>{ modal.removeAttribute('open'); openSeasonEnd(); };
   modal.setAttribute('open','');
