@@ -172,7 +172,8 @@ function openMatch(entry){
 
 function finishTraining(mini){
   const st=Game.state;
-  const gain=+(mini.score*0.5).toFixed(2);
+  // Always award a full point per training session.
+  const gain=1;
   const pre = st.player.overall;
   const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 
@@ -180,7 +181,8 @@ function finishTraining(mini){
     const chosen = (trainingSession && trainingSession.skills && trainingSession.skills.length)
       ? trainingSession.skills
       : relevantSkills(st.player.pos);
-    const per = (trainingSession && trainingSession.trainAll) ? +(gain/Math.max(1,chosen.length)).toFixed(2) : gain;
+    // Split the single point across all selected skills when training multiple.
+    const per = chosen.length>1 ? +(gain/Math.max(1,chosen.length)).toFixed(2) : gain;
     const display = chosen.map(cap);
     chosen.forEach(k=>{
       st.player.skills[k]=Math.min(100, +(st.player.skills[k]+per).toFixed(2));
