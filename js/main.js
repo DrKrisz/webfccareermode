@@ -26,6 +26,58 @@ const bind = (selector, fn) => {
   if (el) el.onclick = fn;
 };
 
+// Country list used for continent/country selection.
+const COUNTRIES = {
+  'Europe': [
+    {value:'United Kingdom',emoji:'\uD83C\uDDEC\uD83C\uDDE7'},
+    {value:'Spain',emoji:'\uD83C\uDDEA\uD83C\uDDF8'},
+    {value:'Germany',emoji:'\uD83C\uDDE9\uD83C\uDDEA'}
+  ],
+  'South America': [
+    {value:'Brazil',emoji:'\uD83C\uDDE7\uD83C\uDDF7'},
+    {value:'Argentina',emoji:'\uD83C\uDDE6\uD83C\uDDF7'},
+    {value:'Uruguay',emoji:'\uD83C\uDDFA\uD83C\uDDFE'}
+  ],
+  'North America': [
+    {value:'United States',emoji:'\uD83C\uDDFA\uD83C\uDDF8'},
+    {value:'Canada',emoji:'\uD83C\uDDE8\uD83C\uDDE6'},
+    {value:'Mexico',emoji:'\uD83C\uDDF2\uD83C\uDDFD'}
+  ],
+  'Africa': [
+    {value:'Nigeria',emoji:'\uD83C\uDDF3\uD83C\uDDEC'},
+    {value:'South Africa',emoji:'\uD83C\uDDFF\uD83C\uDDE6'},
+    {value:'Egypt',emoji:'\uD83C\uDDEA\uD83C\uDDEC'}
+  ],
+  'Asia': [
+    {value:'Japan',emoji:'\uD83C\uDDEF\uD83C\uDDF5'},
+    {value:'South Korea',emoji:'\uD83C\uDDF0\uD83C\uDDF7'},
+    {value:'China',emoji:'\uD83C\uDDE8\uD83C\uDDF3'}
+  ],
+  'Oceania': [
+    {value:'Australia',emoji:'\uD83C\uDDE6\uD83C\uDDFA'},
+    {value:'New Zealand',emoji:'\uD83C\uDDF3\uD83C\uDDFF'},
+    {value:'Fiji',emoji:'\uD83C\uDDEB\uD83C\uDDEF'}
+  ]
+};
+
+function setupCountrySelect(){
+  const cont=q('#continent');
+  const country=q('#country');
+  if(!cont||!country) return;
+  function update(){
+    const list=COUNTRIES[cont.value]||[];
+    country.innerHTML='';
+    list.forEach(c=>{
+      const opt=document.createElement('option');
+      opt.value=c.value;
+      opt.textContent=`${c.emoji} ${c.value}`;
+      country.appendChild(opt);
+    });
+  }
+  cont.addEventListener('change', update);
+  update();
+}
+
 // ===== Download / Retire =====
 function downloadLog(){ const st=Game.state; const text=(st.eventLog||[]).join('\n'); const blob=new Blob([text],{type:'text/plain'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='webcareergame-log.txt'; a.click(); URL.revokeObjectURL(url); }
 function retirePrompt(){ const st=Game.state; const c=q('#retire-content'); c.innerHTML=''; const box=document.createElement('div'); box.className='glass';
@@ -54,15 +106,17 @@ function wireEvents(){
 function wireCoreEvents(){
   const form = document.getElementById('setup-form');
   if(form){
+    setupCountrySelect();
     form.addEventListener('submit', e=>{
       e.preventDefault();
       const name=q('#name').value||'Player';
       const age=q('#age').value||16;
-      const origin=q('#origin').value;
+      const continent=q('#continent').value;
+      const country=q('#country').value;
       const posEl=[...document.querySelectorAll('input[name=pos]')].find(x=>x.checked);
       const pos=posEl ? posEl.value : 'Attacker';
       const alwaysPlay=q('#always-play').checked;
-      Game.newGame({name,age,origin,pos,alwaysPlay});
+      Game.newGame({name,age,continent,country,pos,alwaysPlay});
       renderAll();
       openMarket();
       showPopup('Season start', `Season ${Game.state.season} has started.`);
@@ -213,7 +267,8 @@ function wireDevTools(){
     const setup = {
       name: params.get('name') || 'Player',
       age: params.get('age') || 16,
-      origin: params.get('origin') || 'Europe',
+      continent: params.get('continent') || 'Europe',
+      country: params.get('country') || COUNTRIES['Europe'][0].value,
       pos: params.get('pos') || 'Attacker',
       alwaysPlay: params.get('alwaysPlay') === '1'
     };
