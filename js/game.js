@@ -104,7 +104,7 @@ const TEAM_BASE_LEVELS = {
 const Game = {
   state: {
     // player fields get filled on newGame
-    player: null, // {name, age, origin, pos, overall, skills, club, league, status, timeBand, salary, value, balance, yearsLeft, contractStartSeason, transferListed, alwaysPlay, goldenClub, releaseClause, marketBlocked, contractReworkYear, loan}
+    player: null, // {name, age, continent, country, pos, overall, skills, club, league, status, timeBand, salary, value, balance, yearsLeft, contractStartSeason, transferListed, alwaysPlay, goldenClub, releaseClause, marketBlocked, contractReworkYear, loan}
     season: 1,
     week: 1,
     currentDate: null,
@@ -142,7 +142,8 @@ const Game = {
     this.state.player = {
       name: setup.name.trim(),
       age: +setup.age,
-      origin: setup.origin,
+      continent: setup.continent,
+      country: setup.country,
       pos: setup.pos,
       overall,
       skills,
@@ -185,7 +186,7 @@ const Game = {
     this.state.schedule = buildSchedule(first, leagueWeeks(league), null, league);
     // start at season start marker day for clarity
     this.state.currentDate = this.state.schedule[0].date;
-    this.log(`Career started: ${this.state.player.name}, ${this.state.player.age}, ${this.state.player.pos}, ${this.state.player.origin}`);
+    this.log(`Career started: ${this.state.player.name}, ${this.state.player.age}, ${this.state.player.pos}, ${this.state.player.continent}/${this.state.player.country}`);
     this.save();
   }
 };
@@ -215,6 +216,8 @@ function migrateState(st){
     st.player.contractReworkYear = st.player.contractReworkYear || 0;
     st.player.loan = st.player.loan || null;
     st.player.injury = st.player.injury || null;
+    st.player.continent = st.player.continent || 'Europe';
+    st.player.country = st.player.country || 'United Kingdom';
   }
   if(typeof st.currentDate !== 'number'){
     const firstSched = Array.isArray(st.schedule) && st.schedule.length ? st.schedule[0] : null;
