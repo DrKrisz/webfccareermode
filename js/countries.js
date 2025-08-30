@@ -213,9 +213,9 @@ const flagEmoji = code =>
   String.fromCodePoint(...[...code].map(c => 127397 + c.charCodeAt()));
 
 function setupCountrySelect(){
-  const cont=q('#continent');
-  const country=q('#country');
-  if(!cont||!country) return;
+  const cont = document.getElementById('continent');
+  const country = document.getElementById('country');
+  if(!cont || !country) return;
   function update(){
     const list=COUNTRIES[cont.value]||[];
     country.innerHTML='';
