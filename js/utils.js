@@ -85,11 +85,22 @@ function buildSchedule(firstMatchDate, weeks, excludeClub, league){
   if(lg==='Premier League' || lg==='EFL Championship'){
     insertCarabaoCup(out, firstMatchDate, excludeClub);
   }
-  // season end marker two days after final match
+  // add fixed team training days every second day
   out.sort((a,b)=>a.date-b.date);
+  const seasonStartDate = out[0].date;
   const lastMatch = out.filter(e=>e.isMatch).slice(-1)[0];
   if(lastMatch){
     const end=new Date(lastMatch.date); end.setDate(end.getDate()+2);
+    let d=new Date(seasonStartDate); d.setDate(d.getDate()+1);
+    while(d.getTime()<=end.getTime()){
+      while(out.some(e=>sameDay(e.date,d.getTime()) && e.isMatch)){
+        d.setDate(d.getDate()+1);
+      }
+      if(!out.some(e=>sameDay(e.date,d.getTime()))){
+        out.push({date:d.getTime(), type:'training', isMatch:false, isTraining:true, played:true});
+      }
+      d.setDate(d.getDate()+2);
+    }
     out.push({date:end.getTime(), type:'seasonEnd', isMatch:false, played:true});
   }
   return out.sort((a,b)=>a.date-b.date);

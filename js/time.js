@@ -45,6 +45,9 @@ function nextDay(token, fast=false){
     }
     simulateMatch(entry, fast); return;
   }
+  if(entry && entry.type==='training'){
+    simulateTraining();
+  }
   if(entry && entry.type==='seasonEnd'){ Game.state.auto=false; updateAutoBtn(); openSeasonEnd(); return; }
   if(st.player.injury){
     st.player.injury.days -= 1;

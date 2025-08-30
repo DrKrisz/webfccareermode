@@ -119,6 +119,9 @@ function renderAll(){
   else if(todayEntry && todayEntry.isMatch){
     q('#week-summary').innerHTML = `Match day: ${st.player.club} vs ${todayEntry.opponent}<div class="muted" style="font-size:11px"></div>`;
   }
+  else if(todayEntry && todayEntry.type==='training'){
+    q('#week-summary').textContent = 'Team training day. Stay sharp.';
+  }
   else{
     q('#week-summary').textContent = 'Training and recovery. Prepare for the next game.';
   }
@@ -137,7 +140,7 @@ function renderAll(){
 
   const trainBtn=q('#btn-train');
   if(trainBtn){
-    trainBtn.disabled=!!st.player.injury;
+    trainBtn.disabled=!!st.player.injury || (todayEntry && todayEntry.type==='training');
   }
 
   const nextBtn=q('#btn-next');

@@ -80,9 +80,10 @@ function openMatch(entry){
    const st=Game.state;
    const todayEntry = st.schedule.find(d=>sameDay(d.date, st.currentDate));
    const injured = !!st.player.injury;
-   const daysSince = st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
-   if(todayEntry && todayEntry.isMatch){ showPopup('Training', 'Match scheduled today. Focus on the game.'); return; }
-   if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
+  const daysSince = st.lastTrainingDate ? (st.currentDate - st.lastTrainingDate)/(24*3600*1000) : Infinity;
+  if(todayEntry && todayEntry.isMatch){ showPopup('Training', 'Match scheduled today. Focus on the game.'); return; }
+  if(todayEntry && todayEntry.type==='training'){ showPopup('Training', 'Team session already scheduled today.'); return; }
+  if(injured){ showPopup('Training', 'You are injured and cannot train.'); return; }
    if(daysSince < 1){
      console.log('Tried to train twice today. Come back tomorrow.');
      Game.log('Tried to train twice today. Come back tomorrow.');
@@ -234,6 +235,34 @@ function finishTraining(mini){
       if(injury) setTimeout(()=>showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`), 600);
     }, 600);
   }
+}
+
+function simulateTraining(){
+  const st=Game.state;
+  if(st.player.injury){
+    Game.log('Skipped training due to injury.');
+    showPopup('Training', 'You are injured and cannot train.');
+    return;
+  }
+  const gain=1; const pre=st.player.overall;
+  const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+  if(st.player.skills){
+    const chosen=relevantSkills(st.player.pos);
+    const per=+(gain/Math.max(1,chosen.length)).toFixed(2);
+    chosen.forEach(k=>{ st.player.skills[k]=Math.min(100, +(st.player.skills[k]+per).toFixed(2)); });
+    st.player.overall=computeOverallFromSkills(st.player.skills);
+    const overallDelta=st.player.overall-pre;
+    Game.log(`Team training: +${per.toFixed(2)} each to ${chosen.map(cap).join(', ')}${overallDelta>0?` (overall +${overallDelta.toFixed(2)})`:''}`);
+  } else {
+    st.player.overall=Math.min(100, +(st.player.overall+gain).toFixed(2));
+    const delta=st.player.overall-pre;
+    Game.log(`Team training: overall +${delta.toFixed(2)}`);
+  }
+  st.lastTrainingDate=st.currentDate;
+  const injury=maybeInjure('training');
+  Game.save(); renderAll();
+  if(injury) showPopup('Injury', `You suffered a ${injury.type} and will be out for ${injury.days} days.`);
+  else showPopup('Training day', `Team session complete. Overall ${st.player.overall.toFixed(2)}`);
 }
 
 function minigameView(title, onDone){
