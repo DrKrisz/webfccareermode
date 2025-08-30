@@ -89,7 +89,7 @@ const TEAM_BASE_LEVELS = {
   'Inter': 89,
   'Juventus': 87,
   'Lazio': 82,
-  'Lecce': 67,
+  'Lecce': 67, 
   'Milan': 86,
   'Monza': 72,
   'Napoli': 85,
