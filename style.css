@@ -533,11 +533,15 @@ a {
 	background: var(--text-dim);
 }
 .day.match .dot {
-	background: var(--primary);
-	box-shadow: 0 0 16px rgba(78, 156, 255, 0.8);
+        background: var(--primary);
+        box-shadow: 0 0 16px rgba(78, 156, 255, 0.8);
+}
+.day.training .dot {
+        background: var(--warning);
+        box-shadow: 0 0 16px rgba(255, 208, 106, 0.8);
 }
 .day.win {
-	background: #102b16;
+        background: #102b16;
 	border-color: #225a31;
 	opacity: 1;
 }

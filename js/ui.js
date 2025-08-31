@@ -185,7 +185,11 @@ function renderCalendar(){
     const d=new Date(winStart.getTime()); d.setDate(d.getDate()+i);
     const entry=st.schedule.find(x=>sameDay(x.date, d.getTime()));
     const item=document.createElement('div');
-    item.className='day'+(entry&&entry.isMatch?' match':'')+(sameDay(d.getTime(), st.currentDate)?' today':'')+(entry&&entry.played&&entry.isMatch?' played':'');
+    item.className='day'
+      +(entry&&entry.isMatch?' match':'')
+      +(entry&&entry.type==='training'?' training':'')
+      +(sameDay(d.getTime(), st.currentDate)?' today':'')
+      +(entry&&entry.played&&entry.isMatch?' played':'');
     if(entry && entry.played && entry.result){
       item.classList.add(entry.result==='W'?'win':entry.result==='L'?'loss':'draw');
     }
@@ -195,7 +199,8 @@ function renderCalendar(){
     if(entry){
       if(entry.type==='seasonStart') label='<div style="font-size:11px">Season start</div>';
       else if(entry.type==='seasonEnd') label='<div style="font-size:11px">Season end</div>';
-      else if(entry.isMatch){
+        else if(entry.type==='training') label='<div style="font-size:11px">Training</div>';
+        else if(entry.isMatch){
         let comp=entry.competition||'League';
         if(entry.competition==='Carabao Cup' && entry.round) comp+=` ${entry.round}`;
         label=`<div style="font-size:11px;">vs ${entry.opponent}</div><div style="font-size:10px">${comp} game</div>`;
