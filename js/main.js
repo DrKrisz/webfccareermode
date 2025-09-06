@@ -79,7 +79,16 @@ function wireCoreEvents(){
   bind('#close-shop', ()=>q('#shop-modal').removeAttribute('open'));
   bind('#close-contract', ()=>q('#contract-modal').removeAttribute('open'));
   bind('#close-league', ()=>{ const dlg=q('#league-modal'); if(dlg){ if(dlg.close) dlg.close(); else dlg.removeAttribute('open'); } });
-  bind('#btn-next', ()=>nextDay());
+  bind('#btn-next', ()=>{
+    document.querySelectorAll('.modal[open]').forEach(m=>{
+      if (typeof m.close === 'function') {
+        m.close();
+      } else {
+        m.removeAttribute('open');
+      }
+    });
+    nextDay();
+  });
   bind('#btn-auto', ()=>toggleAuto());
   bind('#btn-train', ()=>openTraining());
   bind('#btn-skills', ()=>toggleSkills());
