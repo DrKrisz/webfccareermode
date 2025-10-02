@@ -1,783 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1" />
-		<title>WebCareerGame • Pre-Alpha v0.1.0</title>
-		<!-- Split build: external CSS & JS -->
-		<link
-			rel="stylesheet"
-			href="style.css" />
-		<script
-			src="js/game.js"
-			defer></script>
-		<script
-			src="js/utils.js"
-			defer></script>
-		<script
-			src="js/ui.js"
-			defer></script>
-		<script
-			src="js/market.js"
-			defer></script>
-		<script
-			src="js/contract.js"
-			defer></script>
-		<script
-			src="js/shop.js"
-			defer></script>
-		<script
-			src="js/goalkeeper.js"
-			defer></script>
-		<script
-			src="js/match.js"
-			defer></script>
-                <script
-                        src="js/season.js"
-                        defer></script>
-                <script
-                        src="js/carabao.js"
-                        defer></script>
-                <script
-                        src="js/league.js"
-                        defer></script>
-                <script
-                        src="js/time.js"
-                        defer></script>
-		<script
-                        src="js/countries.js"
-                        defer></script>
-                <script
-                        src="js/main.js"
-                        defer></script>
-	</head>
-	<body>
-		<header class="app-header">
-			<div class="container brand">
-				<div
-					class="logo"
-					aria-hidden="true"></div>
-				<h1>WebCareerGame</h1>
-				<div class="version">Pre-Alpha <span class="app-version"></span></div>
-			</div>
-		</header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebCareerGame · Career Mode</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles/app.css" />
+    <script type="module" src="scripts/app.js" defer></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="container header-inner">
+        <div class="brand" aria-label="WebCareerGame">
+          <span class="brand-icon" aria-hidden="true">⚽</span>
+          <div class="brand-copy">
+            <span class="brand-name">WebCareerGame</span>
+            <span class="badge version" data-app-version>v1.0</span>
+          </div>
+        </div>
+        <nav class="nav" aria-label="Game navigation">
+          <button class="btn ghost" data-view="dashboard">Dashboard</button>
+          <button class="btn ghost" data-view="calendar">Calendar</button>
+          <button class="btn ghost" data-view="market">Market</button>
+          <button class="btn ghost" data-view="shop">Shop</button>
+          <button class="btn ghost" data-view="league">Table</button>
+          <button class="btn danger" data-action="reset">Retire</button>
+        </nav>
+      </div>
+    </header>
 
-		<main
-			class="container"
-			id="app">
-			<!-- Landing page -->
-			<section
-				id="landing"
-				class="landing">
-				<div class="card">
-					<div class="title">Build your football story</div>
-					<p class="muted intro">Start as a 16 year old free agent and sign your first deal. Train, earn minutes, grow your overall, and climb the leagues. This is still tiny and buggy on purpose so we can iterate fast.</p>
+    <main class="app" id="app" hidden>
+      <aside class="sidebar" aria-label="Player overview">
+        <section class="card">
+          <header class="card-header">
+            <h2 class="card-title">Player</h2>
+            <button class="btn ghost small" data-dialog="skills">Skills</button>
+          </header>
+          <dl class="kv" data-player-overview>
+            <div>
+              <dt>Name</dt>
+              <dd data-field="name">—</dd>
+            </div>
+            <div>
+              <dt>Age</dt>
+              <dd data-field="age">—</dd>
+            </div>
+            <div>
+              <dt>Position</dt>
+              <dd data-field="pos">—</dd>
+            </div>
+            <div>
+              <dt>Club</dt>
+              <dd data-field="club">Free agent</dd>
+            </div>
+            <div>
+              <dt>League</dt>
+              <dd data-field="league">—</dd>
+            </div>
+            <div>
+              <dt>Overall</dt>
+              <dd data-field="overall">—</dd>
+            </div>
+            <div>
+              <dt>Salary</dt>
+              <dd data-field="salary">£0 /wk</dd>
+            </div>
+            <div>
+              <dt>Value</dt>
+              <dd data-field="value">£0</dd>
+            </div>
+            <div>
+              <dt>Balance</dt>
+              <dd data-field="balance">£0</dd>
+            </div>
+          </dl>
+        </section>
 
-					<div class="glass">
-						<div class="row spread">
-							<div>
-								<div class="h">Current version</div>
-								<div class="row pills"
-									><span class="pill"><span class="app-version"></span></span><span class="pill">pre-alpha</span><span class="pill">auto-advance + season</span></div
-								>
-							</div>
-							<div class="row">
-								<button
-									class="btn ghost"
-									id="btn-alert-log"
-									title="Show alert log"
-									>Log</button
-								>
-							</div>
-						</div>
-					</div>
+        <section class="card">
+          <header class="card-header">
+            <h2 class="card-title">Season</h2>
+          </header>
+          <dl class="kv" data-season-overview>
+            <div>
+              <dt>Season</dt>
+              <dd data-field="season">1</dd>
+            </div>
+            <div>
+              <dt>Week</dt>
+              <dd data-field="week">1 / 38</dd>
+            </div>
+            <div>
+              <dt>Form</dt>
+              <dd data-field="form">—</dd>
+            </div>
+            <div>
+              <dt>Minutes</dt>
+              <dd data-field="minutes">0</dd>
+            </div>
+            <div>
+              <dt>Goals</dt>
+              <dd data-field="goals">0</dd>
+            </div>
+            <div>
+              <dt>Assists</dt>
+              <dd data-field="assists">0</dd>
+            </div>
+            <div>
+              <dt>Clean sheets</dt>
+              <dd data-field="cleanSheets">0</dd>
+            </div>
+          </dl>
+        </section>
 
-					<div class="glass">
-						<div class="h">What's new <span class="app-version"></span></div>
-						<ul class="updates">
-							<li>Goalkeeper position playable with dedicated training and match minigames.</li>
-							<li>Goalkeeper contracts feature four tiers from backup to world-class.</li>
-						</ul>
-						<div class="h before">Before</div>
-						<ul class="updates muted before-list">
-							<li>v0.0.9: Play Match beside Next day, action emojis with cooldowns, larger calendar cells.</li>
-							<li>v0.0.7: calendar result colors, event log highlights, expanded shop.</li>
-							<li>v0.0.6: refactored game scripts for modularity.</li>
-							<li>v0.0.5: auto-advance days, season summary, event log.</li>
-							<li>v0.0.4: contract offers, salary/value, market tweaks.</li>
-							<li>v0.0.3: training minigame and match simulation improvements.</li>
-							<li>v0.0.2: retire flow, calendar protections, market respecting contracts, logs.</li>
-							<li>v0.0.1: initial prototype.</li>
-						</ul>
-					</div>
-				</div>
+        <section class="card">
+          <header class="card-header">
+            <h2 class="card-title">Auto advance</h2>
+          </header>
+          <div class="stack">
+            <button class="btn primary" data-action="toggle-auto">Turn on</button>
+            <p class="muted small">Automatically processes daily events until the next major decision.</p>
+          </div>
+        </section>
+      </aside>
 
-				<div class="card">
-					<div class="title">Player setup</div>
-					<form id="setup-form">
-						<div class="field"
-							><label for="name">Player name</label
-							><input
-								id="name"
-								class="input"
-								required
-								placeholder="Your name"
-								value="Kris"
-								maxlength="24"
-						/></div>
-						<div class="field"
-							><label for="age">Age</label
-							><input
-								id="age"
-								class="input"
-								type="number"
-								min="16"
-								max="40"
-								value="16" /><div class="muted hint">start at 16 for free agent intro</div></div
-						>
-                                                <div class="field"
-                                                        ><label for="continent">Continent</label>
-                                                        <select id="continent">
-                                                                <option>Europe</option
-                                                                ><option>South America</option
-                                                                ><option>North America</option
-                                                                ><option>Africa</option
-                                                                ><option>Asia</option
-                                                                ><option>Oceania</option>
-                                                        </select>
-                                                </div>
-                                                <div class="field"
-                                                        ><label for="country">Country</label>
-                                                        <select id="country"></select>
-                                                </div>
-                                                <div class="field"
-                                                        ><label>Position</label>
-                                                        <div class="row wrap">
-                                                                <label class="pill radio"
-									><input
-										type="radio"
-										name="pos"
-										value="Attacker"
-										checked />
-									Attacker</label
-								>
-								<label class="pill radio"
-									><input
-										type="radio"
-										name="pos"
-										value="Midfield" />
-									Midfield</label
-								>
-								<label class="pill radio"
-									><input
-										type="radio"
-										name="pos"
-										value="Defender" />
-									Defender</label
-								>
-								<label class="pill radio"
-									><input
-										type="radio"
-										name="pos"
-										value="Goalkeeper" />
-									Goalkeeper <span class="badge new">NEW</span></label
-								>
-							</div>
-						</div>
-						<label class="pill checkbox"
-							><input
-								type="checkbox"
-								id="always-play" />
-							Always play</label
-						>
-						<div class="row end mt"
-							><button
-								class="btn primary"
-								type="submit"
-								>Start career</button
-							></div
-						>
-					</form>
-				</div>
-			</section>
+      <section class="content" data-view-panel>
+        <section class="view" data-view="dashboard" hidden>
+          <header class="card hero-card">
+            <div>
+              <p class="eyebrow" data-field="date">—</p>
+              <h1 class="card-title">This week</h1>
+              <p class="muted" data-field="summary">Prepare your player to sign the first contract.</p>
+            </div>
+            <div class="cta-group" data-week-actions></div>
+          </header>
 
-			<!-- Manager page -->
-			<section
-				id="manager"
-				class="manager hidden">
-				<div class="grid">
-					<div class="left">
-						<div
-							class="card"
-							id="player-card">
-							<div class="h">Player</div>
-							<div class="kv">
-								<div class="k">Name</div
-								><div
-									class="v"
-									id="v-name"
-									>—</div
-								>
-								<div class="k">Age</div
-								><div
-									class="v"
-									id="v-age"
-									>—</div
-								>
-								<div class="k">Position</div
-								><div
-									class="v"
-									id="v-pos"
-									>—</div
-								>
-								<div class="k">Club</div
-								><div
-									class="v"
-									id="v-club"
-									>Free Agent</div
-								>
-								<div class="k">League</div
-								><div
-									class="v"
-									id="v-league"
-									>—</div
-								>
-								<div class="k">Status</div
-								><div
-									class="v"
-									id="v-status"
-									>—</div
-								>
-								<div class="k">Contract</div
-								><div
-									class="v"
-									id="v-years"
-									>—</div
-								>
-							</div>
-						</div>
+          <section class="card">
+            <header class="card-header">
+              <h2 class="card-title">Event log</h2>
+              <button class="btn ghost small" data-action="clear-log">Clear</button>
+            </header>
+            <ol class="log" data-log></ol>
+          </section>
+        </section>
 
-						<div class="card">
-							<div class="h">Career</div>
-							<div class="kv">
-								<div class="k">Season</div
-								><div
-									class="v"
-									id="v-season"
-									>1</div
-								>
-								<div class="k">Week</div
-								><div
-									class="v"
-									id="v-week"
-									>1 / 38</div
-								>
-                                                                <div class="k">Overall</div
-                                                                ><div class="v">
-                                                                        <span id="v-overall">—</span>
-                                                                        <button class="btn small" id="btn-skills">Skills</button>
-                                                                </div>
-                                                                <div class="k skill-detail hidden">Shooting</div><div class="v skill-detail hidden" id="skill-shooting"></div>
-                                                                <div class="k skill-detail hidden">Passing</div><div class="v skill-detail hidden" id="skill-passing"></div>
-                                                                <div class="k skill-detail hidden">Dribbling</div><div class="v skill-detail hidden" id="skill-dribbling"></div>
-                                                                <div class="k skill-detail hidden">Defending</div><div class="v skill-detail hidden" id="skill-defending"></div>
-                                                                <div class="k skill-detail hidden">Pace</div><div class="v skill-detail hidden" id="skill-pace"></div>
-                                                                <div class="k skill-detail hidden">Physical</div><div class="v skill-detail hidden" id="skill-physical"></div>
-                                                                <div class="k skill-detail hidden">Goalkeeping</div><div class="v skill-detail hidden" id="skill-goalkeeping"></div>
-                                                                <div class="k">Play time</div
-								><div
-									class="v"
-									id="v-playtime"
-									>0 min</div
-								>
-								<div class="k">Salary</div
-								><div
-									class="v"
-									id="v-salary"
-									>£0 /week</div
-								>
-								<div class="k">Value</div
-								><div
-									class="v"
-									id="v-value"
-									>£0</div
-								>
-								<div class="k">Balance</div
-								><div
-									class="v"
-									id="v-balance"
-									>£0</div
-								>
-							</div>
-						</div>
+        <section class="view" data-view="calendar" hidden>
+          <header class="card-header">
+            <h2 class="card-title">Calendar</h2>
+            <div class="card-actions">
+              <button class="btn" data-action="prev-week">Previous week</button>
+              <button class="btn" data-action="next-week">Next week</button>
+            </div>
+          </header>
+          <div class="calendar" data-calendar></div>
+        </section>
 
-						<div class="card">
-							<div class="h">Actions</div>
-							<div class="row wrap">
-								<button
-									class="btn primary"
-									id="btn-market"
-									>🛒 Market</button
-								>
-								<button
-									class="btn primary"
-									id="btn-shop"
-									>🏪 Shop</button
-								>
-								<button
-									class="btn primary"
-									id="btn-train"
-									>🏋️‍♂️ Train</button
-								>
-								<button
-									class="btn primary"
-									id="btn-contract"
-									>📝 Contract</button
-								>
-								<button
-									class="btn primary"
-									id="btn-league"
-									>📊 Table</button
-								>
-							</div>
-							<div class="row wrap mt">
-								<button
-									class="btn danger"
-									id="btn-retire"
-									>👋 Retire</button
-								>
-							</div>
-						</div>
-					</div>
+        <section class="view" data-view="market" hidden>
+          <header class="card-header">
+            <h2 class="card-title">Transfer market</h2>
+          </header>
+          <div class="stack" data-market></div>
+        </section>
 
-					<div class="card">
-						<div class="h">This week</div>
-						<div
-							id="week-summary"
-							class="title sub"
-							>—</div
-						>
-						<div
-							class="row"
-							id="week-cta"></div>
+        <section class="view" data-view="shop" hidden>
+          <header class="card-header">
+            <h2 class="card-title">Player perks</h2>
+          </header>
+          <div class="stack" data-shop></div>
+        </section>
 
-						<div class="week-panel">
-							<div class="glass">
-								<div class="row spread center-v">
-									<div>
-										<div class="h">Calendar</div>
-										<div
-											class="muted"
-											id="date-label"
-											>—</div
-										>
-									</div>
-									<div class="row">
-										<button
-											class="btn"
-											id="btn-auto"
-											>Auto advance: Off</button
-										>
-										<button
-											class="btn primary"
-											id="btn-next"
-											>Next day</button
-										>
-										<button
-											class="btn primary"
-											id="btn-play"
-											disabled
-											>Play match</button
-										>
-									</div>
-								</div>
-								<div
-									class="calendar"
-									id="calendar"></div>
-							</div>
+        <section class="view" data-view="league" hidden>
+          <header class="card-header">
+            <h2 class="card-title">League table</h2>
+          </header>
+          <table class="table" data-league>
+            <thead>
+              <tr>
+                <th scope="col">Pos</th>
+                <th scope="col">Club</th>
+                <th scope="col">Pts</th>
+                <th scope="col">W</th>
+                <th scope="col">D</th>
+                <th scope="col">L</th>
+                <th scope="col">GD</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+      </section>
+    </main>
 
-							<div class="glass">
-								<div class="row spread center-v">
-									<div class="h">Event log</div>
-									<div class="row">
-										<button
-											class="btn ghost small"
-											id="btn-dev"
-											title="Developer tools"
-											>Dev</button
-										>
-										<button
-											class="btn ghost small"
-											id="btn-log"
-											title="Download log"
-											>⬇️</button
-										>
-									</div>
-								</div>
-								<div
-									id="live-log"
-									class="live-log muted"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
-		</main>
+    <dialog class="modal" data-modal="skills">
+      <form method="dialog" class="modal-content">
+        <header class="modal-header">
+          <h2>Skill breakdown</h2>
+          <button class="btn ghost" value="cancel">Close</button>
+        </header>
+        <dl class="kv" data-skill-breakdown></dl>
+      </form>
+    </dialog>
 
-		<footer class="container app-footer"><span class="app-version"></span> • pre-alpha • made for fun</footer>
+    <dialog class="modal" data-modal="match">
+      <form method="dialog" class="modal-content">
+        <header class="modal-header">
+          <h2 data-field="match-title">Match result</h2>
+        </header>
+        <div class="modal-body" data-match-summary></div>
+        <footer class="modal-footer">
+          <button class="btn primary" value="ok">Continue</button>
+        </footer>
+      </form>
+    </dialog>
 
-		<!-- Market modal -->
-		<dialog
-			id="market-modal"
-			class="modal">
-			<div class="sheet">
-				<header class="brand sheet-head">
-					<div class="logo"></div><h1 class="sheet-title">Transfer market</h1>
-					<button
-						class="btn ghost"
-						id="close-market"
-						>Close</button
-					>
-				</header>
-				<div class="content">
-					<div
-						id="market-info"
-						class="muted"></div>
-					<div
-						id="market-list"
-						class="row column"></div>
-					<div
-						id="market-empty"
-						class="muted hidden"
-						>No offers right now.</div
-					>
-				</div>
-			</div>
-		</dialog>
-
-		<!-- Match modal -->
-		<dialog
-			id="match-modal"
-			class="modal">
-			<div class="sheet">
-				<header class="brand sheet-head">
-					<div class="logo"></div><h1 class="sheet-title">Match day</h1>
-					<button
-						class="btn ghost"
-						id="close-match"
-						>Close</button
-					>
-				</header>
-				<div
-					class="content"
-					id="match-content"></div>
-			</div>
-		</dialog>
-
-		<!-- Training modal -->
-		<dialog
-			id="training-modal"
-			class="modal">
-			<div class="sheet">
-				<header class="brand sheet-head">
-					<div class="logo"></div><h1 class="sheet-title">Training</h1>
-					<button
-						class="btn ghost"
-						id="close-training"
-						>Close</button
-					>
-				</header>
-				<div
-					class="content"
-					id="training-content"></div>
-			</div>
-		</dialog>
-
-		<!-- Training cooldown modal -->
-		<dialog
-			id="cooldown-modal"
-			class="modal">
-			<div class="sheet">
-				<header class="brand sheet-head">
-					<div class="logo"></div><h1 class="sheet-title">Rest day</h1>
-					<button
-						class="btn ghost"
-						id="close-cooldown"
-						>Close</button
-					>
-				</header>
-				<div
-					class="content"
-					id="cooldown-content"></div>
-				<div class="content sheet-actions">
-					<button
-						class="btn primary"
-						id="cooldown-ok"
-						>OK</button
-					>
-				</div>
-			</div>
-		</dialog>
-
-		<!-- Shop modal -->
-		<dialog
-			id="shop-modal"
-			class="modal">
-			<div class="sheet">
-				<header class="brand sheet-head">
-					<div class="logo"></div><h1 class="sheet-title">Shop</h1>
-					<button
-						class="btn ghost"
-						id="close-shop"
-						>Close</button
-					>
-				</header>
-				<div
-					class="content"
-					id="shop-content"></div>
-			</div>
-		</dialog>
-
-                <!-- Contract modal -->
-                <dialog
-                        id="contract-modal"
-                        class="modal">
-			<div class="sheet">
-				<header class="brand sheet-head">
-					<div class="logo"></div><h1 class="sheet-title">Contract</h1>
-					<button
-						class="btn ghost"
-						id="close-contract"
-						>Close</button
-					>
-				</header>
-				<div class="content">
-					<div class="field">
-						<label for="contract-salary">Desired weekly salary?</label>
-						<input
-							type="range"
-							id="contract-salary" />
-						<div id="contract-salary-info"></div>
-					</div>
-					<div class="field">
-						<label>Contract years</label>
-						<div
-							id="contract-years"
-							class="row wrap"></div>
-					</div>
-					<div class="field">
-						<label>Status</label>
-						<div
-							id="contract-status"
-							class="row wrap"></div>
-					</div>
-					<div class="field">
-						<label>Time band</label>
-						<div
-							id="contract-time"
-							class="row wrap"></div>
-					</div>
-				</div>
-				<div class="content sheet-actions">
-					<button
-						class="btn ghost"
-						id="contract-cancel"
-						>Cancel</button
-					>
-					<button
-						class="btn primary"
-						id="contract-confirm"
-						>Submit</button
-					>
-				</div>
-			</div>
-                </dialog>
-
-                <!-- Renew Contract modal -->
-                <dialog
-                        id="renew-contract-modal"
-                        class="modal">
-                        <div class="sheet">
-                                <header class="brand sheet-head">
-                                        <div class="logo"></div><h1 class="sheet-title">Renew Contract</h1>
-                                        <button
-                                                class="btn ghost"
-                                                id="close-renew-contract"
-                                                >Close</button
-                                        >
-                                </header>
-                                <div
-                                        class="content row"
-                                        id="renew-contract-options">
-                                        <div class="row column col" id="renew-contract-current"></div>
-                                        <div class="row column col" id="renew-contract-rivals"></div>
-                                </div>
-                        </div>
-                </dialog>
-
-		<!-- League table modal -->
-		<dialog
-			id="league-modal"
-			class="modal">
-			<div class="sheet">
-				<header class="brand sheet-head">
-					<div class="logo"></div><h1 class="sheet-title">League table</h1>
-					<button
-						class="btn ghost"
-						id="close-league"
-						>Close</button
-					>
-				</header>
-				<div
-					class="content"
-					id="league-content"></div>
-			</div>
-		</dialog>
-
-		<!-- Retire modal -->
-		<dialog
-			id="retire-modal"
-			class="modal">
-			<div class="sheet">
-				<header class="brand sheet-head"> <div class="logo"></div><h1 class="sheet-title">Retire</h1> </header>
-				<div
-					class="content"
-					id="retire-content"></div>
-				<div class="content sheet-actions">
-					<button
-						class="btn ghost"
-						id="retire-cancel"
-						>Cancel</button
-					>
-					<button
-						class="btn danger"
-						id="retire-confirm"
-						>Confirm retire</button
-					>
-				</div>
-			</div>
-		</dialog>
-
-		<!-- Message modal -->
-		<dialog
-			id="message-modal"
-			class="modal">
-			<div class="sheet">
-				<header class="brand sheet-head">
-					<div class="logo"></div><h1 class="sheet-title">Manager message</h1>
-					<button
-						class="btn ghost"
-						id="close-message"
-						>✕</button
-					>
-				</header>
-				<div
-					class="content"
-					id="message-content"></div>
-				<div
-					class="content sheet-actions"
-					id="message-actions"></div>
-			</div>
-		</dialog>
-
-		<!-- Alert log modal -->
-		<dialog
-			id="alert-log-modal"
-			class="modal">
-			<div class="sheet">
-				<header class="brand sheet-head">
-					<div class="logo"></div><h1 class="sheet-title">Alert log</h1>
-					<button
-						class="btn ghost"
-						id="close-alert-log"
-						>Close</button
-					>
-				</header>
-				<div class="content">
-					<div
-						id="alert-log"
-						class="live-log"></div>
-				</div>
-			</div>
-		</dialog>
-
-		<!-- Developer tools modal -->
-		<dialog
-			id="dev-modal"
-			class="modal">
-			<div class="sheet">
-				<header class="brand sheet-head">
-					<div class="logo"></div><h1 class="sheet-title">Developer tools</h1>
-					<button
-						class="btn ghost"
-						id="close-dev"
-						>Close</button
-					>
-				</header>
-				<div class="content">
-					<div class="row column">
-						<button
-							class="btn"
-							id="dev-injure"
-							>Injure player (7d)</button
-						>
-						<button
-							class="btn"
-							id="dev-heal"
-							>Heal player</button
-						>
-						<button
-							class="btn"
-							id="dev-loan"
-							>Request loan</button
-						>
-						<button
-							class="btn"
-							id="dev-offers"
-							>Transfer offers</button
-						>
-						<button
-							class="btn"
-							id="dev-skip-month"
-							>Skip month</button
-						>
-						<button
-							class="btn"
-							id="dev-skip-season"
-							>Skip season</button
-						>
-						<button
-							class="btn"
-							id="dev-force-season"
-							>Start next season</button
-						>
-						<div class="row">
-							<input
-								id="dev-balance"
-								type="number"
-								placeholder="Balance (£)" />
-							<button
-								class="btn"
-								id="dev-set-balance"
-								>Set balance</button
-							>
-						</div>
-						<div class="row">
-							<input
-								id="dev-overall"
-								type="number"
-								placeholder="Overall" />
-							<button
-								class="btn"
-								id="dev-set-overall"
-								>Set overall</button
-							>
-						</div>
-					</div>
-				</div>
-			</div>
-		</dialog>
-	</body>
+    <dialog class="modal" data-modal="contract">
+      <form method="dialog" class="modal-content">
+        <header class="modal-header">
+          <h2>Contract offer</h2>
+        </header>
+        <div class="modal-body" data-contract-details></div>
+        <footer class="modal-footer">
+          <button class="btn ghost" value="reject">Reject</button>
+          <button class="btn primary" value="accept">Sign contract</button>
+        </footer>
+      </form>
+    </dialog>
+  </body>
 </html>
