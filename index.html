@@ -1,175 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0" />
-		<title>WebCareerGame – Build Your Football Story</title>
-		<link
-			rel="stylesheet"
-			href="landing.css" />
-		<script
-                        src="js/countries.js"
-                        defer></script>
-                <script
-                        src="js/landing.js"
-                        defer></script>
-	</head>
-	<body>
-		<header class="site-header">
-			<div class="container row between">
-				<div
-					class="logo"
-					aria-hidden="true"
-					>⚽</div
-				>
-				<nav class="nav">
-					<a href="#features">Features</a>
-					<a
-						href="#setup"
-						class="btn primary"
-						>Play now</a
-					>
-				</nav>
-			</div>
-		</header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebCareerGame · Craft Your Football Story</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles/landing.css" />
+    <script type="module" src="scripts/landing.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <div class="brand" aria-label="WebCareerGame">
+          <span class="brand-icon" aria-hidden="true">⚽</span>
+          <span class="brand-name">WebCareerGame</span>
+        </div>
+        <nav class="nav" aria-label="Primary">
+          <a href="#features">Features</a>
+          <a href="#setup">Create Player</a>
+          <a
+            class="btn primary"
+            href="#setup"
+            data-start
+          >Start now</a>
+        </nav>
+      </div>
+    </header>
 
-		<main>
-			<section class="hero">
-				<div class="container">
-					<h1>Craft Your Football Legacy</h1>
-					<p>Start as a free agent and train hard to reach the top.</p>
-					<div class="cta-buttons">
-						<a
-							href="#setup"
-							class="btn primary big"
-							>Player Career</a
-						>
-					</div>
-				</div>
-			</section>
+    <main>
+      <section class="hero" id="top">
+        <div class="container hero-inner">
+          <div class="hero-copy">
+            <p class="eyebrow">Interactive football career simulator</p>
+            <h1>Write the story of a future superstar.</h1>
+            <p class="lede">
+              Start as a 16 year old free agent, master your training routine and earn contracts across Europe’s top leagues. Everything happens straight in your browser – no installs, no accounts, just the beautiful game.
+            </p>
+            <div class="cta-row">
+              <a class="btn primary" href="#setup">Create your pro</a>
+              <a class="btn ghost" href="game.html">Continue career</a>
+            </div>
+          </div>
+          <div class="hero-card" aria-hidden="true">
+            <div class="card-header">
+              <span class="pill">Pre-season</span>
+              <span class="pill primary">v1.0</span>
+            </div>
+            <div class="card-body">
+              <p class="card-lede">Every choice matters:</p>
+              <ul class="card-list">
+                <li>Pick your roots and represent your nation.</li>
+                <li>Balance training, fatigue and market hype.</li>
+                <li>Climb from academy pitches to European nights.</li>
+              </ul>
+              <p class="card-foot">Fully rewritten for blazing fast loads and smoother play.</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-			<section
-				id="features"
-				class="features container">
-				<h2>What you'll do</h2>
-				<div class="grid">
-					<div class="feature">
-						<div class="icon">🎮</div>
-						<h3>Play Matches</h3>
-						<p>Test your skills and earn minutes on the pitch.</p>
-					</div>
-					<div class="feature">
-						<div class="icon">📈</div>
-						<h3>Grow Your Player</h3>
-						<p>Train every day to improve your overall rating.</p>
-					</div>
-                                        <div class="feature">
-                                                <div class="icon">🏆</div>
-                                                <h3>Reach the Top</h3>
-                                                <p>Sign contracts and climb the leagues as a pro.</p>
-                                        </div>
-                                        <div class="feature">
-                                                <div class="icon">🌍</div>
-                                                <h3>Represent Your Nation</h3>
-                                                <p>Choose your homeland and wear it with pride.</p>
-                                        </div>
-                                </div>
-                        </section>
+      <section class="section" id="features">
+        <div class="container">
+          <h2>Built for repeatable football drama</h2>
+          <div class="feature-grid">
+            <article class="feature">
+              <div class="feature-icon" aria-hidden="true">🎮</div>
+              <h3>Playable match moments</h3>
+              <p>Take control when it matters: penalty shoot-outs, last minute corners and crucial saves determine your legacy.</p>
+            </article>
+            <article class="feature">
+              <div class="feature-icon" aria-hidden="true">📈</div>
+              <h3>Living progression</h3>
+              <p>Train, invest and unlock perks that shape your attributes every season.</p>
+            </article>
+            <article class="feature">
+              <div class="feature-icon" aria-hidden="true">📝</div>
+              <h3>Dynamic contract market</h3>
+              <p>Negotiate deals, release clauses and performance bonuses as your reputation grows.</p>
+            </article>
+            <article class="feature">
+              <div class="feature-icon" aria-hidden="true">🌍</div>
+              <h3>Global identity</h3>
+              <p>Choose your homeland and chase call-ups for continental glory.</p>
+            </article>
+          </div>
+        </div>
+      </section>
 
-                        <section
-                                id="setup"
-                                class="setup container">
-                                <h2>Player setup</h2>
-                                <form id="setup-form">
-					<div class="field"
-						><label for="name">Player name</label
-						><input
-							id="name"
-							class="input"
-							required
-							placeholder="Your name"
-							maxlength="24"
-					/></div>
-					<div class="field"
-						><label for="age">Age</label
-						><input
-							id="age"
-							class="input"
-							type="number"
-							min="16"
-							max="40"
-							value="16" /><div class="muted hint">start at 16 for free agent intro</div></div
-					>
-                                        <div class="field"
-                                                ><label for="continent">Continent</label>
-                                                <select id="continent">
-                                                        <option>Europe</option
-                                                        ><option>South America</option
-                                                        ><option>North America</option
-                                                        ><option>Africa</option
-                                                        ><option>Asia</option
-                                                        ><option>Oceania</option>
-                                                </select>
-                                        </div>
-                                        <div class="field"
-                                                ><label for="country">Country</label>
-                                                <select id="country"></select>
-                                        </div>
-                                        <div class="field"
-                                                ><label>Position</label>
-                                                <div class="row wrap">
-                                                        <label class="pill radio"
-								><input
-									type="radio"
-									name="pos"
-									value="Attacker"
-									checked />
-								Attacker</label
-							>
-							<label class="pill radio"
-								><input
-									type="radio"
-									name="pos"
-									value="Midfield" />
-								Midfield</label
-							>
-							<label class="pill radio"
-								><input
-									type="radio"
-									name="pos"
-									value="Defender" />
-								Defender</label
-							>
-							<label class="pill radio"
-								><input
-									type="radio"
-									name="pos"
-									value="Goalkeeper" />
-								Goalkeeper</label
-							>
-						</div>
-					</div>
-					<label class="pill checkbox"
-						><input
-							type="checkbox"
-							id="always-play" />
-						Always play</label
-					>
-					<div class="row end mt">
-						<button
-							class="btn primary"
-							type="submit"
-							>Start career</button
-						>
-					</div>
-				</form>
-			</section>
-		</main>
+      <section class="section alt" id="setup">
+        <div class="container setup-grid">
+          <header class="section-header">
+            <h2>Create your player</h2>
+            <p>We only ask for the essentials. Everything else unfolds in-game.</p>
+          </header>
+          <form class="card form" id="setup-form" novalidate>
+            <div class="field">
+              <label for="name">Player name</label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autocomplete="name"
+                placeholder="Taylor Adams"
+                maxlength="24"
+                required
+              />
+              <p class="hint">Use your real name or invent a legend.</p>
+            </div>
 
-		<footer class="site-footer">
-			<div class="container"> © 2025 WebCareerGame </div>
-		</footer>
-	</body>
+            <div class="field">
+              <label for="age">Starting age</label>
+              <input
+                id="age"
+                name="age"
+                type="number"
+                min="16"
+                max="40"
+                value="16"
+                required
+              />
+              <p class="hint">Younger players develop faster but attract smaller wages.</p>
+            </div>
+
+            <div class="field">
+              <label for="continent">Continent</label>
+              <select id="continent" name="continent" required></select>
+            </div>
+
+            <div class="field">
+              <label for="country">Country</label>
+              <select id="country" name="country" required></select>
+            </div>
+
+            <fieldset class="field">
+              <legend>Preferred position</legend>
+              <div class="pill-group" role="radiogroup" aria-label="Position">
+                <label class="pill">
+                  <input type="radio" name="pos" value="Forward" checked />
+                  Forward
+                </label>
+                <label class="pill">
+                  <input type="radio" name="pos" value="Midfielder" />
+                  Midfielder
+                </label>
+                <label class="pill">
+                  <input type="radio" name="pos" value="Defender" />
+                  Defender
+                </label>
+                <label class="pill">
+                  <input type="radio" name="pos" value="Goalkeeper" />
+                  Goalkeeper
+                </label>
+              </div>
+            </fieldset>
+
+            <label class="pill checkbox">
+              <input type="checkbox" id="always-play" name="alwaysPlay" />
+              Always start competitive matches
+            </label>
+
+            <footer class="form-footer">
+              <button class="btn primary" type="submit">Start career</button>
+              <p class="form-status" role="status" aria-live="polite"></p>
+            </footer>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> WebCareerGame. Rebuilt from the ground up for fast, accessible play.</p>
+      </div>
+    </footer>
+  </body>
 </html>
